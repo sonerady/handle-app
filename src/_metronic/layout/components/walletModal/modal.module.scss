@@ -1,0 +1,250 @@
+.modalBody {
+  .modalContentWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  gap: 2rem;
+  display: flex;
+  align-items: center;
+  width: 842px !important;
+  justify-content: space-between;
+  padding-left: 0 !important;
+  .bottomModal {
+    width: 433px;
+    margin-top: 1.5rem;
+    .emailWrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+      .inputContainer {
+        display: flex;
+        align-items: center;
+      }
+      
+      .inputContainer input {
+        margin-right: 10px;
+        position: relative;
+      }
+      .loginButton {
+        background: var(--pink-gradient, linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%));
+        width: 80px;
+        height: 40px;
+        border: none!important;
+        border-radius: 8px !important;
+        transition: all 0.1s ease-in-out;
+        color: #151517;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 24px;
+        position: absolute;
+        margin-left: 340px;
+        margin-bottom: 35px;
+        padding: auto;
+    
+     
+
+        &:hover {
+          opacity: 0.9;
+        }
+      }
+      input {
+        padding: 0 1rem !important;
+        border: 1px solid var(--neutral-light, #898990);
+        background: var(--neutral-white, #fff);
+        width: 100%;
+        width: 433px;
+        height: 50px;
+        border-radius: 5px !important;
+        &:focus {
+          border: none;
+        }
+      }
+    }
+    p {
+      position: relative;
+      z-index: 999;
+      &::after {
+        content: '';
+        display: block;
+        width: 124px;
+        position: absolute;
+        height: 1px;
+        top: 50%;
+        z-index: 1;
+        left: 0;
+        background-color: #ffffff;
+      }
+      &::before {
+        content: '';
+        right: 0;
+        display: block;
+        width: 124px;
+        position: absolute;
+        height: 1px;
+        top: 50%;
+        z-index: 1;
+        background-color: #ffffff;
+      }
+    }
+  }
+  p,
+  h3 {
+    text-align: center;
+  }
+  h3 {
+    color: #fff;
+    text-align: center;
+    font-size: 21.33px;
+    font-weight: 700;
+    line-height: 31px;
+  }
+  .modalButtons {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    .googleButton {
+      padding: 0 !important;
+    }
+    .buttonContent {
+      width: 200px;
+      display: flex;
+      gap: 1rem;
+      align-items: center !important;
+    }
+    button {
+      &:hover {
+        opacity: 0.9;
+      }
+      transition: all 0.1s ease-in-out;
+      display: flex;
+      border-radius: 5px !important;
+      border: 1px solid var(--neutral-light, #898990);
+      background: var(--neutral-white, #fff);
+      gap: 1rem;
+      align-items: center;
+      padding: 0rem !important;
+      color: #161617 !important;
+      width: 433px;
+      height: 50px;
+      justify-content: center;
+      white-space: nowrap;
+      text-align: center;
+      font-weight: 700 !important;
+      line-height: 24px;
+    }
+  }
+
+  .discordIcon {
+    font-size: 32px;
+    color: #7289da;
+  }
+}
+.modalWrapper {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  z-index: 99999;
+  left: 0;
+  right: 0;
+  display: flex;
+  backdrop-filter: blur(5px);
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  .modalContent {
+    padding: 20px;
+    padding-top: 0 !important;
+    background: #ffffff;
+    position: relative;
+    border-radius: 10px;
+    max-width: 80%;
+    min-width: 568px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+    justify-content: space-between;
+    .closeButton {
+      position: absolute;
+      right: 5px;
+      color: #24244e;
+      cursor: pointer;
+      font-size: 2rem;
+      top: 0px;
+    }
+    .topContent {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100px;
+      width: 100%;
+      align-items: center;
+      label {
+        margin-top: 5px;
+      }
+      .metamaskConnect {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        border-bottom: 1px solid rgba(128, 128, 128, 0.738);
+        width: 100%;
+        padding: 15px 0px;
+      }
+    }
+    .bottomContent {
+      width: 100%;
+      form {
+        display: flex;
+        gap: 2rem;
+        flex-direction: column;
+        align-items: center;
+        strong {
+          cursor: pointer;
+          transition: all 0.3s ease-in-out;
+          &:hover {
+            opacity: 0.8;
+          }
+        }
+      }
+    }
+    .submitButton {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 1rem;
+    }
+  }
+}
+.authText {
+  text-align:right;
+
+  a {
+    text-transform: none !important;
+  }
+}
+.downloadMetamask,
+.signUp,
+.login {
+  cursor: pointer;
+  font-weight: bold;
+  border-image-source: linear-gradient(to left, #ff9085 30%, #fb6fbb 99%);
+  background-image: linear-gradient(to left, #ff9085 30%, #fb6fbb 99%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

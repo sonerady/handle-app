@@ -1,0 +1,19 @@
+.container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #78bd67;
+    .icon {
+      font-size: 11rem;
+    }
+    .mailText {
+      font-size: 2rem;
+    }
+  }
+}

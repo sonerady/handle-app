@@ -1,0 +1,33 @@
+[33maff4467[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m HEAD@{0}: reset: moving to HEAD~2
+[33m6add3e9[m HEAD@{1}: reset: moving to HEAD~3
+[33m71d169c[m HEAD@{2}: commit: fixed
+[33m4c87315[m HEAD@{3}: reset: moving to HEAD^
+[33mfda76ba[m HEAD@{4}: commit: fixed
+[33m4c87315[m HEAD@{5}: commit: fixed
+[33m2434dfe[m HEAD@{6}: commit: fixed
+[33m6add3e9[m HEAD@{7}: commit (merge): fixed
+[33mc94fb83[m HEAD@{8}: commit: fixed
+[33maff4467[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m HEAD@{9}: commit (merge): fixed
+[33mf20a112[m HEAD@{10}: commit: fixed
+[33ma818ef9[m HEAD@{11}: commit: fixed
+[33m32840a8[m HEAD@{12}: pull: Merge made by the 'ort' strategy.
+[33m4161b71[m HEAD@{13}: commit: fixed
+[33m7b6f74c[m HEAD@{14}: commit: fixed
+[33mc80df86[m HEAD@{15}: pull: Fast-forward
+[33m305f9e2[m HEAD@{16}: commit: crop issue fixed
+[33m42a4374[m HEAD@{17}: commit: fixed
+[33m142bcbc[m HEAD@{18}: commit: fixed
+[33m652e76a[m HEAD@{19}: commit (merge): Merge branch 'main' of https://github.com/sonerady/hypergpt_new
+[33mc8969d8[m HEAD@{20}: commit: fixedd
+[33m12fb753[m HEAD@{21}: pull: Merge made by the 'ort' strategy.
+[33mc1b4320[m HEAD@{22}: commit: fixed login and register
+[33m179fd42[m HEAD@{23}: commit: fixed
+[33mbd68a89[m HEAD@{24}: commit: fixed
+[33m797dc30[m HEAD@{25}: commit: fixed
+[33mfe427c5[m HEAD@{26}: pull: Merge made by the 'ort' strategy.
+[33mf82a82d[m HEAD@{27}: commit: fixd
+[33md7b09c7[m HEAD@{28}: commit: fixed
+[33m96171e4[m HEAD@{29}: commit: fixedddddd
+[33m2f68742[m HEAD@{30}: commit: fixed
+[33m8c1ee33[m HEAD@{31}: Branch: renamed refs/heads/master to refs/heads/main
+[33m8c1ee33[m HEAD@{33}: commit (initial): fixed

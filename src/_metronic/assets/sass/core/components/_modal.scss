@@ -1,0 +1,20 @@
+//
+// Modal
+//
+
+.modal-rounded {
+  border-radius: $modal-content-border-radius !important;
+}
+.modal-dialog {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem !important;
+}
+.modal-content {
+  border: none !important;
+  width: 1300px !important;
+}
+.modal-header {
+  border: none !important;
+}

@@ -1,0 +1,57 @@
+.content {
+  height: 100%;
+  padding: 1rem;
+  padding-bottom: 0rem;
+  padding-top: 0rem;
+  padding-left: 1rem;
+  margin-left: 1rem;
+  margin-top: 70px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  .closeBtn {
+    position: absolute;
+    left: 10px;
+    top: -16px;
+    font-size: 3rem;
+    opacity: 0.5;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    &:hover {
+      opacity: 1;
+    }
+  }
+  .contentItem {
+    .chatHistory {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      width: 100%;
+      .userPrompt,
+      .responsePrompt {
+        width: 100%;
+        display: flex;
+        align-items: start;
+        .userPromptSpan,
+        .responsePromptSpan {
+          padding: 5px;
+          display: flex;
+          align-items: center;
+          background: rgba(165, 146, 234, 0.1294117647);
+          min-height: 40px;
+          font-weight: 500;
+          border-radius: 8px;
+          width: 100%;
+        }
+      }
+      .responsePrompt {
+        .responsePromptSpan {
+          background-color: rgba(234, 155, 146, 0.13) !important;
+          p {
+            margin-bottom: 0 !important;
+          }
+        }
+      }
+    }
+  }
+}

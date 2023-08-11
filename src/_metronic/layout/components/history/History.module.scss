@@ -1,0 +1,95 @@
+.show {
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  background-color: transparent;
+  border: 3px solid #fb72b7 !important;
+  height: 100%;
+  padding: 1rem;
+  backdrop-filter: blur(30px);
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+  border-radius: 0.5rem;
+  .header {
+    color: red;
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    span {
+      display: none;
+      position: fixed;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      width: fit-content;
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+.container {
+  overflow-y: scroll;
+  .icon {
+    font-size: 4.5rem;
+    background-color: #232325;
+    width: 3.5rem;
+    height: 3.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+    border-radius: 50%;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+
+.modal {
+  .itemWrapper {
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    .item {
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(128, 128, 128, 0.212);
+      padding: 5px;
+      transition: all 0.2s ease-in-out;
+      &:hover {
+        border: 1px solid #373b71;
+        background-color: #f5f5fc;
+      }
+      .imageWrapper {
+        display: flex;
+        gap: 1rem;
+        .textWrapper {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          font-size: 1rem !important;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+      span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+      }
+      span:nth-child(2) {
+        font-size: 10px;
+        color: gray;
+      }
+    }
+  }
+}

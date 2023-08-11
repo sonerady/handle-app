@@ -1,0 +1,58 @@
+.title {
+  //   margin-bottom: 2rem;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 30px;
+  color: #ffffff;
+}
+button {
+  max-height: 50px;
+}
+.discordButton {
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #898990;
+  background: #fff;
+  &:hover {
+    background-color: #fff !important;
+    opacity: 0.8;
+  }
+  .googleButton {
+    background: none !important;
+    border: none;
+    height: 50px;
+  }
+  .buttonContent {
+    align-items: center;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    display: flex;
+    .btnText {
+      color: #000 !important;
+      text-align: center;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 24px;
+    }
+    .discordIcon {
+      font-size: 32px;
+      color: #5865f2;
+    }
+  }
+}
+.loadingWrapper {
+  background-color: rgba(56, 4, 43, 0.085);
+  height: 100vh;
+  backdrop-filter: blur(20px);
+  width: 100%;
+  position: fixed;
+  top: 0;
+  z-index: 99999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

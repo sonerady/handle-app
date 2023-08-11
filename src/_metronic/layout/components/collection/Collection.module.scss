@@ -1,0 +1,26 @@
+.container {
+  margin-left: 2.5rem;
+
+  .addButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    gap: 5px;
+    border: 1px solid #26264f;
+    border-radius: 2rem;
+    color: #26264f;
+    font-weight: 500;
+  }
+  .title {
+    font-weight: 500;
+    font-size: 20px;
+    color: #26264f;
+    margin-bottom: 1rem;
+    display: flex;
+  }
+  .collectionContainer {
+    display: flex;
+    gap: 1rem;
+  }
+}

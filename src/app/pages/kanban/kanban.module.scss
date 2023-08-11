@@ -1,0 +1,153 @@
+.scaleButtons {
+  width: fit-content !important;
+  display: flex;
+  justify-content: space-between;
+  border: 2px solid gray;
+  width: fit-content;
+  position: fixed;
+  right: 15px;
+  margin-top: 15px;
+  border-radius: 5px;
+  height: 25px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+  gap: 2rem;
+  z-index: 9999;
+  width: 110px;
+  align-items: center;
+  padding: 0 !important;
+  span {
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  p {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 10px;
+    font-weight: bold;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.arrow {
+  width: 150px;
+  position: absolute;
+  top: 20px;
+  right: -160px;
+  opacity: 0.6;
+}
+.taskContent {
+  display: flex;
+  gap: 1rem;
+  img {
+    width: 50%;
+    border-radius: 0.5rem;
+    flex: 1;
+  }
+  p {
+    flex: 1;
+    text-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 0px !important;
+  }
+}
+
+.closeIcon {
+  font-size: 1.5rem;
+  cursor: pointer;
+  position: relative;
+  bottom: 0.6rem;
+  color: #fb6fbb;
+  transition: all 0.5s ease-in-out;
+  &:hover {
+    scale: 1.1;
+  }
+}
+
+.columnTool {
+  backdrop-filter: blur(2px);
+  background-color: yellow;
+  font-size: 2.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+  position: absolute;
+  right: -50px;
+  top: 0;
+  padding: 2px;
+  border: 2px solid #6c55dc;
+  border-radius: 5px;
+  background-color: #8874e947;
+  transition: all 0.5s ease-in-out;
+  svg {
+    cursor: pointer;
+    &:hover {
+      scale: 1.1;
+    }
+  }
+}
+.colorPicker {
+  position: absolute;
+  right: -310px;
+  top: -75px;
+  border: 2px dashed #6c55dc;
+  border-radius: 10px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.bottomArrow,
+.rightArrow {
+  p {
+    margin: 0 !important;
+    svg {
+      background-color: #5df3b0 !important;
+      border-radius: 3px;
+    }
+  }
+  position: absolute;
+  svg {
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+    &:hover {
+      scale: 1.1;
+    }
+  }
+}
+
+.bottomArrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  bottom: -30px;
+  font-size: 1.7rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.rightArrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  right: -54px;
+  top: 50%;
+  transform: translateX(-50%);
+  gap: 12px;
+}
+
+.arrowOther {
+  border-radius: 8px;
+}
