@@ -22,8 +22,6 @@ const MailVerification = () => {
         setMessage(
           'Your account has been successfully activated. You are being redirected to the homepage.'
         )
-
-        setTimeout(() => navigate('/marketplace'), 6000)
       } else {
         setMessage('Verification failed')
       }

@@ -26,6 +26,7 @@ export const TokenProvider = ({children}) => {
   const [isLoadingBotResponse, setIsLoadingBotResponse] = useState(false)
   const [isLoginMetamask, setIsLoginMetamask] = useState(false)
   const [account, setAccount] = useState('')
+  const [showAnnouncement, setShowAnnouncement] = useState(false)
   const [balance, setBalance] = useState(0)
   const [hgptBalance, setHgptBalance] = useState(0)
   const [showPopup, setShowPopup] = useState(false)
@@ -316,6 +317,8 @@ export const TokenProvider = ({children}) => {
         setIsLoginMetamask,
         isValidate,
         setIsValidate,
+        showAnnouncement,
+        setShowAnnouncement,
       }}
     >
       {children}

@@ -108,7 +108,13 @@ const CustomModal: FC<ModalProps> = ({children, openModal}) => {
   return (
     <div className={styles.discordButton}>
       {isGoogleLogin ? (
-        <button className={styles.googleButton} onClick={handleLogout}>
+        <button
+          style={{
+            width: '100%',
+          }}
+          className={styles.googleButton}
+          onClick={handleLogout}
+        >
           <div className={styles.buttonContent}>
             <img src={google} alt='' />
             <span className={styles.btnText}>Sign out from Google</span>

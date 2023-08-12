@@ -29,6 +29,8 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
 
   const isLoginMetamask = localStorage.getItem('metamaskAccount')
 
+  const [isLogin, setIsLogin] = useState(false)
+
   const navigate = useNavigate()
 
   const connectToMetaMask = async () => {
@@ -43,6 +45,10 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
       const metamask = await connectMetamaskAccount(accounts[0])
       if (metamask.Status === 200) {
         setLoginMetamask(true)
+        setIsLogin(true)
+        toast.success('Metamask connected successfully')
+      } else {
+        toast.error(metamask.Description)
       }
     } catch (error) {
       setErrorMessage(
@@ -143,11 +149,11 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
           padding: 'calc(0.775rem + 1px) calc(1.5rem + 1px)',
         }}
         onClick={() => {
-          !profileAccount ? connectToMetaMask() : logoutFromMetaMask()
+          !profileAccount || !isLogin ? connectToMetaMask() : logoutFromMetaMask()
         }}
       >
         <img src={metamask} />
-        {!profileAccount ? title : 'Sign out from Metamask'}
+        {!profileAccount || !isLogin ? title : 'Sign out from Metamask'}
       </div>
     </div>
   )

@@ -14,6 +14,7 @@ import AlertImage from '../_metronic/assets/alert.jpg'
 import ModalOther from '../_metronic/layout/components/walletModal/walletModal'
 import {toast} from 'react-toastify'
 import CustomModal from '../_metronic/layout/components/walletModal/walletModal'
+import {sign} from 'crypto'
 
 const App = () => {
   const {
@@ -62,6 +63,8 @@ const App = () => {
     setUserIsVerified,
     validUsername,
     validEmail,
+    showAnnouncement,
+    setShowAnnouncement,
   } = useGlobal()
   const {getRole, getUserId, updateUser, getUserInfo, getTokenBalance} = useAuthService()
   const [loading, setLoading] = useState(false)
@@ -155,7 +158,7 @@ const App = () => {
         metamask: metamask || 'None',
         discordToken: discordAccessToken || 'None',
         gmailToken: googleAccessToken || 'None',
-        icon: avatarUrl || 'None',
+        icon: 'None',
         valid: true,
       }
 
@@ -250,11 +253,14 @@ const App = () => {
             } else if (signupResponse && signupResponse.access_token) {
               getUserId(signupResponse.access_token)
               setAccessToken(signupResponse.access_token)
+              if (signupResponse.is_verified === true) {
+                setShowAnnouncement(true)
+                localStorage.setItem('isVerifiedUser', signupResponse.is_verified)
+              }
               localStorage.setItem('accessTokenMarketplace', signupResponse.access_token)
               localStorage.setItem('login', 'success')
               localStorage.setItem('avatarUrl', avatarUrl)
               localStorage.setItem('userName', userName)
-              localStorage.setItem('isVerifiedUser', signupResponse.is_verified)
               setIsLoginMetamask(true)
               setUserIsVerified(signupResponse.is_verified)
               if (discordAccessToken) {

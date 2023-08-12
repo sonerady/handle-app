@@ -641,6 +641,8 @@ export const useAuthService = () => {
           'Content-Type': 'application/json',
         },
       })
+      localStorage.setItem('isVerifiedUser', 'true')
+
       return response.data
     } catch (error) {
       setShowErrorImage(true)
@@ -840,6 +842,20 @@ export const useAuthService = () => {
   }
 
   const googleLogout = async (gmail_token) => {
+    try {
+      const response = await api.post(
+        `/gmail_user/logout?token=${accessToken}&gmail_token=${gmail_token}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      return response.data
+    } catch (error) {}
+  }
+
+  const discordLogout = async (gmail_token) => {
     try {
       const response = await api.post(
         `/gmail_user/logout?token=${accessToken}&gmail_token=${gmail_token}`,
@@ -1534,5 +1550,6 @@ export const useAuthService = () => {
     connectGoogleAccount,
     connectMetamaskAccount,
     getTokenBalance,
+    discordLogout,
   }
 }

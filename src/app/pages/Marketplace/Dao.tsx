@@ -523,10 +523,10 @@ const Collection: React.FC<CollectionProps> = () => {
                             </li>
                             <li title={app.name}>{truncate(app.name, 20)}</li>
                             <li title={app.title}>{truncate(app.title, 20)}</li>
-                            <li
+                            <div
                               title={app.description}
                               dangerouslySetInnerHTML={{__html: truncate(app.description, 20)}}
-                            ></li>
+                            />
                           </ul>
                         </div>
                       ))
@@ -552,11 +552,13 @@ const Collection: React.FC<CollectionProps> = () => {
                             <li title={app.name}>{truncate(app.name, 20)}</li>
                             <li
                               title={app.description}
-                              dangerouslySetInnerHTML={{__html: truncate(app.description, 20)}}
+                              dangerouslySetInnerHTML={{__html: truncate(app.title, 20)}}
                             ></li>
 
                             <li title={app.content}>
-                              <div dangerouslySetInnerHTML={{__html: truncate(app.content, 20)}} />
+                              <div
+                                dangerouslySetInnerHTML={{__html: truncate(app.description, 20)}}
+                              />
                             </li>
                           </ul>
                         </div>
@@ -592,13 +594,13 @@ const Collection: React.FC<CollectionProps> = () => {
                               {moment(app.created_at).format('DD.MM.YYYY')}
                             </li>
                             <li title={app.name}>{truncate(app.name, 20)}</li>
+                            <li title={app.title}>
+                              <div dangerouslySetInnerHTML={{__html: truncate(app.title, 20)}} />
+                            </li>
                             <li title={app.description}>
                               <div
                                 dangerouslySetInnerHTML={{__html: truncate(app.description, 20)}}
                               />
-                            </li>
-                            <li title={app.content}>
-                              <div dangerouslySetInnerHTML={{__html: truncate(app.content, 20)}} />
                             </li>
                             <span
                               onClick={() => {

@@ -154,9 +154,6 @@ const ApproveComments: React.FC<ApproveCommentsProps> = ({
           <Form.Control type='text' value={inputValue} onChange={handleChange} />
         </Modal.Body>
         <Modal.Footer>
-          <div className={`${styles.saveButton} ${styles.closeButton}`} onClick={handleClose}>
-            Close
-          </div>
           <div className={styles.saveButton} onClick={handleSave}>
             Save
           </div>

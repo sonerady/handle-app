@@ -19,6 +19,7 @@ const MailVerification = () => {
     async function verify() {
       const result = await verification(url_safe, token)
       if (result?.status === 200) {
+        localStorage.setItem('isVerifiedUser', 'true')
         setMessage(
           'Your account has been successfully activated. You are being redirected to the homepage.'
         )

@@ -184,12 +184,6 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
           <Form.Control type='text' value={inputValue} onChange={handleChange} />
         </Modal.Body>
         <Modal.Footer>
-          <div
-            className={`${styles.saveButton} ${styles.closeButton}`}
-            onClick={handleCloseRejectModal}
-          >
-            Close
-          </div>
           <div className={styles.saveButton} onClick={handleReject}>
             Save
           </div>
