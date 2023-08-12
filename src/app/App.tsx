@@ -112,7 +112,7 @@ const App = () => {
       queryString += `discord_token=${discord_token ? discord_token : ''}&`
       queryString += `gmail_token=${gmail_token ? gmail_token : ''}&`
       queryString += `icon=${icon ? icon : ''}&`
-      queryString += `username=${username ? username : ''}&`
+      queryString += `username=None&`
       queryString += `discord_id=${discord_id ? discord_id : ''}&`
       queryString += `discord_username=${discord_username ? discord_username : ''}&`
       queryString += `gmail_username=${gmail_username ? gmail_username : ''}&`
@@ -188,7 +188,7 @@ const App = () => {
       }
       try {
         if (
-          (discordAccessToken && avatarUrl && userName && discordID) ||
+          (discordAccessToken && avatarUrl && discordID) ||
           metamaskAccessToken ||
           googleAccessToken ||
           mailAccessToken
@@ -199,7 +199,7 @@ const App = () => {
             discordAccessToken, // 4
             googleAccessToken, // 5
             avatarUrl, // 6
-            userName, // 7
+            'None', // 7
             discordID, // 8
             discordUsername, // 9
             gmailUsername, // 10

@@ -207,7 +207,7 @@ const CustomModal: FC<ModalProps> = ({children, openModal, setOpenModal}) => {
               headers: {authorization: `Bearer ${accessToken}`},
             })
             const user = await userInfoResponse.json()
-            setUserName(user.username)
+
             let avatarURL
             if (user.avatar) {
               avatarURL = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
