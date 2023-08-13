@@ -104,7 +104,12 @@ const ApproveApp: FC<ApproveAppProps> = ({
         show={show}
         onHide={handleClose}
       >
-        <Modal.Header closeButton>
+        <Modal.Header
+          style={{
+            background: '#161617',
+          }}
+          closeButton
+        >
           <Modal.Title>
             Review App{' '}
             <span
@@ -123,7 +128,11 @@ const ApproveApp: FC<ApproveAppProps> = ({
             </span>
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body
+          style={{
+            background: '#161617',
+          }}
+        >
           <Review
             handleClose={handleClose}
             waitingApps={waitingApps}

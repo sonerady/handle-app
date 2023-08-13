@@ -232,7 +232,9 @@
 }
 .countdown {
   display: flex;
-  flex-direction: column;
+  .tire {
+    margin: 0rem 1rem;
+  }
   .countdownText {
     white-space: nowrap;
     margin-top: -10px;

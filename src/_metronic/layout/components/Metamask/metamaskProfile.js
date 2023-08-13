@@ -23,7 +23,8 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
     setLoginMetamask,
     hgptBalance,
   } = useGlobal()
-  const {updateUser, connectMetamaskAccount, getTokenBalance, metamaskLogout} = useAuthService()
+  const {updateUser, connectMetamaskAccount, getTokenBalance, metamaskLogout, getUserInfo} =
+    useAuthService()
   const [errorMessage, setErrorMessage] = useState('')
 
   const [account, setAccount] = useState(null)
@@ -33,6 +34,8 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
   const navigate = useNavigate()
 
   const [isMetamask, setIsMetamask] = useState(localStorage.getItem('connect_metamask'))
+
+  const info = userInfo?.data?.discord_logout
 
   const [metamaskId, setMetamaskId] = useState('')
   const connectToMetaMask = async () => {
@@ -72,6 +75,7 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
       setProfileAccount(null)
       setHgptBalance(0)
       // setBalance(0)
+      getUserInfo()
       setAccount('')
       localStorage.removeItem('connect_metamask')
       localStorage.removeItem('metamaskAccount')
@@ -147,7 +151,6 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
   //   )
   // }
 
-
   return (
     <div>
       <div
@@ -166,11 +169,11 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
           padding: 'calc(0.775rem + 1px) calc(1.5rem + 1px)',
         }}
         onClick={() => {
-          loginText === 'Disconnect Metamask' ? logoutFromMetaMask() : connectToMetaMask()
+          info ? logoutFromMetaMask() : connectToMetaMask()
         }}
       >
         <img src={metamask} />
-        <span>{loginText}</span>
+        <span>{info ? 'Disconnect Metamask' : 'Connect Metamask'}</span>
       </div>
     </div>
   )

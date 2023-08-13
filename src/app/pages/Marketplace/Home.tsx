@@ -77,7 +77,9 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
   useEffect(() => {
     // alert(token)
     if (accessToken) {
-      getUserInfo()
+      if (token || url_safe) {
+        getUserInfo()
+      }
     }
   }, [token])
 
@@ -165,7 +167,8 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
           onClose={() => setShowNotification(false)}
           dismissible
         >
-          The image has incorrect size, do not upload.
+          Please upload an image with a size of 64x64. The current image has an incorrect size and
+          cannot be uploaded.
         </Alert>
       )}
       <ToastContainer />

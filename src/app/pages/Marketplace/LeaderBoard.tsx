@@ -17,8 +17,15 @@ const Collection: React.FC<CollectionProps> = () => {
   const isDiscordUser = localStorage.getItem('role')
   const [countdowns, setCountdowns] = useState<any>({})
   const [error, setError] = useState<string | null>(null)
-  const {published, appValidation, reviewValidation, ranking, campaigns, reviewsPublished} =
-    useGlobal()
+  const {
+    published,
+    appValidation,
+    reviewValidation,
+    ranking,
+    campaigns,
+    reviewsPublished,
+    userInfo,
+  } = useGlobal()
   const {
     getPublished,
     getAppValidation,
@@ -87,7 +94,7 @@ const Collection: React.FC<CollectionProps> = () => {
     return () => clearInterval(interval)
   }, [campaigns])
 
-  const roles = localStorage.getItem('role')
+  const roles = userInfo?.data?.discord_role
   const accessTokenMarketplace = localStorage.getItem('accessTokenMarketplace')
 
   if (!appValidation) {
@@ -101,29 +108,17 @@ const Collection: React.FC<CollectionProps> = () => {
 
   const isDiscord = localStorage.getItem('discordAccessToken')
 
-  if (!isDiscord) {
-    return (
-      <Layout>
-        <div className={styles.noLogin}>
-          <div className={styles.noLoginContent}>
-            <span>You are not authorized</span>
-          </div>
-        </div>
-      </Layout>
-    )
-  }
-
   return (
     <Layout>
       <div className={styles.daoWrapper}>
         <div style={{border: 'none'}} className={`${styles.card} card`}>
-          <h1>Overview</h1>
+          <h1>User Role</h1>
           <div className={styles.daoContent}>
             <div className={styles.daoContentTitle}>{roles ?? 'No Role'}</div>
           </div>
         </div>
         <div style={{border: 'none'}} className={`${styles.card} card`}>
-          <h1>Claimable Rewards</h1>
+          <h1>Campaign Rewards</h1>
           <div className={styles.daoContent}>
             <div className={styles.daoContentTitle}>
               {campaigns && campaigns?.length > 0 ? (
@@ -138,7 +133,7 @@ const Collection: React.FC<CollectionProps> = () => {
                 </div>
               ) : null}
             </div>
-            <button className={styles.daoContentButton}>Claim Rewards</button>
+            {/* <button className={styles.daoContentButton}>Claim Rewards</button> */}
           </div>
         </div>
       </div>
@@ -148,19 +143,19 @@ const Collection: React.FC<CollectionProps> = () => {
         `}
       >
         <div className={`${styles.card} card`}>
-          <h3>APPLICATION PUBLISHING</h3>
+          <h3>ADD APP</h3>
           <span>{published ? published.Result : 'Loading...'}</span>
         </div>
         <div className={`${styles.card} card`}>
-          <h3>APPLICATION VALIDATION</h3>
+          <h3>APPROVE APP</h3>
           <span>{appValidation ? appValidation.Result : 'Loading...'}</span>
         </div>
         <div className={`${styles.card} card`}>
-          <h3>commentARY</h3>
+          <h3>ADD COMMENT</h3>
           <span>{reviewsPublished ? reviewsPublished.Result : 'Loading...'}</span>
         </div>
         <div className={`${styles.card} card`}>
-          <h3>comment valıdatıon</h3>
+          <h3>APPROVE COMMENT</h3>
           <span>{reviewValidation ? reviewValidation.Result : 'Loading...'}</span>
         </div>
       </div>
@@ -178,15 +173,24 @@ const Collection: React.FC<CollectionProps> = () => {
                   : 'Loading...'
                 return (
                   <div className={styles.countdown} key={item.id}>
-                    <span>
+                    <span
+                      style={{
+                        fontSize: '1.3rem',
+                      }}
+                    >
                       <strong>Starting Date: </strong>
                       {startDate}
                     </span>
-                    <span>
+                    <span className={styles.tire}>-</span>
+                    <span
+                      style={{
+                        fontSize: '1.3rem',
+                      }}
+                    >
                       <strong>Ending Date: </strong> {endDate}
                     </span>
-                    <p className={styles.hpgt}>Worth of $HGPT Token</p>
-                    <p className={styles.countdownText}>
+                    {/* <p className={styles.hpgt}>Worth of $HGPT Token</p> */}
+                    {/* <p className={styles.countdownText}>
                       <span>
                         {countdowns[item.id]
                           ? `${countdowns[item.id].days} days, 
@@ -195,7 +199,7 @@ const Collection: React.FC<CollectionProps> = () => {
                          ${countdowns[item.id].seconds} seconds`
                           : 'Loading...'}
                       </span>
-                    </p>
+                    </p> */}
                   </div>
                 )
               })()
@@ -219,7 +223,7 @@ const Collection: React.FC<CollectionProps> = () => {
                 className={index % 2 === 0 ? styles.tableRowEven : styles.tableRowOdd}
               >
                 <td>#{item?.ranking}</td>
-                <td>{item?.name ? item.name : item.email ?? 'No name'} </td>
+                <td>{item?.username ? item.username : item.email ?? 'No name'} </td>
                 <td>{item.discord_role ?? 'No role'}</td>
                 <td>{item.share}%</td>
                 <td>{item.total_bonus}</td>

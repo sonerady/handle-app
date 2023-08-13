@@ -27,7 +27,7 @@ const Collection: React.FC<CollectionProps> = () => {
   const [newPassword, setNewPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [confirmPassword, setConfirmPassword] = useState('')
-  
+
   const {
     setAllCollection,
     accessToken,
@@ -323,10 +323,19 @@ const Collection: React.FC<CollectionProps> = () => {
   // }, [userInfo?.data?.email])
 
   useEffect(() => {
-    if (!isLogin) {
+    if (!isLogin && !userInfo?.data?.uid) {
       navigate('/marketplace')
     }
   }, [])
+
+  if (!isLogin && !userInfo?.data?.uid) {
+    return (
+      <div>
+        <h1>Redirecting to Marketplace...</h1>
+      </div>
+    )
+  }
+
   return (
     <Layout>
       <Modal show={showUsernameModal} onHide={handleCloseUsernameModal}>
@@ -527,7 +536,7 @@ const Collection: React.FC<CollectionProps> = () => {
           <Title>ACCOUNTS</Title>
           <div className={styles.loginButtons}>
             <DiscordButton userInfo={userInfo} />
-            <GoogleButton />
+            <GoogleButton userInfo={userInfo} />
             <MetaMaskConnect imageLink={userInfo?.data?.icon} userInfo={userInfo} />
           </div>
         </div>

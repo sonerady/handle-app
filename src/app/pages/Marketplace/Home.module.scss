@@ -396,11 +396,6 @@ main {
 .leaderboard {
   font-weight: bold;
   font-size: 14px;
-  border-image-source: linear-gradient(to left, #ff9085 30%, #fb6fbb 99%);
-  background-image: linear-gradient(to left, #ff9085 30%, #fb6fbb 99%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
   &:hover {
     opacity: 0.7;
   }
@@ -415,11 +410,6 @@ main {
     margin-bottom: 0 !important;
     font-weight: bold;
     font-size: 14px;
-    border-image-source: linear-gradient(to left, #ff9085 30%, #fb6fbb 99%);
-    background-image: linear-gradient(to left, #ff9085 30%, #fb6fbb 99%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
   }
   img {
     transition: all 0.2s ease-in-out;
@@ -432,14 +422,6 @@ main {
 .submenu {
   font-size: 12px;
   margin-left: 1rem;
-  border-image-source: linear-gradient(to left, #ff9085 30%, #fb6fbb 99%);
-  background-image: linear-gradient(to left, #ff9085 30%, #fb6fbb 99%);
-  -webkit-background-clip: text;
-  font-weight: bold;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  p {
-  }
 }
 
 .item {
@@ -777,6 +759,7 @@ main {
               gap: 6px;
               font-style: normal;
               font-weight: 500;
+              white-space: nowrap;
               font-size: 11px;
               line-height: 16px;
               color: #898990;
@@ -881,7 +864,7 @@ main {
 
 // ANNOUNCEMENT
 .importantContainer {
-  position: sticky;
+  position: fixed;
   bottom: 10px;
   display: flex;
   z-index: 9999 !important;

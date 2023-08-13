@@ -89,7 +89,7 @@ const App = () => {
   const accessTokenMarketplace = localStorage.getItem('accessTokenMarketplace')
 
   useEffect(() => {
-    if (accessTokenMarketplace) {
+    if (accessTokenMarketplace || accessToken) {
       getUserInfo()
     }
   }, [accessTokenMarketplace, navigate, window.location.pathname, accessToken])

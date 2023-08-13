@@ -57,11 +57,9 @@ const Dropdown: React.FC<DropdownProps> = ({isOpen, onClose}) => {
           <Link to={'/space'}>My Space</Link>
           <Link to={'/collection'}>Collections</Link>
 
-          {userInfo?.data.discordToken && isDiscordUser && (
-            <Link className={styles.leaderboard} to={'/leaderboard'}>
-              Leaderboard
-            </Link>
-          )}
+          <Link className={styles.leaderboard} to={'/leaderboard'}>
+            Leaderboard
+          </Link>
           {/* {userInfo?.data.discord_role === 'HyperAdmin' && isDiscordUser && (
             <Link className={styles.leaderboard} to={'/add-campaign'}>
               Add Campaign

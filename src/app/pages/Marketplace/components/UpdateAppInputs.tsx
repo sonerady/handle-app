@@ -294,7 +294,7 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
 
           <label className={styles.label} htmlFor=''>
             <div className={styles.leftSide}>
-              <span>Icon</span>
+              <span>Icon (must be 64x64) </span>
               <span className={styles.required}>*</span>
             </div>
           </label>
@@ -343,9 +343,12 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
                         }))
                       }
                     } else {
-                      toast.error('The image has incorrect size, do not upload.', {
-                        position: toast.POSITION.BOTTOM_RIGHT,
-                      })
+                      toast.error(
+                        'Please upload an image with a size of 64x64. The current image has an incorrect size and cannot be uploaded.',
+                        {
+                          position: toast.POSITION.BOTTOM_RIGHT,
+                        }
+                      )
                     }
                   }
                 }

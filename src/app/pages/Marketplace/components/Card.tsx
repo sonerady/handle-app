@@ -8,7 +8,7 @@ import {useAuthService} from '../../../services/authService'
 import {useGlobal} from '../../../context/AuthContext'
 import UserLogo from '../../../../_metronic/assets/marketplace/UserLogo.svg'
 import {toast} from 'react-toastify'
-import ContentLoader from 'react-content-loader'
+// import ContentLoader from 'react-content-loader'
 
 interface FilterButton {
   text: string
@@ -87,6 +87,13 @@ const Card: React.FC<CardProps> = ({
       ...prevHoveredBtns,
       [itemName]: false,
     }))
+  }
+
+  function truncate(text: any, length = 17) {
+    if (text.length > length) {
+      return text.substring(0, length) + '...'
+    }
+    return text
   }
 
   const isInApps = (name: string) => {
@@ -272,7 +279,7 @@ const Card: React.FC<CardProps> = ({
                       )}
                     </div>
                     <div className={styles.desc}>
-                      <div dangerouslySetInnerHTML={{__html: item.title || 'No desc.'}} />
+                      <span>{truncate(item.title)}</span>
                       {item.isfree ? (
                         <span
                           style={{
@@ -320,7 +327,7 @@ const Card: React.FC<CardProps> = ({
       </div>
       {!cardItems && (
         <div className={styles.waitingApps}>
-          <span>Waiting apps...</span>
+          <span>Loading...</span>
         </div>
       )}
     </div>

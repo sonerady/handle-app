@@ -14,6 +14,8 @@ export const TokenProvider = ({children}) => {
   const handleModalToggle = () => setShowImportantModal(!showImportantModal)
   const [authToken, setAuthToken] = useState(null)
   const [commentLength, setCommentLength] = useState(0)
+  const [campaignsUser, setCampaignsUser] = useState([])
+
   const [imageData, setImageData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [promptTitle, setPromptTitle] = useState('')
@@ -340,6 +342,8 @@ export const TokenProvider = ({children}) => {
         handleModalToggle,
         setCommentLength,
         commentLength,
+        campaignsUser,
+        setCampaignsUser,
       }}
     >
       {children}

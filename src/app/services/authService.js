@@ -63,6 +63,8 @@ export const useAuthService = () => {
     setHgptToken,
     setHgptBalance,
     setCommentLength,
+    campaignsUser,
+    setCampaignsUser,
   } = useGlobal()
 
   const checkBalance = () => {
@@ -145,6 +147,7 @@ export const useAuthService = () => {
       console.error(error)
     }
   }
+
   const getSpaceCount = async (appid) => {
     try {
       const response = await api.get(`/app/spaceAdded?app_id=${appid}`)
@@ -1106,10 +1109,11 @@ export const useAuthService = () => {
   const getUserCampaignConditions = async () => {
     try {
       const response = await api.get(`/campaign/getUserCampaignConditions?token=${accessToken}`)
+      setCampaignsUser(response.data)
       return response.data
     } catch (error) {
       console.error(error)
-    }
+    } 
   }
 
   const getWaitingApps = async () => {

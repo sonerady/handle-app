@@ -51,7 +51,7 @@ const Review: React.FC<ReviewProps> = ({
     appid?: string
   }>({})
 
-  const {approveApp, rejectApp, getWaitingApps} = useAuthService()
+  const {approveApp, rejectApp, getWaitingApps, getUserCampaignConditions} = useAuthService()
 
   const [hoverValue, setHoverValue] = useState(null)
   const {likeCount, visitCount, alertComment, comments, userInfo} = useGlobal()
@@ -68,7 +68,7 @@ const Review: React.FC<ReviewProps> = ({
   const [isVisited, setIsVisited] = useState(false)
   const [visibleComment, setVisibleComment] = useState(false)
   const [page, setPage] = useState(1)
-  const displayedComments = comments ? comments.slice(0, page * 5) : []
+  // const displayedComments = comments ? comments?.slice(0, page * 5) : []
   const [isHave, setIsHave] = useState('')
   const appid = new URLSearchParams(location.search).get('appid')
   // VISIT CONFIG
@@ -87,18 +87,18 @@ const Review: React.FC<ReviewProps> = ({
 
   const handleChange = (e: any) => setInputValue(e.target.value)
   const ratingsCount: {[index: number]: number} = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
-  const totalRatings = comments?.reduce((total: any, comment: any) => total + comment.rating, 0)
-  let averageRating = comments?.length ? totalRatings / comments.length : 0
+  // const totalRatings = comments?.reduce((total: any, comment: any) => total + comment.rating, 0)
+  // let averageRating = comments?.length ? totalRatings / comments.length : 0
 
-  if (isNaN(averageRating)) {
-    averageRating = 0
-  }
+  // if (isNaN(averageRating)) {
+  //   averageRating = 0
+  // }
 
-  comments?.forEach((comment: any) => {
-    if (comment.rating >= 1 && comment.rating <= 5) {
-      ratingsCount[comment.rating]++
-    }
-  })
+  // comments?.forEach((comment: any) => {
+  //   if (comment.rating >= 1 && comment.rating <= 5) {
+  //     ratingsCount[comment.rating]++
+  //   }
+  // })
 
   const performApproval = (id: any) => {
     approveApp(id, isRole === 'HyperAdmin' ? moment(publishDate).format('YYYY-MM-DD') : 'None')
@@ -108,7 +108,7 @@ const Review: React.FC<ReviewProps> = ({
           toast.success(res.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
-
+          getUserCampaignConditions()
           getWaitingApps().then((res) => {
             setWaitingApps(res)
           })
@@ -165,6 +165,7 @@ const Review: React.FC<ReviewProps> = ({
           getWaitingForAdmin().then((res: any) => {
             setWaitingAppsAdmin(res)
           })
+          getUserCampaignConditions()
         } else {
           toast.error(res.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
@@ -177,7 +178,6 @@ const Review: React.FC<ReviewProps> = ({
   }
 
   const isRole = userInfo?.data?.discord_role
-
 
   return (
     <div
@@ -268,7 +268,7 @@ const Review: React.FC<ReviewProps> = ({
               <div className={styles.ratingInfo}>
                 <div className={styles.rating}>
                   <Rating
-                    rate={averageRating && averageRating}
+                    rate={5}
                     style={{
                       marginTop: '0rem',
                       fontSize: '1.1rem',
@@ -284,7 +284,7 @@ const Review: React.FC<ReviewProps> = ({
                       top: '6px',
                     }}
                   >
-                    {averageRating?.toFixed(2)} / 10.10
+                    / 10.10
                   </p>
                 </div>
                 <div className={styles.rightText}>
@@ -323,10 +323,11 @@ const Review: React.FC<ReviewProps> = ({
                 borderRadius: '2rem',
               }}
             >
-              <Carousel.Item interval={3000}>
-                <img
-                  className={`d-block w-100 ${styles.slideItem}`}
-                  src={`
+              {app?.image1 && (
+                <Carousel.Item interval={3000}>
+                  <img
+                    className={`d-block w-100 ${styles.slideItem}`}
+                    src={`
                 
                 ${
                   app?.image1
@@ -334,394 +335,94 @@ const Review: React.FC<ReviewProps> = ({
                     : 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Example_image.svg/600px-Example_image.svg.png'
                 }
                 `}
-                  alt='Image One'
-                />
-              </Carousel.Item>
-              <Carousel.Item
-                style={{
-                  borderTopRightRadius: '2rem',
-                  borderBottomRightRadius: '2rem',
-                }}
-                interval={500}
-              >
-                <img
-                  className={`d-block w-100 ${styles.slideItem}`}
-                  src={`
-                  ${
-                    app?.image2
-                      ? app?.image2
-                      : 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Example_image.svg/600px-Example_image.svg.png'
-                  }
-                `}
-                />
-              </Carousel.Item>
-              <Carousel.Item
-                style={{
-                  borderTopRightRadius: '2rem',
-                  borderBottomRightRadius: '2rem',
-                }}
-                interval={500}
-              >
-                <img
-                  className={`d-block w-100 ${styles.slideItem}`}
-                  src={`
-                  ${
-                    app?.image3
-                      ? app?.image3
-                      : 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Example_image.svg/600px-Example_image.svg.png'
-                  }
-                `}
-                />
-              </Carousel.Item>
-              <Carousel.Item
-                style={{
-                  borderTopRightRadius: '2rem',
-                  borderBottomRightRadius: '2rem',
-                }}
-                interval={500}
-              >
-                <img
-                  className={`d-block w-100 ${styles.slideItem}`}
-                  src={`
-                  ${
-                    app?.image4
-                      ? app?.image4
-                      : 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Example_image.svg/600px-Example_image.svg.png'
-                  }
-                `}
-                />
-              </Carousel.Item>
-              <Carousel.Item
-                style={{
-                  borderTopRightRadius: '2rem',
-                  borderBottomRightRadius: '2rem',
-                }}
-                interval={500}
-              >
-                <img
-                  className={`d-block w-100 ${styles.slideItem}`}
-                  src={`
+                    alt='Image One'
+                  />
+                </Carousel.Item>
+              )}
+
+              {app?.image2 && (
+                <Carousel.Item
+                  style={{
+                    borderTopRightRadius: '2rem',
+                    borderBottomRightRadius: '2rem',
+                  }}
+                  interval={500}
+                >
+                  <img
+                    className={`d-block w-100 ${styles.slideItem}`}
+                    src={`
+                    ${
+                      app?.image2
+                        ? app?.image2
+                        : 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Example_image.svg/600px-Example_image.svg.png'
+                    }
+                  `}
+                  />
+                </Carousel.Item>
+              )}
+
+              {app?.image3 && (
+                <Carousel.Item
+                  style={{
+                    borderTopRightRadius: '2rem',
+                    borderBottomRightRadius: '2rem',
+                  }}
+                  interval={500}
+                >
+                  <img
+                    className={`d-block w-100 ${styles.slideItem}`}
+                    src={`
+                          ${
+                            app?.image3
+                              ? app?.image3
+                              : 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Example_image.svg/600px-Example_image.svg.png'
+                          }
+                        `}
+                  />
+                </Carousel.Item>
+              )}
+              {app?.image4 && (
+                <Carousel.Item
+                  style={{
+                    borderTopRightRadius: '2rem',
+                    borderBottomRightRadius: '2rem',
+                  }}
+                  interval={500}
+                >
+                  <img
+                    className={`d-block w-100 ${styles.slideItem}`}
+                    src={`
+                ${
+                  app?.image4
+                    ? app?.image4
+                    : 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Example_image.svg/600px-Example_image.svg.png'
+                }
+              `}
+                  />
+                </Carousel.Item>
+              )}
+
+              {app?.image5 && (
+                <Carousel.Item
+                  style={{
+                    borderTopRightRadius: '2rem',
+                    borderBottomRightRadius: '2rem',
+                  }}
+                  interval={500}
+                >
+                  <img
+                    className={`d-block w-100 ${styles.slideItem}`}
+                    src={`
                   ${
                     app?.image5
                       ? app?.image5
                       : 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Example_image.svg/600px-Example_image.svg.png'
                   }
                 `}
-                />
-              </Carousel.Item>
+                  />
+                </Carousel.Item>
+              )}
             </Carousel>
-          </div>
-        </div>
-        <div className={styles.header}>
-          <div className={`${styles.leftHeader} card`}>
-            <div
-              className={`${styles.rightContent} ${styles.usersCard} fs-2hx fw-bold text-gray-800`}
-            >
-              <div className={styles.top}>
-                <div className={`${styles.side} ${styles.leftSide}`}>
-                  <div className={styles.cardTitleWrapper}>
-                    <span className={styles.cardTitle}>Publisher</span>
-                    <span>
-                      <img src={defaults} alt='' />
-                    </span>
-                  </div>
-                </div>
-                <div className={`${styles.side} ${styles.rightSide}`}>
-                  <div className={styles.cardTitleWrapper}>
-                    <span className={styles.cardTitle}>Validators</span>
-                    <div className={styles.imagewrapper}>
-                      <img
-                        style={{
-                          height: '40px',
-                          width: '40px',
-                          borderRadius: '50%',
-                        }}
-                        src={defaults}
-                        alt=''
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.bottom}>
-                <div className={`${styles.side} ${styles.leftSide}`}>
-                  <div className={styles.cardTitleWrapper}>
-                    <div className={`${styles.cardTitle} ${styles.contWrapper}`}>
-                      <div className={styles.cardTitleWrapperItem}>
-                        <span>Contributors</span>
-                      </div>
-                    </div>
-                    <div className={styles.imagewrapper}>
-                      <img
-                        style={{
-                          height: '40px',
-                          width: '40px',
-                          borderRadius: '50%',
-                        }}
-                        src={defaults}
-                        alt=''
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className={`${styles.leftHeader} card`}>
-            <div
-              className={`${styles.rightContent} ${styles.usersCard} fs-2hx fw-bold text-gray-800`}
-            >
-              <div className={styles.footerRight}>
-                <div className={styles.footerRightTop}>
-                  <span className={styles.cardTitle}>Overall rating</span>
-                  <div className={styles.rating}></div>
-                </div>
-                <div className={styles.ratingProgress}>
-                  {[5, 4, 3, 2, 1].map((item, index) => {
-                    const count = ratingsCount[item] || 0
-                    const percentage = (count / comments?.length) * 100
-
-                    return (
-                      <div className={styles.ratingProgressItem}>
-                        <span className={styles.starts}>
-                          {Array(item)
-                            .fill(0)
-                            .map((_, i) => (
-                              <FaStar
-                                style={{
-                                  cursor: 'pointer',
-                                  fontSize: '1.5rem',
-                                }}
-                                color={'#FD7DA4'}
-                              />
-                            ))}
-                        </span>
-                        <div className={styles.progress}>
-                          <div
-                            style={{
-                              width: `${percentage}%`,
-                            }}
-                            className={styles.progressFull}
-                          ></div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className={styles.header}>
-          <div className={`${styles.leftHeader} ${styles.bottomCard} card`}>
-            <div
-              className={`${styles.rightContent} ${styles.usersCard} ${styles.usersCardReview} fs-2hx fw-bold text-gray-800`}
-            >
-              <div className={styles.top}>
-                <div className={`${styles.side} ${styles.leftSide}`}>
-                  <div className={styles.cardTitleWrapper}></div>
-                  <div className={styles.footer}>
-                    <div className={styles.tabWrapper}>
-                      <span
-                        style={{
-                          borderBottom: activeTab === 1 ? '2px solid #FD7DA4' : 'none',
-                        }}
-                        onClick={() => setActiveTab(1)}
-                      >
-                        COMMENTS
-                      </span>
-                      <span
-                        style={{
-                          borderBottom: activeTab === 2 ? '2px solid #FD7DA4' : 'none',
-                        }}
-                        onClick={() => setActiveTab(2)}
-                      >
-                        REVIEWS
-                      </span>
-                    </div>
-
-                    <div className={styles.think}>
-                      <span>What do you think ?</span>
-
-                      <button
-                        style={{
-                          cursor: 'not-allowed',
-                        }}
-                        className={styles.addComment}
-                      >
-                        Add Comment
-                      </button>
-                    </div>
-                    <div
-                      style={{
-                        display: activeTab === 2 ? 'block' : 'none',
-                      }}
-                      className={styles.footerLeft}
-                    >
-                      {/* <div className={styles.footerLeftTop}>
-                        <span className={styles.cardTitle}>REVIEWS</span>
-
-                        <button
-                          className={styles.addComment}
-                     
-                        >
-                          Add
-                        </button>
-                      </div> */}
-                      {/* // REVIEWS */}
-                      {activeTab === 2 && (
-                        <div
-                          style={{
-                            display: activeTab === 2 ? 'block' : 'none',
-                          }}
-                        >
-                          <div className={styles.footerLeftBottom}>
-                            <div
-                              style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '5px',
-                                paddingBottom: '15px',
-                                marginBottom: '15px',
-                              }}
-                            >
-                              <div className={styles.footerLeftBottomTop}>
-                                {/* Kontrol yapılarını ekliyoruz */}
-                                {comments &&
-                                  displayedComments.map((item: any, index: number) => {
-                                    // comments dizisindeki elemanların null/undefined kontrolü
-                                    if (!item) return null
-
-                                    return (
-                                      <div className={styles.commentItem} key={index}>
-                                        <div className={styles.name}>
-                                          <span>{item?.comment?.match(/[a-zA-Z]/)?.[0]}</span>
-                                          <span className={styles.userName}>{item.comment}</span>
-                                        </div>
-                                        <div className={styles.center}>
-                                          <div className={styles.date}> May 25, 2022</div>
-                                        </div>
-                                        <div className={styles.comment}>{item.username}</div>
-                                        <div className={styles.rating}>
-                                          {[...Array(5)].map((star, i) => {
-                                            const ratingValue = i + 1
-                                            return (
-                                              <FaStar
-                                                key={i}
-                                                style={{
-                                                  cursor: 'pointer',
-                                                  fontSize: '1rem',
-                                                  transition: 'color 200ms',
-                                                }}
-                                                color={
-                                                  item.rating >= ratingValue ? '#FD7DA4' : '#e4e5e9'
-                                                }
-                                              />
-                                            )
-                                          })}
-                                        </div>
-                                      </div>
-                                    )
-                                  })}
-                              </div>
-                              <div className={styles.footerLeftBottomBottom}></div>
-                            </div>
-                            {comments && comments.length > 5 && (
-                              <button
-                                className={styles.loadMore}
-                                onClick={() => setPage(page + 1)}
-                                disabled={page * 5 >= (comments as any[]).length}
-                              >
-                                Show More
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    {activeTab === 1 && (
-                      <div
-                        style={{
-                          display: activeTab === 1 ? 'block' : 'none',
-                        }}
-                        className={styles.footerLeft}
-                      >
-                        {/* <div className={styles.footerLeftTop}>
-                          <span className={styles.cardTitle}>COMMENTS</span>
-                          <button
-                            className={styles.addComment}
-                            onClick={() => setVisibleComment(true)}
-                          >
-                            Add
-                          </button>
-                        </div> */}
-                        <div
-                          style={{
-                            display: activeTab === 1 ? 'block' : 'none',
-                          }}
-                        >
-                          {visibleComment && (
-                            <div className={styles.commentContainer}>
-                              <label>
-                                Comment
-                                <textarea
-                                  value={commentData.comment}
-                                  rows={5}
-                                  placeholder='Comment'
-                                  onChange={(e) =>
-                                    setcommentData({...commentData, comment: e.target.value})
-                                  }
-                                />
-                              </label>
-                              {alertComment === false && (
-                                <span className={styles.alert}>{'Already voted !'}</span>
-                              )}
-                              <button className={styles.sendComment}>Send Comment</button>
-                            </div>
-                          )}
-                          <div className={styles.footerLeftBottom}>
-                            <div
-                              style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '5px',
-                                paddingBottom: '15px',
-                                marginBottom: '15px',
-                              }}
-                            >
-                              <div className={styles.footerLeftBottomTop}>
-                                {/* Kontrol yapılarını ekliyoruz */}
-
-                                <div className={styles.commentItem}>
-                                  <div className={styles.name}>
-                                    <span>{'Example'.match(/[a-zA-Z]/)?.[0]}</span>
-                                    <span className={styles.userName}>Example Comment</span>
-                                  </div>
-                                  <div className={styles.center}>
-                                    <div className={styles.date}> May 25, 2022</div>
-                                  </div>
-                                  <div className={styles.comment}>Ex. Username</div>
-                                </div>
-                              </div>
-                              <div className={styles.footerLeftBottomBottom}></div>
-                            </div>
-                            {comments && comments.length > 5 && (
-                              <button
-                                className={styles.loadMore}
-                                onClick={() => setPage(page + 1)}
-                                disabled={page * 5 >= (comments as any[]).length}
-                              >
-                                Show More
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

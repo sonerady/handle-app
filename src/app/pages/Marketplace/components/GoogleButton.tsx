@@ -14,11 +14,14 @@ interface ModalProps {
   children?: ReactNode
   openModal?: boolean
   setOpenModal?: (open: boolean) => void
+  userInfo?: any
 }
 
-const CustomModal: FC<ModalProps> = ({children, openModal}) => {
+const CustomModal: FC<ModalProps> = ({children, openModal, userInfo}) => {
   const [isSignedIn, setIsSignedIn] = useState(false)
-  const {logOut, googleLogout, connectGoogleAccount} = useAuthService()
+  const {logOut, googleLogout, connectGoogleAccount, getUserInfo} = useAuthService()
+
+  const info = userInfo?.data?.discord_logout
 
   const {
     setGoogleAccessToken,
@@ -31,7 +34,7 @@ const CustomModal: FC<ModalProps> = ({children, openModal}) => {
     setOpenModal,
     gmailEmail,
     gmailUsername,
-    userInfo,
+    // userInfo,
   } = useGlobal()
   const clientId = '279751245565-og702v9ag0i0th14uaan19js2hq3nt12.apps.googleusercontent.com'
 
@@ -75,7 +78,7 @@ const CustomModal: FC<ModalProps> = ({children, openModal}) => {
       if (logout.status) {
         setIsSignedIn(false)
         localStorage.removeItem('googleAccessToken')
-
+        getUserInfo()
         setGoogleAccessToken && setGoogleAccessToken('')
         setUserName && setUserName('')
         setGmailUsername && setGmailUsername('')
@@ -117,7 +120,7 @@ const CustomModal: FC<ModalProps> = ({children, openModal}) => {
 
   return (
     <div className={styles.discordButton}>
-      {isGoogleLogin ? (
+      {info ? (
         <button
           style={{
             width: '100%',

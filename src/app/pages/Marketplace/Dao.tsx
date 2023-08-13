@@ -54,6 +54,8 @@ const Collection: React.FC<CollectionProps> = () => {
     userRejectedApps,
     setUserRejectedApps,
     accessToken,
+    campaignsUser,
+    setCampaignsUser,
   } = useGlobal()
   const {
     fixApp,
@@ -77,7 +79,7 @@ const Collection: React.FC<CollectionProps> = () => {
   const [show, setShow] = useState(false)
   const handleClose = () => setShow(false)
   const [activeTab, setActiveTab] = useState(0)
-  const [campaigns, setCampaigns] = useState([])
+
   const [addedApp, setAddedApp] = useState(false)
   const [reasonData, setReasonData] = useState('')
   const isDiscordUser = localStorage.getItem('isVerifiedUser')
@@ -95,7 +97,7 @@ const Collection: React.FC<CollectionProps> = () => {
 
   const taskOrder = ['Add App', 'Approve App', 'Add Comment', 'Approve Comment']
 
-  const sortedCampaigns = (campaigns as {task_name: string}[]).sort((a, b) => {
+  const sortedCampaigns = (campaignsUser as {task_name: string}[]).sort((a, b) => {
     const aIndex = taskOrder.indexOf(a.task_name)
     const bIndex = taskOrder.indexOf(b.task_name)
     return aIndex - bIndex
@@ -181,6 +183,7 @@ const Collection: React.FC<CollectionProps> = () => {
             toast.success('Operation completed successfully!', {
               position: toast.POSITION.BOTTOM_RIGHT,
             })
+            getUserCampaignConditions()
 
             formik.resetForm()
           }
@@ -195,6 +198,8 @@ const Collection: React.FC<CollectionProps> = () => {
             toast.success('Operation completed successfully!', {
               position: toast.POSITION.BOTTOM_RIGHT,
             })
+            getUserCampaignConditions()
+
             formik.resetForm()
           }
         }
@@ -248,10 +253,7 @@ const Collection: React.FC<CollectionProps> = () => {
       getCategories().then((res) => {
         setCategories(res)
       })
-
-      getUserCampaignConditions().then((res) => {
-        setCampaigns(res)
-      })
+      getUserCampaignConditions()
     }
   }, [accessToken])
 
@@ -426,8 +428,8 @@ const Collection: React.FC<CollectionProps> = () => {
                 <li>Created Date</li>
                 <li>Rating</li>
                 <li>Comment</li>
-                <li>Validates</li>
                 <li>Type</li>
+                <li>Validates</li>
                 <li></li>
                 <li></li>
               </ul>

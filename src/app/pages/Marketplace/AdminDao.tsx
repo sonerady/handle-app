@@ -53,6 +53,8 @@ const Collection: React.FC<CollectionProps> = () => {
     accessToken,
     roles,
     userInfo,
+    campaigns,
+    setCampaigns,
   } = useGlobal()
   const {
     fileUpload,
@@ -71,7 +73,6 @@ const Collection: React.FC<CollectionProps> = () => {
   } = useAuthService()
   const [error, setError] = useState<string | null>(null)
   const handleClose = () => setShow(false)
-  const [campaigns, setCampaigns] = useState([])
   const [forAdminReviews, setForAdminReviews] = useState<any>([])
   const [activeTab, setActiveTab] = useState(0)
   const [show, setShow] = useState(false)
@@ -174,6 +175,7 @@ const Collection: React.FC<CollectionProps> = () => {
           })
           formik.resetForm()
           setSelectedCategories([])
+
           window.scrollTo(0, 0)
           setAddedApp(true)
         }
@@ -228,9 +230,7 @@ const Collection: React.FC<CollectionProps> = () => {
         setCategories(res)
       })
 
-      getUserCampaignConditions().then((res) => {
-        setCampaigns(res)
-      })
+      getUserCampaignConditions()
     }
   }, [accessToken])
 
@@ -300,7 +300,6 @@ const Collection: React.FC<CollectionProps> = () => {
       setTask(2)
     }
   }, [parametre])
-
 
   if (isAdmin !== 'HyperAdmin') {
     return (

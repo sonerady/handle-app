@@ -20,7 +20,8 @@ interface ApproveCommentsProps {
 const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setApprovalReviews}) => {
   const [show, setShow] = useState(false)
   const [selectedApp, setSelectedApp] = useState(null)
-  const {approveReview, getForApprovalReviews, rejectReview} = useAuthService()
+  const {approveReview, getForApprovalReviews, rejectReview, getUserCampaignConditions} =
+    useAuthService()
   const [reviews, setReviews] = useState([])
   const navigate = useNavigate()
   const handleClose = () => setShow(false)
@@ -70,6 +71,7 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
           toast.success('Successfully rejected', {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
+          getUserCampaignConditions()
           handleCloseRejectModal()
         } else {
           toast.error(res.Description, {
@@ -95,6 +97,7 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
           toast.success('Approved', {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
+          getUserCampaignConditions()
           getForApprovalReviews().then((res) => {
             setApprovalReviews(res)
           })
