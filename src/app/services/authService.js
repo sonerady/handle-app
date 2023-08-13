@@ -62,6 +62,7 @@ export const useAuthService = () => {
     setSpaceCount,
     setHgptToken,
     setHgptBalance,
+    setCommentLength,
   } = useGlobal()
 
   const checkBalance = () => {
@@ -90,7 +91,7 @@ export const useAuthService = () => {
     }
   }
 
-  const getSliderTop = async (id) => {
+  const getSliderTop = async () => {
     try {
       const response = await api.get(`/user/slidertop`)
       return response
@@ -303,15 +304,25 @@ export const useAuthService = () => {
 
   const getAllApps = async (page, count) => {
     try {
-      const response = await api.get(`/user/allApps?page=${page}&count=${count}`, {
+      let url = `/user/allApps?page=${page}&count=${count}`
+
+      if (accessToken) {
+        url += `&token=${accessToken}`
+      }
+
+      const response = await api.get(url, {
         headers: {
           'Content-Type': 'application/json',
         },
       })
       setAllApps(response.data)
       return response.data
-    } catch (error) {}
+    } catch (error) {
+      // Burada hatayı yakalayabilir ve gerekli işlemleri yapabilirsiniz.
+      console.error('Bir hata oluştu:', error)
+    }
   }
+
   const getTrendingApps = async () => {
     try {
       const response = await api.get(`/app/getTrendingApps?`, {
@@ -1054,6 +1065,7 @@ export const useAuthService = () => {
         },
       })
       // setComments(response.data)
+      setCommentLength(response.data.total)
       return response.data
     } catch (error) {
       console.error(error)
@@ -1240,7 +1252,7 @@ export const useAuthService = () => {
 
   const getAppSlider = async (appid) => {
     try {
-      const response = await api.get(`/user/appslider?appid=${appid}&token=${accessToken}`, {
+      const response = await api.get(`/user/appslider?appid=${appid}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',

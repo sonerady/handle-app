@@ -106,85 +106,85 @@ const Home = () => {
 
   return (
     <div>
-      {loading ? (
+      {/* {loading ? (
         <img src={Logo} alt='Logo' className={styles.spinner} />
-      ) : (
-        <Layout>
-          <div className={styles.layout}>
-            <div className={`${styles.container} `}>
-              <div className={styles.cardContainer}>
-                {firstCard.map((item: any, index: any) => {
-                  return (
-                    <Card
-                      order={item.order}
-                      link={item.link}
-                      color={item.color}
-                      key={index}
-                      title={item.title}
-                      backgroundImage={item.backgroundImage}
-                      height='225px'
-                      position={item.position}
-                      bgSize={item.bgSize}
-                    />
-                  )
-                })}
-              </div>
-              <div className={styles.marketCard}>
-                {firstMarketCard.map((item: any, index: any) => {
-                  return (
-                    <FilteredData
-                      column={2}
-                      gap='20px'
-                      mapItems={firstMarketCard}
-                      headerTitle={item.title}
-                      headerIcon={item.icons}
-                      showAll={true}
-                      linkItems={item.title === 'Trending' ? 'trending' : 'new'}
-                    />
-                  )
-                })}
-              </div>
-              <div className={`${styles.cardContainer} ${styles.bottomImages} `}>
-                {secondCard.map((item: any, index: any) => {
-                  return (
-                    <Card
-                      isBottom={true}
-                      isCenter={item.isCenter}
-                      icon={item.icon}
-                      button={item.button}
-                      color={item.color}
-                      key={index}
-                      title={item.title}
-                      backgroundImage={item.backgroundImage}
-                      height='200px'
-                      position={item.position}
-                      bgSize={item.bgSize}
-                    />
-                  )
-                })}
-              </div>
-              <div className={styles.marketCard}>
-                {secondMarketCard.map((item: any, index: any) => {
-                  return (
-                    <MarketCard
-                      linkData={item.title === 'Ranking' ? 'ranking' : 'all'}
-                      // isFilter={item.isFilter}
-                      isListNumber={true}
-                      showAll={true}
-                      column={4}
-                      gap='30px'
-                      key={index}
-                      headerTitle={item.title}
-                      headerIcon={item.icons}
-                      cardItems={allApps?.result?.filter((app: any) => app.status === 'approved')}
-                    />
-                  )
-                })}
-              </div>
+      ) : ( */}
+      <Layout>
+        <div className={styles.layout}>
+          <div className={`${styles.container} `}>
+            <div className={styles.cardContainer}>
+              {firstCard.map((item: any, index: any) => {
+                return (
+                  <Card
+                    order={item.order}
+                    link={item.link}
+                    color={item.color}
+                    key={index}
+                    title={item.title}
+                    backgroundImage={item.backgroundImage}
+                    height='225px'
+                    position={item.position}
+                    bgSize={item.bgSize}
+                  />
+                )
+              })}
+            </div>
+            <div className={`${styles.marketCard} ${styles.marketCardTop}`}>
+              {firstMarketCard.map((item: any, index: any) => {
+                return (
+                  <FilteredData
+                    column={2}
+                    gap='20px'
+                    mapItems={firstMarketCard}
+                    headerTitle={item.title}
+                    headerIcon={item.icons}
+                    showAll={true}
+                    linkItems={item.title === 'Trending' ? 'trending' : 'new'}
+                  />
+                )
+              })}
+            </div>
+            <div className={`${styles.cardContainer} ${styles.bottomImages} `}>
+              {secondCard.map((item: any, index: any) => {
+                return (
+                  <Card
+                    isBottom={true}
+                    isCenter={item.isCenter}
+                    icon={item.icon}
+                    button={item.button}
+                    color={item.color}
+                    key={index}
+                    title={item.title}
+                    backgroundImage={item.backgroundImage}
+                    height='200px'
+                    position={item.position}
+                    bgSize={item.bgSize}
+                  />
+                )
+              })}
+            </div>
+            <div className={styles.marketCard}>
+              {secondMarketCard.map((item: any, index: any) => {
+                return (
+                  <MarketCard
+                    linkData={item.title === 'Ranking' ? 'ranking' : 'all'}
+                    // isFilter={item.isFilter}
+                    isListNumber={true}
+                    showAll={true}
+                    column={4}
+                    gap='30px'
+                    key={index}
+                    headerTitle={item.title}
+                    headerIcon={item.icons}
+                    cardItems={allApps?.result?.filter((app: any) => app.status === 'approved')}
+                  />
+                )
+              })}
             </div>
           </div>
-        </Layout>
-      )}
+        </div>
+      </Layout>
+      {/* )} */}
     </div>
   )
 }

@@ -15,9 +15,7 @@ import clsx from 'clsx'
 import Input from './Input'
 import {useAuthService} from '../../../services/authService'
 import {toast} from 'react-toastify'
-import {MdOutlineLogout} from 'react-icons/md'
 import {BiInfoCircle} from 'react-icons/bi'
-import {access} from 'fs'
 
 interface NavbarProps {
   isSticky?: boolean
@@ -49,14 +47,17 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
     discordUsername,
     isValidate,
     setIsValidate,
+    setAccessToken,
+    showImportantModal,
+    setShowImportantModal,
+    handleModalToggle,
   } = useGlobal()
 
   const api = useAPI()
 
   const {verifyProfile} = useAuthService()
-  const [showModal, setShowModal] = useState(false)
+
   const [provider, setProvider] = useState<Provider | null>(null)
-  const handleModalToggle = () => setShowModal(!showModal)
   const [errorMessage, setErrorMessage] = useState<string>('')
 
   const [tokenBalance, setTokenBalance] = useState('')
@@ -75,6 +76,7 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
   let searchParams = new URLSearchParams(location.search)
 
   const url_safe = searchParams.get('url_safe')
+  const token = searchParams.get('token')
 
   const numberFormatter = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 2,
@@ -94,6 +96,14 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
       return response.data
     } catch (error) {}
   }
+
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem('accessTokenMarketplace', token)
+      setAccessToken(token)
+      getBalance()
+    }
+  }, [token, url_safe])
 
   // useEffect(() => {
   //   if (!accessToken) return
@@ -138,7 +148,6 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
     getTokenBalance()
   }, [profileAccount, isLoginMetamask, account])
 
-
   useEffect(() => {
     async function detectProvider() {
       const provider = await detectEthereumProvider()
@@ -168,17 +177,22 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
       // verifyProfile işlevini çağırın
       const result = await verifyProfile(email)
       // İşlem başarılı ise toast ile bilgi ver
-      toast.success('Verified link to  mail.', {
-        position: toast.POSITION.BOTTOM_RIGHT,
-      })
+      if (result.status === 200) {
+        toast.success(result.desc, {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+        handleModalToggle()
+      } else {
+        toast.error(result.desc, {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+      }
     } catch (error) {
       // İşlem başarısızsa toast ile hata mesajı göster
       toast.error('Verification failed. Please try again.', {
         position: toast.POSITION.BOTTOM_RIGHT,
       })
     }
-
-    handleModalToggle()
   }
 
   // const connectToMetaMask = async () => {
@@ -214,26 +228,6 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
 
   return (
     <div className={`${styles.navbarWrapper} ${isSticky ? styles.navbarWrapperSticky : ''}`}>
-      {!isVerified && accessTokenLocal ? (
-        <div className={styles.announcement}>
-          <div className={styles.announcementLeft}>
-            <span className={styles.announcementIcon}>
-              <BiInfoCircle />
-            </span>
-            <span className={styles.announcementText}>IMPORTANT: </span>
-            <span className={styles.announcementTextSecond}>
-              Complete your profile to unlock exclusive features. Don't miss out on the
-              opportunities available only to fully registered members!
-            </span>
-            <span onClick={handleModalToggle} className={styles.announcementTextThird}>
-              Click and complete your membership now!
-            </span>
-          </div>
-        </div>
-      ) : (
-        ''
-      )}
-
       <div className={styles.navbar}>
         <div className={styles.right}>
           <Link to='/marketplace'>
@@ -285,14 +279,6 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
                 alt=''
               />
             ) : (
-              // <button
-              //   onClick={() => {
-              //     setOpenModal(true)
-              //   }}
-              //   className={styles.connectButton}
-              // >
-              //   Login
-              // </button>
               ''
             )}
             {!accessTokenLocal && (
@@ -313,7 +299,7 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
           </span>
         </div>
       </div>
-      <Modal centered show={showModal} onHide={handleModalToggle}>
+      <Modal centered show={showImportantModal} onHide={handleModalToggle}>
         <Modal.Header closeButton>
           <Modal.Title>Set Your Email</Modal.Title>
         </Modal.Header>

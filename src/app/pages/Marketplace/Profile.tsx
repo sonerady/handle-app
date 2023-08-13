@@ -19,21 +19,15 @@ interface CollectionProps {}
 const Collection: React.FC<CollectionProps> = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const [counter, setCounter] = useState(5)
   const isLogin = localStorage.getItem('accessTokenMarketplace') || ''
   const [inputValue, setInputValue] = useState('')
   const [openInput, setOpenInput] = useState(false)
   const [newUserName, setNewUserName] = useState<any>('')
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
-  const userId = localStorage.getItem('userId') || ''
-  const [selectedTag, setSelectedTag] = useState(null)
   const [error, setError] = useState<string | null>(null)
-  const avatarUrl = localStorage.getItem('avatarUrl') || ''
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [confirmPassword, setConfirmPassword] = useState('')
-  const currentUserName = localStorage.getItem('userName') || ''
-  const mailToken = localStorage.getItem('mailAccessToken') || ''
+  
   const {
     setAllCollection,
     accessToken,

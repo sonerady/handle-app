@@ -3,6 +3,7 @@ import {useAuthService} from '../../../services/authService'
 import {useGlobal} from '../../../context/AuthContext'
 import {useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
+import ContentLoader from 'react-content-loader'
 
 interface Props {
   column?: number

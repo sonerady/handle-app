@@ -17,6 +17,7 @@ import {PageDataProvider} from './core'
 import {reInitMenu} from '../helpers'
 import {ToolbarWrapper} from './components/toolbar'
 import {useGlobal} from '../../app/context/AuthContext'
+import Important from '../../app/pages/Marketplace/components/Important'
 
 const MasterLayout = () => {
   const {openModal, setOpenModal} = useGlobal()
@@ -88,7 +89,7 @@ const MasterLayout = () => {
                     <Outlet />
                   </Content>
                 </div>
-
+                {/* <Important /> */}
                 <FooterWrapper />
               </div>
             </div>

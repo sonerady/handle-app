@@ -10,7 +10,10 @@ export const useGlobal = () => {
 }
 
 export const TokenProvider = ({children}) => {
+  const [showImportantModal, setShowImportantModal] = useState(false)
+  const handleModalToggle = () => setShowImportantModal(!showImportantModal)
   const [authToken, setAuthToken] = useState(null)
+  const [commentLength, setCommentLength] = useState(0)
   const [imageData, setImageData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [promptTitle, setPromptTitle] = useState('')
@@ -332,6 +335,11 @@ export const TokenProvider = ({children}) => {
         setShowAnnouncement,
         discordRole,
         setDiscordRole,
+        showImportantModal,
+        setShowImportantModal,
+        handleModalToggle,
+        setCommentLength,
+        commentLength,
       }}
     >
       {children}

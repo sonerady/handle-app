@@ -9,6 +9,7 @@ import rewardModal from '../../../_metronic/assets/marketplace/rewardModal.svg'
 import Loading from './components/Loading'
 import {useLocation, useNavigate} from 'react-router-dom'
 import {useAuthService} from '../../services/authService'
+import Important from './components/Important'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -18,7 +19,7 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
   const [scrollPosition, setScrollPosition] = useState(0)
   const [isSticky, setIsSticky] = useState(false)
   const isLogin = localStorage.getItem('login')
-  const [showModal, setShowModal] = useState(false) // Set initial state to false
+  const [showModal, setShowModal] = useState(false)
   const {
     accessToken,
     account,
@@ -51,7 +52,9 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
       if (result?.status === 200) {
         toast.success(result?.Desc)
         // setMailAccessToken(result?.user_mail)
-        setShowPopup(true)
+        if (result?.show_popup) {
+          setShowPopup(true)
+        }
         localStorage.setItem('accessTokenMarketplace', token)
         setAccessToken(token)
         if (result && token !== '') {
@@ -167,7 +170,10 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
       )}
       <ToastContainer />
       <Navbar isSticky={isSticky} />
-      <main>{children}</main>
+      <main>
+        {children}
+        <Important />
+      </main>
       <Modal
         centered
         style={{

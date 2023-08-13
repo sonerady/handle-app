@@ -83,13 +83,12 @@ const Details: React.FC<DetailsProps> = () => {
     setAppInSpace,
     setIsVisited,
     isVisited,
-    ratingCount,
-    setRatingCount,
     raitingDatas,
-    setRaitingDatas,
     setComments,
     setCommentsOther,
     spaceCount,
+    setCommentLength,
+    commentLength,
   } = useGlobal()
 
   const [isLiked, setIsLiked] = useState(false)
@@ -249,7 +248,7 @@ const Details: React.FC<DetailsProps> = () => {
   }, [])
 
   useEffect(() => {
-    if (id) {
+    if (id && accessToken) {
       getSpaceCount(id)
     }
   }, [id])
@@ -496,8 +495,8 @@ const Details: React.FC<DetailsProps> = () => {
 
   useEffect(() => {
     if (!accessToken) return
-    getAppSlider(appid)
-  }, [accessToken, appid])
+    getAppSlider(id)
+  }, [accessToken, id])
 
   useEffect(() => {
     setAppsById('')
@@ -838,7 +837,7 @@ const Details: React.FC<DetailsProps> = () => {
                 <div className={styles.ratingProgress}>
                   {raitingDatas
                     ? [5, 4, 3, 2, 1]?.map((item, index) => {
-                        const totalComments = comments?.total
+                        const totalComments = commentLength
 
                         const count = raitingDatas?.count[item] || 0
 

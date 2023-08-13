@@ -248,6 +248,11 @@ const App = () => {
               discordAccessToken,
               googleAccessToken
             )
+            if (mailAccessToken && signupResponse.user === 'User is not active') {
+              toast.success('Please check your e-mail address', {
+                position: toast.POSITION.BOTTOM_RIGHT,
+              })
+            }
             if (signupResponse === null) {
               toast.error('Incorrect username or password.', {
                 position: toast.POSITION.BOTTOM_RIGHT,
@@ -259,6 +264,7 @@ const App = () => {
                 setShowAnnouncement(true)
                 localStorage.setItem('isVerifiedUser', signupResponse.is_verified)
               }
+
               localStorage.setItem('accessTokenMarketplace', signupResponse.access_token)
               localStorage.setItem('login', 'success')
               localStorage.setItem('avatarUrl', avatarUrl)

@@ -92,8 +92,6 @@ const CustomModal: FC<ModalProps> = ({children, openModal, setOpenModal}) => {
     setMailAccessToken(emailInput)
     setPassword(passwordInput)
 
-    // Here you would typically send the data to your server...
-    // On success:
     setTriggerLogin && setTriggerLogin(!triggerLogin)
   }
 
@@ -303,12 +301,7 @@ const CustomModal: FC<ModalProps> = ({children, openModal, setOpenModal}) => {
                   type='text'
                   placeholder='Please enter your email address'
                 />
-                {/* <input
-                  value={passwordInput}
-                  onChange={handlePasswordChange}
-                  type='password'
-                  placeholder='Please enter your password'
-                /> */}
+
                 <button onClick={handleLogin} className={styles.loginButton}>
                   Continue
                 </button>
@@ -322,18 +315,6 @@ const CustomModal: FC<ModalProps> = ({children, openModal, setOpenModal}) => {
                 >
                   Download Metamask
                 </a>
-
-                {/* <div className={styles.authText} >
-                  New here?{' '}
-                  <span className={styles.signUp} onClick={() => setIsLogin(false)}>
-                    Sign Up
-                  </span>
-                </div> */}
-                {/* <div className={styles.authText} >
-                  <span className={styles.signUp} onClick={() => setForgot(true)} >
-                    Forgot your password
-                  </span>
-                </div> */}
               </div>
             ) : (
               // Register Form
