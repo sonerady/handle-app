@@ -74,6 +74,21 @@ const Card: React.FC<CardProps> = ({
   const {appJoin, getApps, getAllApps} = useAuthService()
   const {apps, accessToken, isSuccess} = useGlobal()
   const isSign = localStorage.getItem('login')
+  const [hoveredBtns, setHoveredBtns] = useState<any>({}) // Her bir düğmenin "hover" durumunu takip etmek için nesne
+
+  const handleMouseEnter = (itemName: any) => {
+    setHoveredBtns((prevHoveredBtns: any) => ({
+      ...prevHoveredBtns,
+      [itemName]: true,
+    }))
+  }
+
+  const handleMouseLeave = (itemName: any) => {
+    setHoveredBtns((prevHoveredBtns: any) => ({
+      ...prevHoveredBtns,
+      [itemName]: false,
+    }))
+  }
 
   const isInApps = (name: string) => {
     return apps.some((app: any) => app.name === name)
@@ -103,6 +118,7 @@ const Card: React.FC<CardProps> = ({
   const filteredCardItems = cardItems
     ?.filter((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .slice(0, MAX_CARD_ITEMS)
+
   const filterButtons: FilterButton[] = [
     {
       text: 'Month',
@@ -133,13 +149,17 @@ const Card: React.FC<CardProps> = ({
     getApps()
   }, [isSuccess])
 
+  console.log('sdds', filteredCardItems)
+
   return (
     <div className={`${styles.card} card `}>
       <div className={styles.cardHeader}>
         <div className={styles.titleWrapper}>
           <div className={styles.top}>
-            
-            <span className={styles.cardHeaderTitle}>{headerTitle}  <img src={headerIcon} alt='' style={{height:'20px',marginLeft:'2px'}} /></span>
+            <span className={styles.cardHeaderTitle}>
+              {headerTitle}{' '}
+              <img src={headerIcon} alt='' style={{height: '20px', marginLeft: '2px'}} />
+            </span>
             {search && (
               <input
                 className={styles.searchInput}
@@ -186,7 +206,7 @@ const Card: React.FC<CardProps> = ({
         }}
         className={styles.cardItemWrapper}
       >
-        {cardItems?.map((item, index) => (
+        {(search ? filteredCardItems : cardItems)?.map((item, index) => (
           <div
             onClick={() => navigate(`/marketplace/detail/${item.name}/${item.appid}`)}
             key={index}
@@ -258,12 +278,15 @@ const Card: React.FC<CardProps> = ({
             </div>
 
             <button
+              onMouseEnter={() => handleMouseEnter(item.name)}
+              onMouseLeave={() => handleMouseLeave(item.name)}
               disabled={isInApps(item.name)}
               style={{
                 cursor: isInApps(item.name) ? 'not-allowed' : 'pointer',
-                background: isInApps(item.name)
-                  ? 'var(--pink-gradient, linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%))'
-                  : 'none',
+                background:
+                  isInApps(item.name) || hoveredBtns[item.name]
+                    ? 'var(--pink-gradient, linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%))'
+                    : 'none',
                 color: isInApps(item.name)
                   ? '#fff'
                   : 'var(--pink-gradient, linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%))',

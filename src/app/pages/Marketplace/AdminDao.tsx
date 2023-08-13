@@ -301,7 +301,6 @@ const Collection: React.FC<CollectionProps> = () => {
     }
   }, [parametre])
 
-  console.log('task', isAdmin)
 
   if (isAdmin !== 'HyperAdmin') {
     return (

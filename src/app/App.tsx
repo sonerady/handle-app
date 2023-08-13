@@ -65,6 +65,7 @@ const App = () => {
     validEmail,
     showAnnouncement,
     setShowAnnouncement,
+    discordRole,
   } = useGlobal()
   const {getRole, getUserId, updateUser, getUserInfo, getTokenBalance} = useAuthService()
   const [loading, setLoading] = useState(false)
@@ -225,11 +226,13 @@ const App = () => {
               userInfo?.data?.icon ? userInfo?.data?.icon : userInfo?.data?.icon, // icon
               userInfo?.data?.username ? userInfo?.data?.username : userName, // username
               userInfo?.data?.discord_username ? userInfo?.data?.discord_username : discordUsername, // discord_username
-              userInfo?.data?.discordIcon ? userInfo?.data?.discord_icon : discordIcon, // discord_icon
+              'None', // discord_icon
               userInfo?.data?.gmail_username ? userInfo?.data?.gmail_username : gmailUsername, // gmail_username
-              userInfo?.data?.gmail_icon ? userInfo?.data?.gmail_icon : gmailIcon, // gmail_icon
+              'None', // gmail_icon
               userInfo?.data?.discord_emaik ? userInfo?.data?.discord_email : discordEmail,
-              userInfo?.data?.gmail_email ? userInfo?.data?.gmail_email : gmailEmail
+              userInfo?.data?.gmail_email ? userInfo?.data?.gmail_email : gmailEmail,
+              userInfo?.data?.discord_id ? userInfo?.data?.discord_id : discordID,
+              userInfo?.data?.discord_role ? userInfo?.data?.discord_id : discordRole
             )
           }
           if (
@@ -245,7 +248,6 @@ const App = () => {
               discordAccessToken,
               googleAccessToken
             )
-
             if (signupResponse === null) {
               toast.error('Incorrect username or password.', {
                 position: toast.POSITION.BOTTOM_RIGHT,
@@ -281,7 +283,6 @@ const App = () => {
               // toast.error('User is not active.', {
               //   position: toast.POSITION.BOTTOM_RIGHT,
               // })
-              console.log('User is not active.')
             }
           }
         }

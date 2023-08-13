@@ -2,11 +2,9 @@ import React, {useEffect, useRef, useState} from 'react'
 import {useLocation, useNavigate} from 'react-router-dom'
 import Layout from './Home'
 import styles from './Profile.module.scss'
-import defaultProfile from '../../../_metronic/assets/marketplace/icons/defaultProfile.svg'
 import Title from './components/Title'
 import DiscordButton from '../Marketplace/components/DiscordButton'
 import GoogleButton from '../Marketplace/components/GoogleButton'
-import MetamaskButton from '../Marketplace/components/MetamaskButton'
 import {useGlobal} from '../../context/AuthContext'
 import UserLogo from '../../../_metronic/assets/marketplace/UserLogo.svg'
 import {useAuthService} from '../../services/authService'
@@ -113,12 +111,16 @@ const Collection: React.FC<CollectionProps> = () => {
     try {
       if (validEmail.test(verifyEmail)) {
         const response = await verifyProfile(verifyEmail)
-        if (response) {
+        if (response === 200) {
           toast.success(response.desc, {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
           handleCloseEmailModal()
           getUserInfo()
+        } else {
+          toast.error(response.desc, {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          })
         }
       } else {
         toast.error(
@@ -263,15 +265,20 @@ const Collection: React.FC<CollectionProps> = () => {
           trimmedNewUserName
         )
 
-        if (response) {
+        if (response.Status !== 400) {
           handleCloseUsernameModal()
           setNewUserName('')
           setError('')
-          toast.success('Username updated successfully', {
+          toast.success(response.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
             style: {background: 'green'},
           })
           getUserInfo()
+        } else {
+          toast.error(response.Description, {
+            position: toast.POSITION.BOTTOM_RIGHT,
+            style: {background: 'red'},
+          })
         }
       } else {
         toast.error(
@@ -291,16 +298,16 @@ const Collection: React.FC<CollectionProps> = () => {
     }
   }
 
-  useEffect(() => {
-    if (!isLogin) {
-      if (counter > 0) {
-        const timer = setTimeout(() => setCounter(counter - 1), 1000)
-        return () => clearTimeout(timer)
-      } else {
-        navigate('/marketplace')
-      }
-    }
-  }, [counter, isLogin, navigate])
+  // useEffect(() => {
+  //   if (!isLogin) {
+  //     if (counter > 0) {
+  //       const timer = setTimeout(() => setCounter(counter - 1), 1000)
+  //       return () => clearTimeout(timer)
+  //     } else {
+  //       navigate('/marketplace')
+  //     }
+  //   }
+  // }, [counter, isLogin, navigate])
 
   const discordAccessToken = localStorage.getItem('discordAccessToken') || ''
   const userInfoData = userInfo?.data || {}
@@ -523,7 +530,7 @@ const Collection: React.FC<CollectionProps> = () => {
         </div>
 
         <div style={{border: 'none'}} className={`${styles.card} card`}>
-          <Title>ACOUNTS</Title>
+          <Title>ACCOUNTS</Title>
           <div className={styles.loginButtons}>
             <DiscordButton userInfo={userInfo} />
             <GoogleButton />

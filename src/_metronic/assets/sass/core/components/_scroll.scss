@@ -1,9 +1,13 @@
 //
 // Scroll
 //
+.Toastify {
+  z-index: 9999 !important;
+}
 .modal {
-  background: #0b05050f !important;
-  backdrop-filter: blur(5px) !important;
+  z-index: 9998 !important;
+  // background: #0b05050f !important;
+  // backdrop-filter: blur(5px) !important;
 }
 .modal-footer {
   border-top: none !important;

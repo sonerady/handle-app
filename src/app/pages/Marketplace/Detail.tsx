@@ -118,6 +118,11 @@ const Details: React.FC<DetailsProps> = () => {
   const [openReviewInput, setOpenReviewInput] = useState(true)
   const [openCommentInput, setOpenCommentInput] = useState(true)
 
+  useEffect(() => {
+    // Sayfa yüklendiğinde en üstte olacak şekilde kaydırma yapılır
+    window.scrollTo(0, 0)
+  }, [])
+
   const handleClose = () => setShow(false)
   const handleShow = () => {
     setShow(true)
@@ -134,11 +139,7 @@ const Details: React.FC<DetailsProps> = () => {
 
   const rate = appsById?.average_rate
 
-  console.log('rate', rate)
-
   const isRole = userInfo?.data.discord_role
-
-  console.log('isRole', isRole)
 
   const icon = userInfo?.data.icon
   const [commentData, setcommentData] = useState({
@@ -174,32 +175,61 @@ const Details: React.FC<DetailsProps> = () => {
   // }, [])
 
   useEffect(() => {
-    getReview(currentReviewPage, id)
-    getComment(currentCommentPage, id)
     getRating(id)
-  }, [id, allApps, alertComment])
+  }, [id])
 
   const handleShowReview = (page: any) => {
-    getReview(page + 1, id).then((response) => {
+    const nextPage = page + 1
+
+    getReview(nextPage, id).then((response) => {
       const newComments = response?.result || []
 
-      setComments((prevComments: any) => ({
-        ...response,
-        result: [...prevComments.result, ...newComments],
-      }))
+      setComments((prevComments: any) => {
+        // Önceki yorumların ID'lerini bir küme içerisinde saklayalım
+        const existingIds = new Set(prevComments.result.map((comment: any) => comment.id))
+
+        // Sadece yeni yorumları ekleyelim
+        const uniqueNewComments = newComments.filter((comment: any) => !existingIds.has(comment.id))
+
+        return {
+          ...prevComments,
+          result: [...prevComments.result, ...uniqueNewComments],
+        }
+      })
     })
   }
 
   const handleShowComment = (page: any) => {
-    getComment(page + 1, id).then((response) => {
+    const nextPage = page + 1
+
+    // Mevcut sayfa numarasının toplam sayfa sayısını aşması durumunu kontrol edin
+    if (nextPage > comments?.total_page) {
+      return
+    }
+
+    getComment(nextPage, id).then((response) => {
       const newComments = response?.result || []
 
-      setCommentsOther((prevComments: any) => ({
-        ...response,
-        result: [...prevComments.result, ...newComments],
-      }))
+      setCommentsOther((prevComments: any) => {
+        // Önceki yorumların ID'lerini bir küme içerisinde saklayalım
+        const existingIds = new Set(prevComments?.result.map((comment: any) => comment.id))
+
+        // Sadece yeni yorumları ekleyelim
+        const uniqueNewComments = newComments.filter((comment: any) => !existingIds.has(comment.id))
+
+        return {
+          ...prevComments,
+          result: [...prevComments.result, ...uniqueNewComments],
+        }
+      })
     })
   }
+
+  useEffect(() => {
+    // Sayfa ilk yüklendiğinde yorumları getir
+    handleShowComment(0) // 1: İlk sayfa numarası
+    handleShowReview(0) // 1: İlk sayfa numarası
+  }, [])
 
   useEffect(() => {
     if (id) {
@@ -249,7 +279,6 @@ const Details: React.FC<DetailsProps> = () => {
   const handleLike = async () => {
     if (isLogin) {
       try {
-        setIsLiked(true)
         if (id) {
           const currentLikes = JSON.parse(localStorage.getItem('likes') || '{}')
           if (!currentLikes[id]) {
@@ -261,6 +290,7 @@ const Details: React.FC<DetailsProps> = () => {
 
             localStorage.setItem(`likes-${account}`, JSON.stringify(currentLikes))
           }
+          setIsLiked(true)
         }
       } catch (error: string | any) {
         console.error(error)
@@ -272,6 +302,17 @@ const Details: React.FC<DetailsProps> = () => {
     }
   }
 
+  useEffect(() => {
+    if (id !== undefined) {
+      const likesString = localStorage.getItem('likes') || ''
+      const currentLikes = likesString.includes(id)
+      // Rest of your code
+      if (currentLikes) {
+        setIsLiked(true)
+      }
+    }
+  }, [id])
+
   const checkIfLiked = () => {
     if (id) {
       const currentLikes = JSON.parse(localStorage.getItem('likes') || '{}')
@@ -280,11 +321,11 @@ const Details: React.FC<DetailsProps> = () => {
     return false
   }
 
-  useEffect(() => {
-    if (selectedApp) {
-      setIsLiked(checkIfLiked())
-    }
-  }, [selectedApp, localStorage.getItem('likes')])
+  // useEffect(() => {
+  //   if (selectedApp) {
+  //     setIsLiked(checkIfLiked())
+  //   }
+  // }, [selectedApp, localStorage.getItem('likes')])
 
   useEffect(() => {
     const fetchLikeCount = async () => {
@@ -345,15 +386,12 @@ const Details: React.FC<DetailsProps> = () => {
         const response = await addComment(commentData)
         setLoading(!loading)
         setOpenCommentInput(false)
-        if (response.status === true) {
-          toast.success(
-            '"Your comment has been added successfully. Please wait for your comment to be approved."',
-            {
-              position: toast.POSITION.BOTTOM_RIGHT,
-            }
-          )
+        if (response.status === 200) {
+          toast.success(response.Description, {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          })
         } else {
-          toast.error('Comment could not be added', {
+          toast.error(response.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
         }
@@ -387,17 +425,17 @@ const Details: React.FC<DetailsProps> = () => {
           })
         }
         if (response.status === true) {
-          toast.success(response.rating, {
+          toast.success('Review added success.', {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
         } else {
-          toast.error('Review could not be added', {
+          toast.error(response.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
         }
       } catch (error: string | any) {
         console.error(error)
-        toast.error('Comment could not be added', {
+        toast.error(error, {
           position: toast.POSITION.BOTTOM_RIGHT,
         })
       }
@@ -443,7 +481,6 @@ const Details: React.FC<DetailsProps> = () => {
       if (contributorsItems && id) {
         setContributors(contributorsItems)
         setContLength(contributorsItems.number)
-        console.log('contributorsItems', contributorsItems)
       }
     }
 
@@ -462,7 +499,9 @@ const Details: React.FC<DetailsProps> = () => {
     getAppSlider(appid)
   }, [accessToken, appid])
 
-  console.log('conttt', contributors)
+  useEffect(() => {
+    setAppsById('')
+  }, [window.location.pathname])
 
   return (
     <Layout>
@@ -472,9 +511,17 @@ const Details: React.FC<DetailsProps> = () => {
             <div className={`${styles.rightContent} fs-2hx fw-bold text-gray-800`}>
               <div className={styles.headerContainer}>
                 <div className={styles.titleWrapper}>
-                  {appsById?.icon && (
+                  {appsById ? (
                     <img
                       src={appsById?.icon}
+                      alt='ıcon'
+                      onError={(e: React.ChangeEvent<HTMLImageElement>) =>
+                        (e.target.src = UserLogo)
+                      }
+                    />
+                  ) : (
+                    <img
+                      src={UserLogo}
                       alt='ıcon'
                       onError={(e: React.ChangeEvent<HTMLImageElement>) =>
                         (e.target.src = UserLogo)
@@ -491,7 +538,7 @@ const Details: React.FC<DetailsProps> = () => {
                         ? appsById?.name?.length > 8
                           ? appsById?.name.substring(0, 8) + '...'
                           : appsById?.name
-                        : ''}
+                        : 'Loading...'}
                     </div>
                     {appsById?.isfree && <span className={styles.priceBadge}>Free</span>}
                     <div
@@ -519,7 +566,7 @@ const Details: React.FC<DetailsProps> = () => {
                       {isLiked ? <AiTwotoneHeart /> : <AiOutlineHeart />}
                     </div>
                   </div>
-                  <a target={isVisited ? '_blank' : ''} href={isVisited ? appsById?.link : '#'}>
+                  <a target='_blank' href={appsById?.link}>
                     <img
                       // onClick={() => {
                       //   window.open(appsById?.link, '_blank')
@@ -580,17 +627,22 @@ const Details: React.FC<DetailsProps> = () => {
                       top: '6px',
                     }}
                   >
-                    {averageRating?.toFixed(1)}
+                    {appsById ? rate?.toFixed(1) : 0}
                   </p>
                 </div>
                 <div className={styles.rightText}>
                   <div className={styles.rigthTextItem}>
                     <img src={pinkCircle} alt='' />
-                    <span>{spaceCount ?? '0'} added to space</span>
+                    {appsById ? (
+                      <span>{spaceCount ?? '0'} added to space</span>
+                    ) : (
+                      <span>Loading...</span>
+                    )}
                   </div>
                   <div className={styles.rigthTextItem}>
                     <img src={pinkCircle} alt='' />
-                    <strong>{likeCount?.count ? likeCount?.count : '0'}</strong> <span>like</span>
+                    <strong>{appsById ? likeCount?.count ?? '0' : 'Loading...'}</strong>{' '}
+                    <span>like</span>
                   </div>
 
                   <div className={styles.rigthTextItem}>
@@ -603,9 +655,11 @@ const Details: React.FC<DetailsProps> = () => {
                 <div className={styles.description}>
                   <span className={styles.descTitle}>Description</span>
                   <p className={styles.desc}>
-                    {textDescription?.length > 200
-                      ? textDescription.slice(0, 200) + '... '
-                      : textDescription}
+                    {textDescription
+                      ? textDescription?.length > 200
+                        ? textDescription.slice(0, 200) + '... '
+                        : textDescription
+                      : 'Loading...'}
                     {textDescription?.length > 200 && (
                       <span className={styles.showMore} onClick={handleShow}>
                         Show more
@@ -782,43 +836,52 @@ const Details: React.FC<DetailsProps> = () => {
                   <div className={styles.rating}></div>
                 </div>
                 <div className={styles.ratingProgress}>
-                  {[5, 4, 3, 2, 1]?.map((item, index) => {
-                    const count = ratingsCount[item] || 0
-                    const percentage = (count / comments?.length) * 100
+                  {raitingDatas
+                    ? [5, 4, 3, 2, 1]?.map((item, index) => {
+                        const totalComments = comments?.total
 
-                    return (
-                      <div className={styles.ratingProgressItem}>
-                        <span className={styles.starts}>
-                          {Array(item)
-                            .fill(0)
-                            .map((_, i) => (
-                              <FaStar
+                        const count = raitingDatas?.count[item] || 0
+
+                        const percentage = (count / totalComments) * 100
+
+                        return (
+                          <div className={styles.ratingProgressItem}>
+                            <span className={styles.starts}>
+                              {Array(item)
+                                .fill(0)
+                                .map((_, i) => (
+                                  <FaStar
+                                    style={{
+                                      cursor: 'pointer',
+                                      fontSize: '1.5rem',
+                                    }}
+                                    color={'#FD7DA4'}
+                                  />
+                                ))}
+                            </span>
+                            <div className={styles.progress}>
+                              <div
                                 style={{
-                                  cursor: 'pointer',
-                                  fontSize: '1.5rem',
+                                  width: `${percentage}%`,
                                 }}
-                                color={'#FD7DA4'}
-                              />
-                            ))}
-                        </span>
-                        <div className={styles.progress}>
-                          <div
-                            style={{
-                              width: `${percentage}%`,
-                            }}
-                            className={styles.progressFull}
-                          ></div>
-                        </div>
-                      </div>
-                    )
-                  })}
+                                className={styles.progressFull}
+                              ></div>
+                            </div>
+                          </div>
+                        )
+                      })
+                    : ''}
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div className={styles.header}>
-          <div className={`${styles.leftHeader} ${styles.bottomCard} card`}>
+          <div
+            className={`${styles.leftHeader}
+            ${styles.bottomCardOther}
+            ${styles.bottomCard} card`}
+          >
             <div
               className={`${styles.rightContent} ${styles.usersCard} ${styles.usersCardReview} fs-2hx fw-bold text-gray-800`}
             >
@@ -949,7 +1012,7 @@ const Details: React.FC<DetailsProps> = () => {
                             >
                               <div className={styles.footerLeftBottomTop}>
                                 {/* Kontrol yapılarını ekliyoruz */}
-                                {comments
+                                {comments && comments?.result && comments.result.length > 0
                                   ? comments?.result?.map((item: any, index: number) => {
                                       // comments dizisindeki elemanların null/undefined kontrolü
                                       if (!item) return null
@@ -1006,7 +1069,7 @@ const Details: React.FC<DetailsProps> = () => {
                             {comments && comments?.result?.length > 4 && (
                               <button
                                 className={styles.loadMore}
-                                onClick={() => setPage(page + 1)}
+                                onClick={() => handleShowReview(page)}
                                 disabled={page * 5 >= (comments as any[])?.length}
                               >
                                 Show More

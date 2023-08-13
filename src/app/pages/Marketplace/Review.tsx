@@ -178,7 +178,6 @@ const Review: React.FC<ReviewProps> = ({
 
   const isRole = userInfo?.data?.discord_role
 
-  console.log('publishDate', moment(publishDate).format('YYYY-MM-DD'))
 
   return (
     <div

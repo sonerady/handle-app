@@ -46,6 +46,7 @@ function MetaMaskConnect({title, setOpenModal}) {
         method: 'eth_requestAccounts',
       })
       localStorage.setItem('metamaskAccount', accounts[0])
+      localStorage.setItem('connect_metamask', accounts[0])
       setAccount(accounts[0])
       setMetamaskAccessToken(accounts[0])
     } catch (error) {
@@ -54,7 +55,6 @@ function MetaMaskConnect({title, setOpenModal}) {
       )
     }
   }
-
 
   const accountLine = account?.slice(0, 6) + '...' + account?.slice(-4)
 

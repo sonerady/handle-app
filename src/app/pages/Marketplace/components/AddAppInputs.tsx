@@ -140,8 +140,6 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
     }
   }
 
-  console.log('formikvv', formik.values)
-  console.log(' backgrounds', backgrounds)
   const handleSubmit = () => {
     const contentState = descState.getCurrentContent()
     handleAddApp('publish')

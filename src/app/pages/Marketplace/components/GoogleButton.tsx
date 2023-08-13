@@ -37,7 +37,7 @@ const CustomModal: FC<ModalProps> = ({children, openModal}) => {
 
   const onFailure = (res: any) => {}
 
-  const onSuccess = (res: any) => {
+  const onSuccess = async (res: any) => {
     const googleAccessToken = res?.accessToken
 
     localStorage.setItem('googleAccessToken', googleAccessToken)
@@ -51,26 +51,31 @@ const CustomModal: FC<ModalProps> = ({children, openModal}) => {
       setGmailIcon && setGmailIcon(googleProfile.imageUrl)
       setGmailUsername && setGmailUsername(googleProfile.name)
       setIsSignedIn(true)
-      connectGoogleAccount(googleAccessToken, googleProfile.name, googleProfile.email)
+      const response = await connectGoogleAccount(
+        googleAccessToken,
+        googleProfile.name,
+        googleProfile.email
+      )
+      if (response.success) {
+        toast.success('Google account connected successfully')
+      }
     }
   }
 
   const handleLogout = async () => {
     try {
-      gapi.auth2
-        .getAuthInstance()
-        .signOut()
-        .then(() => {
-          setIsSignedIn(false)
-        })
-      const googleAccessToken = localStorage.getItem('googleAccessToken')
+      // gapi.auth2
+      //   .getAuthInstance()
+      //   .signOut()
+      //   .then(() => {
+      //     setIsSignedIn(false)
+      //   })
 
-      const logout = await googleLogout(googleAccessToken)
-
-      if (logout.status === 200) {
+      const logout = await googleLogout()
+      if (logout.status) {
         setIsSignedIn(false)
         localStorage.removeItem('googleAccessToken')
-        localStorage.removeItem('accessTokenMarketplace')
+
         setGoogleAccessToken && setGoogleAccessToken('')
         setUserName && setUserName('')
         setGmailUsername && setGmailUsername('')
@@ -78,9 +83,14 @@ const CustomModal: FC<ModalProps> = ({children, openModal}) => {
         setAvatarUrl && setAvatarUrl('')
         setGmailEmail && setGmailEmail('')
         // window.location.reload()
-        setOpenModal(true)
+        // setOpenModal(true)
+        toast?.success(logout.Desc, {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
       } else {
-        toast.error(logout.Desc)
+        toast.error(logout.Desc, {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
       }
     } catch (error) {}
   }
@@ -117,7 +127,7 @@ const CustomModal: FC<ModalProps> = ({children, openModal}) => {
         >
           <div className={styles.buttonContent}>
             <img src={google} alt='' />
-            <span className={styles.btnText}>Sign out from Google</span>
+            <span className={styles.btnText}>Disconnect Google</span>
           </div>
         </button>
       ) : (

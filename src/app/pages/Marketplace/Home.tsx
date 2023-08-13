@@ -79,7 +79,7 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
   }, [token])
 
   useEffect(() => {
-    if (userInfo?.data?.is_verified && showPopup) {
+    if (showPopup) {
       setShowModal(true)
     }
   }, [userInfo, accessToken, showPopup])
@@ -189,6 +189,8 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
         </Modal.Body>
       </Modal>
       <Modal
+        className={styles.modalBody}
+        centered
         size='lg'
         style={{
           padding: '2rem',
@@ -199,6 +201,8 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
         <Modal.Header closeButton></Modal.Header>
         <Modal.Body
           style={{
+            paddingBottom: '4rem',
+
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
@@ -207,11 +211,11 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
           }}
         >
           <strong className={styles.notActiveMessage}>{notActiveMessage}</strong>
-          <div>
+          <div className={styles.resendEmailContainer}>
+            <span className={styles.resendEmailText}>Token has expired</span>
             <strong onClick={() => resendEmailHandle()} className={styles.resendEmail}>
-              Resend{' '}
+              Resend
             </strong>
-            email verification to <strong>{resendEmail}</strong>?
           </div>
         </Modal.Body>
       </Modal>

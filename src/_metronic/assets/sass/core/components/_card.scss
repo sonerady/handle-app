@@ -4,6 +4,7 @@
 
 // Base
 .card {
+  border: none !important;
   @if ($card-border-enabled) {
     border: $card-border-width $card-border-style var(--#{$prefix}card-border-color);
   } @else {

@@ -16,6 +16,11 @@ interface CustomModalProps {
 const CustomModal: FC<CustomModalProps> = ({userInfo}) => {
   const [isError, setIsError] = useState(false)
 
+  const [isLogout, setIsLogout] = useState(false)
+  const [isLoginDiscord, setIsLoginDiscord] = useState(localStorage.getItem('connect_discord'))
+
+  const [loginText, setLoginText] = useState('Connect Discord')
+
   const {
     setDiscordAccessToken,
     setAvatarUrl,
@@ -27,28 +32,29 @@ const CustomModal: FC<CustomModalProps> = ({userInfo}) => {
     setOpenModal,
     setDiscordIcon,
     discordAccessToken,
+    discordUsername,
   } = useGlobal()
-  const {getRole, getUserInfo, connectDiscordAccount, logOut} = useAuthService()
+  const {getRole, getUserInfo, connectDiscordAccount, discordLogout} = useAuthService()
 
+  const [user, setUser] = useState<any>('')
   const navigate = useNavigate()
 
   const logoutDiscord = async () => {
     try {
-      await logOut(localStorage.getItem('discordAccessToken'))
-      localStorage.removeItem('discordAccessToken')
-      localStorage.removeItem('discordID')
-      localStorage.removeItem('discordUserName')
-      localStorage.removeItem('accessTokenMarketplace')
-      localStorage.removeItem('login')
-      localStorage.removeItem('role')
-      localStorage.removeItem('avatarUrl')
-      localStorage.removeItem('userName')
-      localStorage.removeItem('userId')
-      localStorage.removeItem('userEmail')
-      setDiscordAccessToken(null)
-      setAccessToken(null)
-      setOpenModal(true)
-      navigate('/marketplace')
+      const connect = await discordLogout()
+      if (connect.success) {
+        setLoginText('Connect Discord')
+        setIsLogout(true)
+        localStorage.removeItem('connect_discord')
+        localStorage.removeItem('discordAccessToken')
+        localStorage.removeItem('discordID')
+      } else {
+        toast.error(connect.message, {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+      }
+
+      setIsLoginDiscord(null)
     } catch (err) {
       console.error(err)
     }
@@ -102,8 +108,8 @@ const CustomModal: FC<CustomModalProps> = ({userInfo}) => {
           const accessToken = res.access_token
 
           if (accessToken) {
-            setDiscordAccessToken(accessToken)
-            localStorage.setItem('discordAccessToken', accessToken)
+            // setDiscordAccessToken(accessToken)
+
             if (discordAccessToken) {
               getRole()
             }
@@ -127,13 +133,6 @@ const CustomModal: FC<CustomModalProps> = ({userInfo}) => {
             setDiscordID(user.id)
             setDiscordIcon(user.avatar)
 
-            localStorage.setItem('discordIcon', user.avatar)
-            localStorage.setItem('discordAvatarUrl', avatarURL)
-            localStorage.setItem('discordUsername', user.username)
-            localStorage.setItem('discordID', user.id)
-            localStorage.setItem('discordUserName', user.username)
-            localStorage.setItem('discordEmail', user.email)
-
             const discordId = user.id
             const discordToken = accessToken
             const discordIcon = avatarURL
@@ -154,7 +153,20 @@ const CustomModal: FC<CustomModalProps> = ({userInfo}) => {
                   position: toast.POSITION.BOTTOM_RIGHT,
                 })
               } else {
+                toast.success('Discord account connected successfully', {
+                  position: toast.POSITION.BOTTOM_RIGHT,
+                })
                 localStorage.setItem('disLogin', 'true')
+                localStorage.setItem('discordAccessToken', accessToken)
+                localStorage.setItem('discordIcon', user.avatar)
+                localStorage.setItem('discordAvatarUrl', avatarURL)
+                localStorage.setItem('discordUsername', user.username)
+                localStorage.setItem('discordID', user.id)
+                localStorage.setItem('discordUserName', user.username)
+                localStorage.setItem('discordEmail', user.email)
+                localStorage.setItem('connect_discord', user.username)
+                setDiscordUsername(user.username)
+                setLoginText('Disconnect Discord')
               }
             }
             getUserInfo()
@@ -168,8 +180,26 @@ const CustomModal: FC<CustomModalProps> = ({userInfo}) => {
     fetchTokenAndUserData()
   }, [code])
 
-  const isLoginDiscord = localStorage.getItem('discordAccessToken')
-  const disLogin = localStorage.getItem('disLogin')
+  // const isLoginDiscord = localStorage.getItem('connect_discord')
+
+  // useEffect(() => {
+  //   const isLoginDiscord =
+  //     localStorage.getItem('connect_discord') || localStorage.getItem('discordAccessToken')
+  //   if (isLoginDiscord) {
+  //     setLoginText('Disconnect Discord')
+  //   } else {
+  //     setLoginText('Connect Discord')
+  //   }
+  // }, [])
+
+  useEffect(() => {
+    const isLoginDiscord = localStorage.getItem('connect_discord')
+    if (isLoginDiscord === discordUsername) {
+      setLoginText('Disconnect Discord')
+    } else {
+      setLoginText('Connect Discord')
+    }
+  })
 
   return (
     <Button
@@ -181,16 +211,16 @@ const CustomModal: FC<CustomModalProps> = ({userInfo}) => {
       className={styles.discordButton}
       variant='dark'
       onClick={() => {
-        isLoginDiscord ? logoutDiscord() : (window.location.href = discordAuthUrl)
+        loginText === 'Disconnect Discord'
+          ? logoutDiscord()
+          : (window.location.href = discordAuthUrl)
       }}
     >
       <div className={styles.buttonContent}>
         <span className={styles.discordIcon}>
           <BsDiscord />
         </span>
-        <span className={styles.btnText}>
-          {isLoginDiscord ? ' Disconnect Discord' : 'Connect Discord'}
-        </span>
+        <span className={styles.btnText}>{loginText}</span>
       </div>
     </Button>
   )

@@ -19,6 +19,7 @@ export const TokenProvider = ({children}) => {
   const [code, setCode] = useState('')
   const [imagePreview, setImagePreview] = useState(null)
   const [showAlert, setShowAlert] = useState('')
+  const [discordRole, setDiscordRole] = useState('')
   const [uploadedFile, setUploadedFile] = useState(false)
   const [localImagePreview, setLocalImagePreview] = useState(false)
   const [chatHistory, setChatHistory] = useState([])
@@ -53,8 +54,18 @@ export const TokenProvider = ({children}) => {
   const [openHistory, setOpenHistory] = useState(false)
   const [version, setVersion] = useState('v1')
   const [alertComment, setAlertComment] = useState()
-  const [comments, setComments] = useState()
-  const [commentsOther, setCommentsOther] = useState()
+  const [comments, setComments] = useState({
+    next: 1,
+    total_page: 1,
+    total: 0,
+    result: [],
+  })
+  const [commentsOther, setCommentsOther] = useState({
+    next: 1,
+    total_page: 1,
+    total: 0,
+    result: [],
+  })
   const [isSuccess, setIsSuccess] = useState('')
   const [appSlider, setAppSlider] = useState([])
   const [imageId, setImageId] = useState()
@@ -319,6 +330,8 @@ export const TokenProvider = ({children}) => {
         setIsValidate,
         showAnnouncement,
         setShowAnnouncement,
+        discordRole,
+        setDiscordRole,
       }}
     >
       {children}

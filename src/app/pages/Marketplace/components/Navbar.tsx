@@ -53,7 +53,7 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
 
   const api = useAPI()
 
-  const {logOut, verifyProfile, getTokenBalance} = useAuthService()
+  const {verifyProfile} = useAuthService()
   const [showModal, setShowModal] = useState(false)
   const [provider, setProvider] = useState<Provider | null>(null)
   const handleModalToggle = () => setShowModal(!showModal)
@@ -138,7 +138,6 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
     getTokenBalance()
   }, [profileAccount, isLoginMetamask, account])
 
-  console.log('metaa', account)
 
   useEffect(() => {
     async function detectProvider() {
@@ -316,12 +315,11 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
       </div>
       <Modal centered show={showModal} onHide={handleModalToggle}>
         <Modal.Header closeButton>
-          <Modal.Title>Complete Your Membership</Modal.Title>
+          <Modal.Title>Set Your Email</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group className='mb-3'>
-              <Form.Label>Email</Form.Label>
               <Form.Control
                 style={{
                   height: '40px',
@@ -334,9 +332,6 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <button className={styles.closeButton} onClick={handleModalToggle}>
-            Close
-          </button>
           <button className={styles.saveButton} onClick={handleFormSubmit}>
             Save Changes
           </button>

@@ -12,14 +12,22 @@ interface DropdownProps {
 }
 
 const Dropdown: React.FC<DropdownProps> = ({isOpen, onClose}) => {
-  const {account, roles, googleAccessToken} = useGlobal()
+  const {
+    account,
+    roles,
+    googleAccessToken,
+    setGoogleAccessToken,
+    setDiscordAccessToken,
+    setMetamaskAccessToken,
+    setMailAccessToken,
+  } = useGlobal()
   const navigate = useNavigate()
   const [isSubmenuOpen, setSubmenuOpen] = useState(false)
 
   const accountLine = account?.slice(0, 6) + '...' + account?.slice(-4)
   const dropdownRef = useRef<HTMLDivElement>(null) // Bu satırı ekleyin
   const {accessToken, setAccessToken, userInfo} = useGlobal()
-  const {logOut, googleLogout} = useAuthService()
+
   // Bu useEffect'i ekleyin
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -99,25 +107,25 @@ const Dropdown: React.FC<DropdownProps> = ({isOpen, onClose}) => {
             <button
               onClick={async () => {
                 localStorage.removeItem('accessTokenMarketplace')
-                const id = localStorage.getItem('discordAccessToken')
-                const response = await logOut(id)
-                if (response) {
-                  await googleLogout(googleAccessToken)
-                  window.location.reload()
-                  localStorage.removeItem('discordAccessToken')
-                  localStorage.removeItem('accessTokenMarketplace')
-                  localStorage.removeItem('login')
-                  localStorage.removeItem('discordID')
-                  localStorage.removeItem('userId')
-                  localStorage.removeItem('role')
-                  localStorage.removeItem('avatarUrl')
-                  localStorage.removeItem('userName')
-                  localStorage.removeItem('googleAccessToken')
-                  localStorage.removeItem('metamaskAccount')
-                  localStorage.removeItem('disLogin')
-                  localStorage.removeItem('isVerifiedUser')
-                  navigate('/marketplace')
-                }
+                window.location.reload()
+                localStorage.removeItem('discordAccessToken')
+                localStorage.removeItem('accessTokenMarketplace')
+                localStorage.removeItem('login')
+                localStorage.removeItem('discordID')
+                localStorage.removeItem('userId')
+                localStorage.removeItem('role')
+                localStorage.removeItem('avatarUrl')
+                localStorage.removeItem('userName')
+                localStorage.removeItem('googleAccessToken')
+                localStorage.removeItem('metamaskAccount')
+                localStorage.removeItem('disLogin')
+                localStorage.removeItem('isVerifiedUser')
+                localStorage.removeItem('connect_metamask')
+                setMailAccessToken('')('')
+                setMetamaskAccessToken('')
+                setDiscordAccessToken('')
+                setGoogleAccessToken('')
+                navigate('/marketplace')
               }}
               className={` ${styles.logoutButton}`}
             >

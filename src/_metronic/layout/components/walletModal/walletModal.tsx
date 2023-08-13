@@ -45,6 +45,7 @@ const CustomModal: FC<ModalProps> = ({children, openModal, setOpenModal}) => {
     setGmailIcon,
     setGmailUsername,
     validUsername,
+    setDiscordRole,
   } = useGlobal()
   const {getRole, sendForgot} = useAuthService()
   const [emailInput, setEmailInput] = useState('')
@@ -137,7 +138,6 @@ const CustomModal: FC<ModalProps> = ({children, openModal, setOpenModal}) => {
       // Decode the user name and avatar URL
       const decodedName = decodeURIComponent(googleProfile.name)
       const decodedImageUrl = decodeURIComponent(googleProfile.imageUrl)
-      console.log('Google profile', googleProfile)
       setUserName && setUserName(decodedName)
       setAvatarUrl && setAvatarUrl(decodedImageUrl)
       setGmailEmail && setGmailEmail(googleProfile.email)
@@ -166,14 +166,14 @@ const CustomModal: FC<ModalProps> = ({children, openModal, setOpenModal}) => {
 
   const discordClientId = '1121395648437174313'
 
-  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fmarketplace&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
+  // const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fmarketplace&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
 
-  // const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=https%3A%2F%2Fhypermarket.azurewebsites.net%2Fmarketplace&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
+  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=https%3A%2F%2Fhypermarket.azurewebsites.net%2Fmarketplace&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
 
   const url = new URL(window.location.href)
   const code = url.searchParams.get('code')
-  const redirectUri = 'http://localhost:8080/marketplace'
-  // const redirectUri = 'https://hypermarket.azurewebsites.net/marketplace'
+  // const redirectUri = 'http://localhost:8080/marketplace'
+  const redirectUri = 'https://hypermarket.azurewebsites.net/marketplace'
 
   useEffect(() => {
     const fetchTokenAndUserData = async () => {
@@ -220,6 +220,7 @@ const CustomModal: FC<ModalProps> = ({children, openModal, setOpenModal}) => {
             setDiscordEmail(user.email)
             setDiscordID(user.id)
             setDiscordIcon(user.avatar)
+            setDiscordRole(user.role)
             localStorage.setItem('discordIcon', user.avatar)
             localStorage.setItem('discordAvatarUrl', avatarURL)
             localStorage.setItem('discordUsername', user.username)

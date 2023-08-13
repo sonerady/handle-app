@@ -5,6 +5,32 @@ main {
   width: 38px;
   height: 38px;
 }
+
+.resendEmailContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-direction: column;
+  .resendEmailText {
+    font-size: 1.4rem;
+  }
+  .resendEmail {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--pink-gradient, linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%));
+    padding: 0 20px;
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    height: 40px;
+    border: none;
+  }
+}
+
 .saveButton,
 .closeButton {
   background: var(--pink-gradient, linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%));
@@ -501,18 +527,18 @@ main {
     z-index: 1;
   }
 }
-.resendEmail {
-  cursor: pointer;
-  font-weight: bold;
-  border-image-source: linear-gradient(to left, #ff9085 30%, #fb6fbb 99%);
-  background-image: linear-gradient(to left, #ff9085 30%, #fb6fbb 99%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  &:hover {
-    opacity: 0.7;
-  }
-}
+// .resendEmail {
+//   cursor: pointer;
+//   font-weight: bold;
+//   border-image-source: linear-gradient(to left, #ff9085 30%, #fb6fbb 99%);
+//   background-image: linear-gradient(to left, #ff9085 30%, #fb6fbb 99%);
+//   -webkit-background-clip: text;
+//   background-clip: text;
+//   -webkit-text-fill-color: transparent;
+//   &:hover {
+//     opacity: 0.7;
+//   }
+// }
 .imageCard {
   width: 400px;
   background-size: cover;
@@ -703,7 +729,6 @@ main {
         width: 62.39px;
         height: 23px;
         border: 2px solid #fb72b7;
-
         border-radius: 2rem;
         color: #ffffff !important;
         text-transform: uppercase;
@@ -712,10 +737,6 @@ main {
         display: flex;
         justify-content: center;
         align-items: center;
-        &:hover {
-          background-color: #ffc444;
-          color: white;
-        }
       }
       .cardItem {
         min-height: 97px;

@@ -8,6 +8,7 @@ import metamask from '../../../../_metronic/assets/marketplace/icons/metamask.sv
 import {useAuthService} from '../../../../app/services/authService'
 import {useNavigate} from 'react-router-dom'
 import {toast} from 'react-toastify'
+import {set} from 'lodash'
 
 function MetaMaskConnect({title, userInfo, imageLink}) {
   const [provider, setProvider] = useState(null)
@@ -22,17 +23,18 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
     setLoginMetamask,
     hgptBalance,
   } = useGlobal()
-  const {updateUser, connectMetamaskAccount, getTokenBalance} = useAuthService()
+  const {updateUser, connectMetamaskAccount, getTokenBalance, metamaskLogout} = useAuthService()
   const [errorMessage, setErrorMessage] = useState('')
 
   const [account, setAccount] = useState(null)
 
-  const isLoginMetamask = localStorage.getItem('metamaskAccount')
-
-  const [isLogin, setIsLogin] = useState(false)
+  const [loginText, setLoginText] = useState('Connect Metamask')
 
   const navigate = useNavigate()
 
+  const [isMetamask, setIsMetamask] = useState(localStorage.getItem('connect_metamask'))
+
+  const [metamaskId, setMetamaskId] = useState('')
   const connectToMetaMask = async () => {
     try {
       const ethereum = window.ethereum
@@ -44,36 +46,51 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
       // localStorage.setItem('blanace', accounts[0])
       const metamask = await connectMetamaskAccount(accounts[0])
       if (metamask.Status === 200) {
+        setLoginText('Disconnect Metamask')
+        localStorage.setItem('connect_metamask', accounts[0])
+        setMetamaskId(accounts[0])
         setLoginMetamask(true)
-        setIsLogin(true)
-        toast.success('Metamask connected successfully')
+        toast.success('Metamask connected successfully', {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
       } else {
-        toast.error(metamask.Description)
+        toast.error(metamask.Description, {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
       }
     } catch (error) {
-      setErrorMessage(
-        'Metamask connection failed. Please try logging in by opening the Metamask extension.'
-      )
+      setErrorMessage({
+        message: error.message,
+      })
     }
   }
 
-  const logoutFromMetaMask = () => {
-    setProfileAccount(null)
-    setHgptBalance(0)
-    setBalance(0)
-    setAccount('')
-    localStorage.removeItem('metamaskAccount')
-    localStorage.removeItem('accessTokenMarketplace')
-    localStorage.removeItem('login')
-    localStorage.removeItem('isVerifiedUser')
-    localStorage.removeItem('discordUsername')
-    localStorage.removeItem('discordAvatarUrl')
-    localStorage.removeItem('discordUserName')
-    localStorage.removeItem('balanceee')
-    localStorage.removeItem('discordEmail')
-    setOpenModal(true)
-    navigate('/marketplace')
+  const logoutFromMetaMask = async () => {
+    const response = await metamaskLogout()
+    if (response.success === true) {
+      setLoginText('Connect Metamask')
+      setProfileAccount(null)
+      setHgptBalance(0)
+      // setBalance(0)
+      setAccount('')
+      localStorage.removeItem('connect_metamask')
+      localStorage.removeItem('metamaskAccount')
+    } else {
+      toast.error(response.message, {
+        position: toast.POSITION.BOTTOM_RIGHT,
+      })
+    }
+    setIsMetamask(null)
   }
+
+  useEffect(() => {
+    const isLoginDiscord = localStorage.getItem('connect_metamask')
+    if (isLoginDiscord) {
+      setLoginText('Disconnect Metamask')
+    } else {
+      setLoginText('Connect Metamask')
+    }
+  })
 
   // const accountLine = profileAccount?.slice(0, 6) + '...' + profileAccount?.slice(-4)
 
@@ -130,9 +147,9 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
   //   )
   // }
 
+
   return (
     <div>
-      {' '}
       <div
         style={{
           borderRadius: '10px',
@@ -149,11 +166,11 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
           padding: 'calc(0.775rem + 1px) calc(1.5rem + 1px)',
         }}
         onClick={() => {
-          !profileAccount || !isLogin ? connectToMetaMask() : logoutFromMetaMask()
+          loginText === 'Disconnect Metamask' ? logoutFromMetaMask() : connectToMetaMask()
         }}
       >
         <img src={metamask} />
-        {!profileAccount || !isLogin ? title : 'Sign out from Metamask'}
+        <span>{loginText}</span>
       </div>
     </div>
   )
@@ -162,6 +179,6 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
 export default MetaMaskConnect
 
 MetaMaskConnect.defaultProps = {
-  title: 'Connect Metamask',
+  title: '',
   setOpenModal: () => {},
 }

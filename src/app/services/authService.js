@@ -496,7 +496,9 @@ export const useAuthService = () => {
     gmailUserName,
     gmailIcon,
     discord_email,
-    gmail_email
+    gmail_email,
+    discordId, // eklenen
+    discordRole // eklenen
   ) => {
     try {
       const response = await api.post(
@@ -508,7 +510,12 @@ export const useAuthService = () => {
           discordIcon || 'None'
         }&gmail_username=${gmailUserName || 'None'}&gmail_icon=${
           gmailIcon || 'None'
-        }&discord_email=${discord_email || 'None'}&gmail_email=${gmail_email || 'None'}`,
+        }&discord_email=${discord_email || 'None'}&gmail_email=${
+          gmail_email || 'None'
+        }&discord_id=${
+          discordId || 'None' // eklenen
+        }&discord_role=${discordRole || 'None'}`, // eklenen
+
         {
           headers: {
             'Access-Control-Allow-Methods': 'GET, POST, HEAD, PUT, DELETE, OPTIONS, PATCH',
@@ -542,6 +549,7 @@ export const useAuthService = () => {
           },
         }
       )
+
       return response.data
     } catch (error) {
       setShowErrorImage(true)
@@ -841,30 +849,36 @@ export const useAuthService = () => {
     } catch (error) {}
   }
 
-  const googleLogout = async (gmail_token) => {
+  const googleLogout = async () => {
     try {
-      const response = await api.post(
-        `/gmail_user/logout?token=${accessToken}&gmail_token=${gmail_token}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      )
+      const response = await api.post(`/gmail_user/logout?token=${accessToken}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
       return response.data
     } catch (error) {}
   }
 
-  const discordLogout = async (gmail_token) => {
+  const metamaskLogout = async () => {
     try {
-      const response = await api.post(
-        `/gmail_user/logout?token=${accessToken}&gmail_token=${gmail_token}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      )
+      const response = await api.post(`/metamask_user/logout?token=${accessToken}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      return response.data
+    } catch (error) {}
+  }
+
+  const discordLogout = async () => {
+    try {
+      const response = await api.post(`/discord_user/logout?token=${accessToken}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
       return response.data
     } catch (error) {}
   }
@@ -916,7 +930,7 @@ export const useAuthService = () => {
 
   const resendVerification = async (email) => {
     try {
-      const response = await api.get(`/user/resend_verification_link=${email}`, {
+      const response = await api.get(`/user/resend_verification_link?email=${email}`, {
         headers: {
           Authorization: `Bearer "${accessToken}"`,
         },
@@ -1039,7 +1053,7 @@ export const useAuthService = () => {
           'Content-Type': 'application/json',
         },
       })
-      setComments(response.data)
+      // setComments(response.data)
       return response.data
     } catch (error) {
       console.error(error)
@@ -1053,7 +1067,7 @@ export const useAuthService = () => {
           'Content-Type': 'application/json',
         },
       })
-      setCommentsOther(response.data)
+      // setCommentsOther(response.data)
       return response.data
     } catch (error) {
       console.error(error)
@@ -1551,5 +1565,6 @@ export const useAuthService = () => {
     connectMetamaskAccount,
     getTokenBalance,
     discordLogout,
+    metamaskLogout,
   }
 }

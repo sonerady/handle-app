@@ -143,7 +143,6 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
           // const data = await response?.json()
 
           setLink(response?.link)
-          // console.log(data)
         }
       }
     }
@@ -152,7 +151,6 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
   const handleSubmit = () => {
     const contentState = descState.getCurrentContent()
     const htmlContent = draftToHtml(convertToRaw(contentState))
-    console.log(htmlContent)
     handleAddApp('fix', selectedApp?.appid)
   }
 

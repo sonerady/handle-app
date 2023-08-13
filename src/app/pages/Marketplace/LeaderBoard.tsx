@@ -17,15 +17,8 @@ const Collection: React.FC<CollectionProps> = () => {
   const isDiscordUser = localStorage.getItem('role')
   const [countdowns, setCountdowns] = useState<any>({})
   const [error, setError] = useState<string | null>(null)
-  const {
-    published,
-    appValidation,
-    reviewValidation,
-    ranking,
-    campaigns,
-    userRanking,
-    reviewsPublished,
-  } = useGlobal()
+  const {published, appValidation, reviewValidation, ranking, campaigns, reviewsPublished} =
+    useGlobal()
   const {
     getPublished,
     getAppValidation,
