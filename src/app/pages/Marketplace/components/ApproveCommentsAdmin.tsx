@@ -94,13 +94,13 @@ const ApproveComments: React.FC<ApproveCommentsProps> = ({
       {showApproveButton && (
         <div className={styles.approveButtonWrapper}>
           <button onClick={() => handleApprove(item.id)} className={styles.approveButton}>
-            Approve Review
+            Approve Comments
           </button>
           <button
             onClick={() => handleShow()}
             className={`${styles.approveButton} ${styles.rejectButton}`}
           >
-            Reject Review
+            Reject Comment
           </button>
         </div>
       )}

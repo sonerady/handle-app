@@ -322,6 +322,8 @@ const Collection: React.FC<CollectionProps> = () => {
 
   const role = localStorage.getItem('role')
 
+  console.log('formik', formik.values)
+
   if (!isDiscordUser || role === 'HyperAdmin') {
     return (
       <Layout>

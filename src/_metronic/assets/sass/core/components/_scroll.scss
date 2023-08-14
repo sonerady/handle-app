@@ -204,6 +204,8 @@ input[type='date']::-webkit-calendar-picker-indicator {
 }
 .rdw-editor-toolbar {
   background: #ffffff1a !important;
+  border-radius: 6px !important;
+  border: none !important;
 }
 .rdw-dropdownoption-default {
   color: black !important;
@@ -215,8 +217,8 @@ input[type='date']::-webkit-calendar-picker-indicator {
 
 .editorClassName {
   padding: 1rem;
-  background: #1f1f21 !important;
-  border: 1px solid #80808057 !important;
+  border-radius: 6px;
+  background: #161617 !important;
   min-height: 300px !important;
 }
 .gradient-bg {

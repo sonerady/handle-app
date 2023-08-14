@@ -312,20 +312,6 @@ const Details: React.FC<DetailsProps> = () => {
     }
   }, [id])
 
-  const checkIfLiked = () => {
-    if (id) {
-      const currentLikes = JSON.parse(localStorage.getItem('likes') || '{}')
-      return currentLikes[id] ? true : false
-    }
-    return false
-  }
-
-  // useEffect(() => {
-  //   if (selectedApp) {
-  //     setIsLiked(checkIfLiked())
-  //   }
-  // }, [selectedApp, localStorage.getItem('likes')])
-
   useEffect(() => {
     const fetchLikeCount = async () => {
       if (id) {
@@ -633,7 +619,7 @@ const Details: React.FC<DetailsProps> = () => {
                   <div className={styles.rigthTextItem}>
                     <img src={pinkCircle} alt='' />
                     {appsById ? (
-                      <span>{spaceCount ?? '0'} added to space</span>
+                      <span>{appsById?.space_added ?? '0'} added to space</span>
                     ) : (
                       <span>Loading...</span>
                     )}

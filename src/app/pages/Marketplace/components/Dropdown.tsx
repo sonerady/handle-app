@@ -97,7 +97,7 @@ const Dropdown: React.FC<DropdownProps> = ({isOpen, onClose}) => {
               <div className={styles.submenu}>
                 <Link to={'/dao?task=add-app'}>Add App</Link>
                 {/* <Link to={'/dao?task=add-comment'}>Add Comment</Link> */}
-                <Link to={'/dao?task=approve-comment'}>Approve Review</Link>
+                <Link to={'/dao?task=approve-comment'}>Approve Comment</Link>
                 <Link to={'/dao?task=approve-app'}>Approve App</Link>
               </div>
             )}

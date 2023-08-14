@@ -10,6 +10,7 @@ import {CropperRef, Cropper, FixedCropper, ImageRestriction} from 'react-advance
 import 'react-advanced-cropper/dist/style.css'
 import Select from 'react-select'
 import {Modal} from 'react-bootstrap'
+import {useGlobal} from '../../../context/AuthContext'
 
 interface AddAppInputsProps {
   formik: any
@@ -52,6 +53,8 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
   categories,
 }) => {
   const [showModal, setShowModal] = useState<any>()
+
+  const {successTrigger, setSuccessTrigger} = useGlobal()
 
   const [croppedImage, setCroppedImage] = useState<HTMLCanvasElement | null>(null)
 
@@ -141,8 +144,8 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
   }
 
   const handleSubmit = () => {
-    const contentState = descState.getCurrentContent()
     handleAddApp('publish')
+    setDescState(EditorState.createWithContent(ContentState.createFromText('')))
   }
 
   return (

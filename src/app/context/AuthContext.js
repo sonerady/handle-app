@@ -25,6 +25,7 @@ export const TokenProvider = ({children}) => {
   const [imagePreview, setImagePreview] = useState(null)
   const [showAlert, setShowAlert] = useState('')
   const [discordRole, setDiscordRole] = useState('')
+  const [successTrigger, setSuccessTrigger] = useState(false)
   const [uploadedFile, setUploadedFile] = useState(false)
   const [localImagePreview, setLocalImagePreview] = useState(false)
   const [chatHistory, setChatHistory] = useState([])
@@ -344,6 +345,8 @@ export const TokenProvider = ({children}) => {
         commentLength,
         campaignsUser,
         setCampaignsUser,
+        successTrigger,
+        setSuccessTrigger,
       }}
     >
       {children}
