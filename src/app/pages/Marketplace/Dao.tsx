@@ -22,6 +22,7 @@ import {useNavigate, useLocation, useParams} from 'react-router-dom'
 import 'react-toastify/dist/ReactToastify.css'
 import {Modal} from 'react-bootstrap'
 import moment from 'moment'
+import {userInfo} from 'os'
 interface CollectionProps {}
 
 type Category = {
@@ -56,6 +57,7 @@ const Collection: React.FC<CollectionProps> = () => {
     accessToken,
     campaignsUser,
     setCampaignsUser,
+    userInfo,
   } = useGlobal()
   const {
     fixApp,
@@ -156,9 +158,8 @@ const Collection: React.FC<CollectionProps> = () => {
     validationSchema: Yup.object({
       name: Yup.string().required('Required'),
       title: Yup.string().required('Required'),
-      // description: Yup.string().required('Required'),
       icon: Yup.string().required('Required'),
-      link: Yup.string().url('Must be a valid URL').required('Required'),
+      link: Yup.string().required('Required'),
     }),
     onSubmit: async (values) => {},
   })
@@ -230,6 +231,7 @@ const Collection: React.FC<CollectionProps> = () => {
       console.error(error)
     }
   }
+
 
   const handleCategoryClick = (categoryName: string) => {
     if (selectedCategories.includes(categoryName)) {
@@ -320,11 +322,10 @@ const Collection: React.FC<CollectionProps> = () => {
     }
   }, [parametre])
 
-  const role = localStorage.getItem('role')
+  const role = userInfo?.data?.discord_role
 
-  console.log('formik', formik.values)
 
-  if (!isDiscordUser || role === 'HyperAdmin') {
+  if (!role) {
     return (
       <Layout>
         <div className={styles.noLogin}>

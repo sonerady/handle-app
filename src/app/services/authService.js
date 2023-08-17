@@ -102,6 +102,15 @@ export const useAuthService = () => {
     }
   }
 
+  const getSliderCenter = async () => {
+    try {
+      const response = await api.get(`/user/slidercenter`)
+      return response
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   const getAppValidation = async () => {
     try {
       const response = await api.get(`/app/getApplicationValidation?&token=${accessToken}`)
@@ -831,7 +840,21 @@ export const useAuthService = () => {
         },
       })
 
-      setIsSuccess(response.data.app_join.appid)
+      return response.data
+    } catch (error) {}
+  }
+
+  const removeJoin = async (appId) => {
+    try {
+      const response = await api.post(
+        `/user/removeFromSpace?app_id=${appId}&token=${accessToken}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+
       return response.data
     } catch (error) {}
   }
@@ -1113,7 +1136,7 @@ export const useAuthService = () => {
       return response.data
     } catch (error) {
       console.error(error)
-    } 
+    }
   }
 
   const getWaitingApps = async () => {
@@ -1582,5 +1605,7 @@ export const useAuthService = () => {
     getTokenBalance,
     discordLogout,
     metamaskLogout,
+    getSliderCenter,
+    removeJoin,
   }
 }

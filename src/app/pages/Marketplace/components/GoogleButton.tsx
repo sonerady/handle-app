@@ -22,6 +22,7 @@ const CustomModal: FC<ModalProps> = ({children, openModal, userInfo}) => {
   const {logOut, googleLogout, connectGoogleAccount, getUserInfo} = useAuthService()
 
   const info = userInfo?.data?.discord_logout
+  const email = userInfo?.data?.gmail_email
 
   const {
     setGoogleAccessToken,
@@ -36,7 +37,7 @@ const CustomModal: FC<ModalProps> = ({children, openModal, userInfo}) => {
     gmailUsername,
     // userInfo,
   } = useGlobal()
-  const clientId = '279751245565-og702v9ag0i0th14uaan19js2hq3nt12.apps.googleusercontent.com'
+  const clientId = '271809243258-r9i0c8undu3tsm1r2ndagmvn3ba6okuv.apps.googleusercontent.com'
 
   const onFailure = (res: any) => {}
 
@@ -116,11 +117,9 @@ const CustomModal: FC<ModalProps> = ({children, openModal, userInfo}) => {
     }
   })
 
-  const isGoogleLogin = localStorage.getItem('googleAccessToken')
-
   return (
     <div className={styles.discordButton}>
-      {info ? (
+      {!info && email ? (
         <button
           style={{
             width: '100%',

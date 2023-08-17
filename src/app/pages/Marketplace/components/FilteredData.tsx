@@ -22,10 +22,10 @@ const Home: React.FC<Props> = ({linkItems, headerTitle, headerIcon, showAll}) =>
   const location = useLocation()
   const query = new URLSearchParams(location.search)
 
-  useEffect(() => {
-    if (!accessToken) return
-    getAllApps(1, 50)
-  }, [accessToken])
+  // useEffect(() => {
+  //   if (!accessToken) return
+  //   getAllApps(1, 20)
+  // }, [accessToken])
 
   interface App {
     isverified: boolean
@@ -40,13 +40,13 @@ const Home: React.FC<Props> = ({linkItems, headerTitle, headerIcon, showAll}) =>
     filteredApps = allApps?.result?.filter((app: App) => app.isverified === true)
     title = 'Verified Apps'
   } else if (query.get('new') === 'true' || headerTitle?.includes('New')) {
-    filteredApps = allApps.result?.filter((app: App) => app.isnew === true)
+    filteredApps = allApps?.result?.filter((app: App) => app.isnew === true)
     title = 'New Apps'
   } else if (query.get('trending') === 'true' || headerTitle === 'Trending') {
-    filteredApps = allApps.result?.filter((app: App) => app.istrending === true)
+    filteredApps = allApps?.result?.filter((app: App) => app.istrending === true)
     title = 'Trending Apps'
   } else {
-    filteredApps = allApps.result
+    filteredApps = allApps?.result
   }
 
   const secondMarketCard = [
@@ -55,6 +55,18 @@ const Home: React.FC<Props> = ({linkItems, headerTitle, headerIcon, showAll}) =>
       isFilter: true,
     },
   ]
+
+  const MIN_CARD_ITEMS = 6
+
+  if (filteredApps && filteredApps.length < MIN_CARD_ITEMS) {
+    const itemsNeeded = MIN_CARD_ITEMS - filteredApps.length
+
+    const additionalItems = allApps?.result
+      ?.filter((app: App) => !filteredApps.includes(app))
+      .slice(0, itemsNeeded)
+
+    filteredApps = [...filteredApps, ...additionalItems]
+  }
 
   return (
     <>

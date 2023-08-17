@@ -7,7 +7,9 @@ import Input from './Input'
 import {useAuthService} from '../../../services/authService'
 import {useGlobal} from '../../../context/AuthContext'
 import UserLogo from '../../../../_metronic/assets/marketplace/UserLogo.svg'
+import Logo from '../../../../_metronic/assets/marketplace/Logo.svg'
 import {toast} from 'react-toastify'
+import {OverlayTrigger, Tooltip} from 'react-bootstrap'
 // import ContentLoader from 'react-content-loader'
 
 interface FilterButton {
@@ -71,9 +73,9 @@ const Card: React.FC<CardProps> = ({
   const [searchQuery, setSearchQuery] = useState('') //
   const navigate = useNavigate()
   const {appJoin, getAllApps} = useAuthService()
-  const {apps, accessToken, isSuccess} = useGlobal()
+  const {apps, accessToken, isSuccess, setAllApps} = useGlobal()
   const isSign = localStorage.getItem('login')
-  const [hoveredBtns, setHoveredBtns] = useState<any>({}) // Her bir düğmenin "hover" durumunu takip etmek için nesne
+  const [hoveredBtns, setHoveredBtns] = useState<any>({})
 
   const handleMouseEnter = (itemName: any) => {
     setHoveredBtns((prevHoveredBtns: any) => ({
@@ -90,7 +92,7 @@ const Card: React.FC<CardProps> = ({
   }
 
   function truncate(text: any, length = 17) {
-    if (text.length > length) {
+    if (text?.length > length) {
       return text.substring(0, length) + '...'
     }
     return text
@@ -111,15 +113,13 @@ const Card: React.FC<CardProps> = ({
     const newInAppsStatus: {[key: string]: boolean} = {}
 
     cardItems?.forEach((item) => {
-      newInAppsStatus[item.name] = apps.some((app: any) => app.name === item.name)
+      newInAppsStatus[item?.name] = apps.some((app: any) => app.name === item?.name)
     })
 
     setInAppsStatus(newInAppsStatus)
   }, [apps, cardItems])
 
   const MAX_CARD_ITEMS = 6
-
-  const isLogin = localStorage.getItem('login')
 
   const filteredCardItems = cardItems
     ?.filter((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -140,21 +140,35 @@ const Card: React.FC<CardProps> = ({
     },
   ]
 
-  const handleAddButtonClick = (event: any, onAdd: any, appid: any) => {
+  const handleAddButtonClick = async (event: any, onAdd: any, appid: any) => {
     event.stopPropagation()
-    if (isSign) {
-      appJoin(appid).then(() => {
-        getAllApps(1, 50)
-      })
-    } else {
-      toast.error('Please login to add app')
+    try {
+      if (accessToken) {
+        const response = await appJoin(appid)
+        if (response.Status === 200) {
+          toast.success(response.Description, {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          })
+
+          setAllApps([])
+          getAllApps(1, 20)
+        } else {
+          toast.error(response.Description, {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          })
+          getAllApps(1, 20)
+        }
+      } else {
+        toast.error('Please login first', {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+      }
+    } catch (error: string | any) {
+      console.error(error)
     }
   }
 
-  // useEffect(() => {
-  //   if (!accessToken) return
-  //   getAllApps(1, 50)
-  // }, [isSuccess])
+  const myspace = window.location.href.includes('space')
 
   return (
     <div className={`${styles.card} ${styles.filterAppCard} card `}>
@@ -230,57 +244,47 @@ const Card: React.FC<CardProps> = ({
             </ContentLoader>
           )
         })} */}
-        {filteredCardItems || cardItems
+        {!filteredCardItems || cardItems
           ? (search ? filteredCardItems : cardItems)?.map((item, index) => (
               <div
-                onClick={() => navigate(`/marketplace/detail/${item.name}/${item.appid}`)}
+                onClick={() => navigate(`/marketplace/detail/${item?.name}/${item?.appid}`)}
                 key={index}
                 className={styles.cardItem}
               >
                 <div className={styles.rightContent}>
                   <div className={styles.imageContainer}>
                     <div className={styles.imageWrapper}>
-                      {item.icon ? (
-                        <img
-                          src={item.icon}
-                          alt=''
-                          onError={(e: React.ChangeEvent<HTMLImageElement>) =>
-                            (e.target.src = UserLogo)
-                          }
-                        />
-                      ) : (
-                        <UserLogo />
-                      )}
+                      {item?.icon && <img src={item?.icon} alt='' />}
                       {isListNumber && <div className={styles.listNumber}>{index + 1}</div>}
                     </div>
-                    <Rating rate={item.average_rate ? item.average_rate : 0} />
-                    {item.isfeatured && <div className={styles.featured}>Featured</div>}
-                    {item.rate && <div>{item.rate}</div>}
+                    {/* <Rating rate={item?.average_rate ? item?.average_rate : 0} /> */}
+                    {item?.isfeatured && <div className={styles.featured}>Featured</div>}
+                    {item?.rate && <div>{item?.rate}</div>}
 
-                    {/* {item.isnew && <img className={styles.newBadge} src={newBadge} alt='' />}
-                {item.isverified && (
+                    {/* {item?.isnew && <img className={styles.newBadge} src={newBadge} alt='' />}
+                {item?.isverified && (
                   <img className={styles.verifiedBadge} src={verifiedBadge} alt='' />
                 )} */}
                   </div>
                   <div className={styles.contentWrapper}>
                     <label className={`${styles.name} `}>
-                      {item.name.length > 10 ? item.name.slice(0, 10) + '...' : item.name}
+                      {item?.name?.length > 10 ? item?.name.slice(0, 10) + '...' : item?.name}
                     </label>
                     <div className={styles.content}>
-                      {item?.category && item.category.length > 0 && (
-                        <span title={item.category[0]}>{item.category[0]}</span>
+                      {item?.category && item?.category?.length > 0 && (
+                        <span title={item?.category[0]}>{item?.category[0]}</span>
                       )}
                       <img src={circle} alt='' />
 
-                      {item?.category && item.category.length > 0 && (
-                        <span title={item.category[0]}>
-                          {item.category[0].length > 7 && item.category[0].slice(0, 7) + '...'}
+                      {item?.category && item?.category?.length > 0 && (
+                        <span title={item?.category[1]}>
+                          {item?.category[1]?.length > 7 && item?.category[1]?.slice(0, 7) + '...'}
                         </span>
                       )}
                     </div>
                     <div className={styles.desc}>
-                      <span>{truncate(item.title)}</span>
-                      {item.isfree ? (
+                      <span>{truncate(item?.title)}</span>
+                      {item?.isfree ? (
                         <span
                           style={{
                             color: '#FB70BA',
@@ -303,33 +307,34 @@ const Card: React.FC<CardProps> = ({
                 </div>
 
                 <button
-                  onMouseEnter={() => handleMouseEnter(item.name)}
-                  onMouseLeave={() => handleMouseLeave(item.name)}
-                  disabled={item.app_join}
+                  onMouseEnter={() => handleMouseEnter(item?.name)}
+                  onMouseLeave={() => handleMouseLeave(item?.name)}
+                  disabled={item?.app_join}
                   style={{
-                    cursor: item.app_join ? 'not-allowed' : 'pointer',
+                    cursor: item?.app_join || myspace ? 'not-allowed' : 'pointer',
                     background:
-                      item.app_join || hoveredBtns[item.name]
+                      item?.app_join || hoveredBtns[item?.name] || myspace
                         ? 'var(--pink-gradient, linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%))'
                         : 'none',
-                    color: item.app_join
-                      ? '#fff'
-                      : 'var(--pink-gradient, linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%))',
+                    color:
+                      item?.app_join || myspace
+                        ? '#fff'
+                        : 'var(--pink-gradient, linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%))',
                   }}
                   className={styles.addButton}
-                  onClick={(event) => handleAddButtonClick(event, item.onAdd, item.appid)}
+                  onClick={(event) => handleAddButtonClick(event, item?.onAdd, item?.appid)}
                 >
-                  {item.app_join ? 'OPEN' : 'Add'}
+                  {item?.app_join || myspace ? 'OPEN' : 'Add'}
                 </button>
               </div>
             ))
-          : ''}
+          : 'Loading...'}
       </div>
-      {!cardItems && (
+      {/* {!cardItems && (
         <div className={styles.waitingApps}>
-          <span>Loading...</span>
+          <img src={Logo} alt='Logo' className={styles.spinner} />
         </div>
-      )}
+      )} */}
     </div>
   )
 }

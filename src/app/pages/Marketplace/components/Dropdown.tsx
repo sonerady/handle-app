@@ -123,7 +123,7 @@ const Dropdown: React.FC<DropdownProps> = ({isOpen, onClose}) => {
                 setMetamaskAccessToken('')
                 setDiscordAccessToken('')
                 setGoogleAccessToken('')
-                navigate('/marketplace')
+                navigate('/')
               }}
               className={` ${styles.logoutButton}`}
             >

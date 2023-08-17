@@ -253,8 +253,8 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
           <div className={styles.categoryContainer}>
             <Select
               value={selectedCategories.map((category: any) => ({
-                value: category,
-                label: category,
+                value: category.id,
+                label: category.id,
               }))}
               styles={{
                 control: (baseStyles, state) => ({

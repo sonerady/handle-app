@@ -3,12 +3,9 @@ import {useLocation, useParams} from 'react-router-dom'
 import Layout from './Home'
 import styles from './Detail.module.scss'
 import visit from '../../../_metronic/assets/marketplace/icons/visit.svg'
-import open from '../../../_metronic/assets/marketplace/icons/open.svg'
-import add from '../../../_metronic/assets/marketplace/icons/add.svg'
 import defaults from '../../../_metronic/assets/marketplace/icons/defaults.svg'
 import pinkCircle from '../../../_metronic/assets/marketplace/icons/pinkCircle.svg'
 import {Modal, Button} from 'react-bootstrap'
-import frame from '../../../_metronic/assets/marketplace/icons/frame.svg'
 import Rating from './components/Rating'
 import {useAuthService} from '../../services/authService'
 import {useGlobal} from '../../context/AuthContext'
@@ -18,7 +15,6 @@ import 'bootstrap/dist/css/bootstrap.css'
 import moment from 'moment'
 import Carousel from 'react-bootstrap/Carousel'
 import {toast} from 'react-toastify'
-import {access} from 'fs'
 import UserLogo from '../../../_metronic/assets/marketplace/UserLogo.svg'
 
 interface DetailsProps {}
@@ -36,40 +32,22 @@ const Details: React.FC<DetailsProps> = () => {
     appid?: string
   }>({})
 
-  const exampleTags = ['text', 'image', 'art']
   const [loading, setLoading] = useState(false)
   const {
     appJoin,
     addLike,
-    getLike,
-    addVisit,
-    getVisit,
     addComment,
     getComment,
     getReview,
-    getApps,
     getAppsById,
-    getAppSlider,
-    getValidators,
-    getContributors,
     getAppInSpace,
     addReview,
-    getRanking,
-    getRating,
-    getSpaceCount,
+    removeJoin,
   } = useAuthService()
-  const [hoverValue, setHoverValue] = useState(null)
-  const [validators, setValidators] = useState<any>([])
-  const [contributors, setContributors] = useState<any>([])
   const [showModal, setShowModal] = useState(false)
-  const [fullDescription, setFullDescription] = useState('')
   const {
-    likeCount,
     accessToken,
-    setLikeCount,
     account,
-    visitCount,
-    setVisitCount,
     alertComment,
     comments,
     allApps,
@@ -79,20 +57,15 @@ const Details: React.FC<DetailsProps> = () => {
     userInfo,
     setAppsById,
     appsById,
-    appInSpace,
-    setAppInSpace,
-    setIsVisited,
     isVisited,
-    raitingDatas,
     setComments,
     setCommentsOther,
-    spaceCount,
-    setCommentLength,
     commentLength,
   } = useGlobal()
 
   const [isLiked, setIsLiked] = useState(false)
   const [visibleComment, setVisibleComment] = useState(false)
+  const [visibleReview, setVisibleReview] = useState(false)
   const [page, setPage] = useState(1)
   const [contLength, setContLength] = useState(0)
   const accessTokenMarketplace = localStorage.getItem('accessTokenMarketplace')
@@ -101,15 +74,11 @@ const Details: React.FC<DetailsProps> = () => {
   const [isHave, setIsHave] = useState('')
   const appid = new URLSearchParams(location.search).get('appid')
   const [selectedApp, setSelectedApp] = useState<any>(null)
-  const [showAll, setShowAll] = useState(false)
-  const [modalShow, setModalShow] = useState(false)
   const isLogin = localStorage.getItem('accessTokenMarketplace')
   const isDiscord = localStorage.getItem('discordAccessToken')
   const {id} = useParams<{id: string}>()
   const [appLink, setAppLink] = useState('')
   const appsNames = apps.map((app: any) => app.name)
-  const appsNamesWithId = apps.map((app: any) => app.appid)
-
   const [isOpen, setIsOpen] = useState(false)
 
   const [show, setShow] = useState(false)
@@ -131,14 +100,9 @@ const Details: React.FC<DetailsProps> = () => {
   const htmlDescription = appsById?.description || 'No description'
   const textDescription = htmlDescription.replace(/<[^>]+>/g, '')
 
-  const [currentReviewPage, setCurrentReviewPage] = useState(1)
-  const [currentCommentPage, setCurrentCommentPage] = useState(1)
-
   const [bgJoin, setSetBgJoin] = useState(false)
 
   const rate = appsById?.average_rate
-
-  const isRole = userInfo?.data.discord_role
 
   const icon = userInfo?.data.icon
   const [commentData, setcommentData] = useState({
@@ -157,25 +121,6 @@ const Details: React.FC<DetailsProps> = () => {
   const handleStarClick = (i: any) => {
     setReviewData({...reviewData, rating: i + 1})
   }
-
-  // LIKE CONFIG
-  const handleGetLike = async () => {
-    try {
-      await getLike(id)
-    } catch (error: string | any) {
-      console.error(error)
-    }
-  }
-
-  // useEffect(() => {
-  //   if (isVisited) {
-  //     setVisibleComment(true)
-  //   }
-  // }, [])
-
-  useEffect(() => {
-    getRating(id)
-  }, [id])
 
   const handleShowReview = (page: any) => {
     const nextPage = page + 1
@@ -247,24 +192,47 @@ const Details: React.FC<DetailsProps> = () => {
     localStorage.setItem('likes', JSON.stringify(accountLikes))
   }, [])
 
-  useEffect(() => {
-    if (id && accessToken) {
-      getSpaceCount(id)
-    }
-  }, [id])
-
   const handleAddApp = async (id: any) => {
     try {
       if (isLogin) {
         const repsonse = await appJoin(id)
-        if (repsonse.status === true) {
+        if (repsonse.Status === 200) {
           setSetBgJoin(true)
-          getAppInSpace(id)
+          getAppsById(id)
+          toast.success(repsonse.Description, {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          })
         }
-        toast.success('App added successfully', {
+        toast.error(repsonse.Description, {
           position: toast.POSITION.BOTTOM_RIGHT,
         })
         setIsOpen(true)
+      } else {
+        toast.error('Please login first', {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+      }
+    } catch (error: string | any) {
+      console.error(error)
+    }
+  }
+
+  const removeApp = async (id: any) => {
+    try {
+      if (isLogin) {
+        const repsonse = await removeJoin(id)
+        if (repsonse.status === 200) {
+          setSetBgJoin(false)
+          getAppsById(id)
+          getAppInSpace(id)
+          toast.success(repsonse.Description, {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          })
+        } else {
+          toast.error(repsonse.Description, {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          })
+        }
       } else {
         toast.error('Please login first', {
           position: toast.POSITION.BOTTOM_RIGHT,
@@ -282,8 +250,7 @@ const Details: React.FC<DetailsProps> = () => {
           const currentLikes = JSON.parse(localStorage.getItem('likes') || '{}')
           if (!currentLikes[id]) {
             await addLike(id)
-            handleGetLike()
-
+            getAppsById(id)
             currentLikes[id] = true
             localStorage.setItem('likes', JSON.stringify(currentLikes))
 
@@ -313,23 +280,7 @@ const Details: React.FC<DetailsProps> = () => {
   }, [id])
 
   useEffect(() => {
-    const fetchLikeCount = async () => {
-      if (id) {
-        try {
-          const likeCount = await getLike(id)
-          setLikeCount(likeCount)
-        } catch (error: string | any) {
-          console.error(error)
-        }
-      }
-    }
-
-    fetchLikeCount()
-  }, [id])
-
-  useEffect(() => {
     if (allApps?.length > 0 && apps?.length > 0) {
-      // sadece belirli bir appid'ye sahip objeler üzerinde işlem yap
       const selectedApp = apps.find((app: any) => app.appid === id)
 
       if (!selectedApp) {
@@ -351,16 +302,6 @@ const Details: React.FC<DetailsProps> = () => {
       if (app) {
         setSelectedApp(app)
         setcommentData((prevState) => ({...prevState, appId: app.appid}))
-      }
-    }
-  }, [id, allApps])
-
-  useEffect(() => {
-    if (allApps?.length > 0) {
-      const selectedApp = allApps?.result?.find((app: any) => app.appid === id)
-      if (selectedApp) {
-        const linkData = selectedApp.link
-        setAppLink(linkData)
       }
     }
   }, [id, allApps])
@@ -431,62 +372,17 @@ const Details: React.FC<DetailsProps> = () => {
     }
   }
 
-  const handleGetVisit = async () => {
-    try {
-      await getVisit(id)
-      getAppInSpace(id)
-    } catch (error: string | any) {
-      console.error(error)
-    }
-  }
-
-  useEffect(() => {
-    if (!accessToken) return
-    handleGetVisit()
-  }, [id, accessToken, isVisited])
-
-  useEffect(() => {
-    if (!id) return
-
-    const fetchData = async () => {
-      const validatorsItems = await getValidators(id)
-      if (validatorsItems && id) {
-        setValidators(validatorsItems)
-      }
-    }
-
-    fetchData()
-  }, [id])
-
-  useEffect(() => {
-    if (!id) return
-
-    const fetchData = async () => {
-      const contributorsItems = await getContributors(id)
-      if (contributorsItems && id) {
-        setContributors(contributorsItems)
-        setContLength(contributorsItems.number)
-      }
-    }
-
-    fetchData()
-  }, [id])
-
-  const ratingsCount: {[index: number]: number} = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
-  let averageRating = selectedApp?.average_rate
-  // Eğer averageRating hala NaN ise, 0 olarak set et
-  if (isNaN(averageRating)) {
-    averageRating = 0
-  }
-
-  useEffect(() => {
-    if (!accessToken) return
-    getAppSlider(id)
-  }, [accessToken, id])
-
   useEffect(() => {
     setAppsById('')
   }, [window.location.pathname])
+
+  const images = [
+    appsById?.image1,
+    appsById?.image2,
+    appsById?.image3,
+    appsById?.image4,
+    appsById?.image5,
+  ]
 
   return (
     <Layout>
@@ -561,35 +457,55 @@ const Details: React.FC<DetailsProps> = () => {
                       alt=''
                     />
                   </a>
-
                   {/* <img
                     style={{cursor: isHave === 'OPEN' ? 'not-allowed' : 'pointer'}}
                     onClick={() => handleAddApp(id)}
                     src={isVisited ? open : add}
                     alt=''
                   /> */}
-                  <button
-                    className={styles.btn}
-                    disabled={isHave === 'OPEN'}
-                    style={{
-                      cursor: isVisited || bgJoin ? 'default' : 'pointer',
-                      background:
-                        isVisited || bgJoin
-                          ? 'linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%)'
-                          : 'none',
-                      color:
-                        isVisited || bgJoin
-                          ? '#fff'
-                          : 'linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%)',
-                    }}
-                    onClick={() => {
-                      if (!isVisited) {
-                        handleAddApp(id)
-                      }
-                    }}
-                  >
-                    {isVisited || bgJoin ? 'OPEN' : 'ADD'}
-                  </button>
+                  <div>
+                    <button
+                      className={styles.btn}
+                      disabled={isHave === 'OPEN'}
+                      style={{
+                        cursor: isVisited || bgJoin ? 'default' : 'pointer',
+                        background:
+                          isVisited || bgJoin
+                            ? 'linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%)'
+                            : 'none',
+                        color:
+                          isVisited || bgJoin
+                            ? '#fff'
+                            : 'linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%)',
+                      }}
+                      onClick={() => {
+                        if (!isVisited) {
+                          handleAddApp(id)
+                        }
+                      }}
+                    >
+                      {isVisited || bgJoin ? 'OPEN' : 'ADD'}
+                    </button>
+                    {/* {isVisited && (
+                      <span
+                        onClick={() => {
+                          removeApp(id)
+                        }}
+                        style={{
+                          fontSize: '12px',
+                          color: '#CD6096',
+                          textAlign: 'center',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          width: '100%',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Discard
+                      </span>
+                    )} */}
+                  </div>
                 </div>
               </div>
               <div className={styles.ratingInfo}>
@@ -626,13 +542,13 @@ const Details: React.FC<DetailsProps> = () => {
                   </div>
                   <div className={styles.rigthTextItem}>
                     <img src={pinkCircle} alt='' />
-                    <strong>{appsById ? likeCount?.count ?? '0' : 'Loading...'}</strong>{' '}
+                    <strong>{appsById ? appsById?.likes ?? '0' : 'Loading...'}</strong>{' '}
                     <span>like</span>
                   </div>
 
                   <div className={styles.rigthTextItem}>
                     <img src={pinkCircle} alt='' />
-                    <span>{validators?.length ? validators?.length : '0'} Validated</span>
+                    <span>{appsById?.validators?.length} Validated</span>
                   </div>
                 </div>
               </div>
@@ -671,64 +587,27 @@ const Details: React.FC<DetailsProps> = () => {
             </div>
           </div>
           <div style={{display: 'block', width: 619, height: 350}}>
-            <Carousel
-              style={{
-                height: '350px',
-                borderRadius: '2rem',
-              }}
-            >
-              {appsById?.image1 && (
-                <Carousel.Item>
-                  <img className={`d-block w-100 ${styles.slideItem}`} src={appsById?.image1} />
-                </Carousel.Item>
-              )}
-
-              {appsById?.image2 && (
-                <Carousel.Item
-                  style={{
-                    borderTopRightRadius: '2rem',
-                    borderBottomRightRadius: '2rem',
-                  }}
-                >
-                  <img
-                    className={`d-block w-100 ${styles.slideItem}`}
-                    src={appsById?.image2}
-                    alt='Image Two'
-                  />
-                </Carousel.Item>
-              )}
-
-              {appsById?.image3 && (
-                <Carousel.Item
-                  style={{
-                    borderTopRightRadius: '2rem',
-                    borderBottomRightRadius: '2rem',
-                  }}
-                >
-                  <img className={`d-block w-100 ${styles.slideItem}`} src={appsById?.image3} />
-                </Carousel.Item>
-              )}
-
-              {appsById?.image4 && (
-                <Carousel.Item
-                  style={{
-                    borderTopRightRadius: '2rem',
-                    borderBottomRightRadius: '2rem',
-                  }}
-                >
-                  <img className={`d-block w-100 ${styles.slideItem}`} src={appsById?.image4} />
-                </Carousel.Item>
-              )}
-              {appsById?.image5 && (
-                <Carousel.Item
-                  style={{
-                    borderTopRightRadius: '2rem',
-                    borderBottomRightRadius: '2rem',
-                  }}
-                >
-                  <img className={`d-block w-100 ${styles.slideItem}`} src={appsById?.image5} />
-                </Carousel.Item>
-              )}
+            <Carousel style={{height: '350px', borderRadius: '2rem'}}>
+              {images?.map((image, index) => {
+                if (image) {
+                  return (
+                    <Carousel.Item
+                      key={index}
+                      style={{
+                        borderTopRightRadius: '2rem',
+                        borderBottomRightRadius: '2rem',
+                      }}
+                    >
+                      <img
+                        className={`d-block w-100 ${styles.slideItem}`}
+                        src={image}
+                        alt={`Slide ${index + 1}`}
+                      />
+                    </Carousel.Item>
+                  )
+                }
+                return null // Eğer image yoksa null döndürerek render etmeyiz.
+              })}
             </Carousel>
           </div>
         </div>
@@ -742,7 +621,13 @@ const Details: React.FC<DetailsProps> = () => {
                   <div className={styles.cardTitleWrapper}>
                     <span className={styles.cardTitle}>Publisher</span>
                     <span>
-                      <img src={defaults} alt='' />
+                      <img
+                        style={{
+                          borderRadius: '50%',
+                        }}
+                        src={appsById?.publisher?.icon ?? UserLogo}
+                        alt=''
+                      />
                     </span>
                   </div>
                 </div>
@@ -755,7 +640,7 @@ const Details: React.FC<DetailsProps> = () => {
                       }}
                       className={styles.imagewrapper}
                     >
-                      {validators?.map((item: any, index: any) => {
+                      {appsById?.validators?.map((item: any, index: any) => {
                         return (
                           <img
                             style={{
@@ -780,19 +665,13 @@ const Details: React.FC<DetailsProps> = () => {
                         <span>Contributors</span>
                         <div className={styles.total}>
                           <span>Total:</span>
-                          <strong>{contLength}</strong>
+                          <strong>{appsById?.contributors?.contributors?.length ?? 0}</strong>
                         </div>
                       </div>
-                      <div>
-                        {/* {contributors?.length > 20 && (
-                          <span className={styles.showAll} onClick={() => setModalShow(true)}>
-                            {'{Show All}'}
-                          </span>
-                        )} */}
-                      </div>
+                      <div></div>
                     </div>
                     <div className={styles.imagewrapper}>
-                      {contributors.contributors?.map((item: any, index: any) => {
+                      {appsById?.contributors?.contributors?.map((item: any, index: any) => {
                         return (
                           <img
                             style={{
@@ -821,11 +700,11 @@ const Details: React.FC<DetailsProps> = () => {
                   <div className={styles.rating}></div>
                 </div>
                 <div className={styles.ratingProgress}>
-                  {raitingDatas
+                  {appsById?.app_ratings
                     ? [5, 4, 3, 2, 1]?.map((item, index) => {
                         const totalComments = commentLength
 
-                        const count = raitingDatas?.count[item] || 0
+                        const count = appsById?.app_ratings?.count[item] || 0
 
                         const percentage = (count / totalComments) * 100
 
@@ -911,7 +790,7 @@ const Details: React.FC<DetailsProps> = () => {
                         <span>What do you think ?</span>
                         {role !== 'HyperAdmin' && accessTokenMarketplace && (
                           <button
-                            onClick={() => setVisibleComment(true)}
+                            onClick={() => setVisibleReview(true)}
                             className={styles.addComment}
                           >
                             {isLogin ? 'Add Review' : 'Login to Review'}
@@ -925,7 +804,7 @@ const Details: React.FC<DetailsProps> = () => {
                       }}
                       className={styles.footerLeft}
                     >
-                      {visibleComment && activeTab === 2 && isVisited && openReviewInput && (
+                      {visibleReview && activeTab === 2 && isVisited && openReviewInput && (
                         <div className={styles.commentContainer}>
                           <label
                             style={{
@@ -942,7 +821,7 @@ const Details: React.FC<DetailsProps> = () => {
                                 cursor: 'pointer',
                               }}
                             >
-                              {stars.map((_, i) => (
+                              {stars?.map((_, i) => (
                                 <FaStar
                                   key={i}
                                   color={i < reviewData.rating ? '#FD7DA4' : 'gray'}
@@ -968,17 +847,7 @@ const Details: React.FC<DetailsProps> = () => {
                           </button>
                         </div>
                       )}
-                      {/* <div className={styles.footerLeftTop}>
-                        <span className={styles.cardTitle}>REVIEWS</span>
 
-                        <button
-                          className={styles.addComment}
-                     
-                        >
-                          Add
-                        </button>
-                      </div> */}
-                      {/* // REVIEWS */}
                       {activeTab === 2 && (
                         <div
                           style={{

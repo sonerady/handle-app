@@ -98,6 +98,7 @@ const ApproveApp: FC<ApproveAppProps> = ({
         </div>
       )}
       <Modal
+        size='sm'
         style={{
           padding: '2rem',
         }}

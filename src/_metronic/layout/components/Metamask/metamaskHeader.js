@@ -60,7 +60,19 @@ function MetaMaskConnect({title, setOpenModal}) {
   return (
     <>
       {!account ? (
-        <div style={{borderRadius: '10px'}} onClick={connectToMetaMask}>
+        <div
+          style={{
+            borderRadius: '10px',
+            background: 'linear-gradient(270deg,#ff9085 0,#fb6fbb 100%)',
+            height: 'fit-content',
+            color: '#000',
+            marginTop: '1rem',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            padding: '0.5rem 0.8rem',
+          }}
+          onClick={connectToMetaMask}
+        >
           {title}
         </div>
       ) : (

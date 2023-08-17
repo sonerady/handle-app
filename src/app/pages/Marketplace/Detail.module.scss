@@ -175,8 +175,8 @@
           gap: 1rem;
           .tags {
             white-space: nowrap;
-            background: var(--pink-gradient, linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%));
-            color: #ffffff;
+            background: #ce6888;
+            color: #000;
             padding: 2px 12px;
             border-radius: 1rem;
             padding: 5 15px;
@@ -510,11 +510,11 @@
     flex: 1;
   }
   .imagewrapper {
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
     gap: 1rem;
     flex-wrap: wrap;
-    justify-content: space-between;
+    // justify-content: space-between;
   }
 
   .side {

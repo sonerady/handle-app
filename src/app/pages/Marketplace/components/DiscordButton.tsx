@@ -76,17 +76,26 @@ const CustomModal: FC<CustomModalProps> = ({userInfo}) => {
 
   const discordClientId = '1121395648437174313'
 
+  // LOCAL
+
   // const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fprofile&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
 
-  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=https%3A%2F%2Fhypermarket.azurewebsites.net%2Fprofile&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
+  // TEST
+
+  // const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=https%3A%2F%2Fhypermarket.azurewebsites.net%2Fprofile&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
+
+  // PROD
+  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=https%3A%2F%2Fstore.hypergpt.ai%2Fprofile&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
 
   const url = new URL(window.location.href)
   const code = url.searchParams.get('code')
 
   const info = userInfo?.data?.discord_logout
+  const discordId = userInfo?.data?.discord_id
 
   // const redirectUri = 'http://localhost:8080/profile'
-  const redirectUri = 'https://hypermarket.azurewebsites.net/profile'
+  // const redirectUri = 'https://hypermarket.azurewebsites.net/profile'
+  const redirectUri = 'https://store.hypergpt.ai/profile'
 
   useEffect(() => {
     const fetchTokenAndUserData = async () => {
@@ -215,14 +224,16 @@ const CustomModal: FC<CustomModalProps> = ({userInfo}) => {
       className={styles.discordButton}
       variant='dark'
       onClick={() => {
-        !info ? logoutDiscord() : (window.location.href = discordAuthUrl)
+        !info && discordId ? logoutDiscord() : (window.location.href = discordAuthUrl)
       }}
     >
       <div className={styles.buttonContent}>
         <span className={styles.discordIcon}>
           <BsDiscord />
         </span>
-        <span className={styles.btnText}>{!info ? 'Disconnect Discord' : 'Connect Discord'}</span>
+        <span className={styles.btnText}>
+          {!info && discordId ? 'Disconnect Discord' : 'Connect Discord'}
+        </span>
       </div>
     </Button>
   )

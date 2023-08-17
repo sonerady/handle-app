@@ -22,13 +22,11 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
   const [showModal, setShowModal] = useState(false)
   const {
     accessToken,
-    account,
     setShowNotification,
     showNotification,
     showNotificationForSize,
     setShowNotificationForSize,
     userInfo,
-    setMailAccessToken,
     setAccessToken,
     showPopup,
     setShowPopup,
@@ -40,6 +38,8 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
   let searchParams = new URLSearchParams(location.search)
   const url_safe = searchParams.get('url_safe')
   const token: any = searchParams.get('token')
+  const email: any = searchParams.get('email')
+  const login: any = searchParams.get('is_login')
   const [isNotActive, setIsNotActive] = useState(false)
   const [notActiveMessage, setNotActiveMessage] = useState('')
   const [resendEmail, setResendEmail] = useState(false)
@@ -51,7 +51,6 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
       const result = await verification(url_safe, token)
       if (result?.status === 200) {
         toast.success(result?.Desc)
-        // setMailAccessToken(result?.user_mail)
         if (result?.show_popup) {
           setShowPopup(true)
         }
@@ -60,19 +59,16 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
         if (result && token !== '') {
           navigate('/marketplace', {replace: true})
         }
-        // if (token !== '') {
-        //   getUserInfo()
-        // }
       } else {
         setIsNotActive(true)
         setNotActiveMessage(result?.Desc)
         setResendEmail(result?.user_mail)
       }
     }
-    if (url_safe && token) {
+    if (url_safe && token && login) {
       verify()
     }
-  }, [url_safe, token])
+  }, [token])
 
   useEffect(() => {
     // alert(token)
@@ -116,11 +112,12 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
   }, [showNotification, showNotificationForSize])
 
   const isHome = window.location.pathname === '/marketplace'
+  const mail = searchParams.get('email')
 
   const resendEmailHandle = async () => {
-    const result = await resendVerification(resendEmail)
+    const result = await resendVerification(mail)
     if (result?.status === 200) {
-      toast.success('Email sent to ' + result.user_email)
+      toast.success('Email sent to ' + mail)
     } else {
       toast.error('Email not sent')
     }
@@ -171,7 +168,6 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
           cannot be uploaded.
         </Alert>
       )}
-      <ToastContainer />
       <Navbar isSticky={isSticky} />
       <main>
         {children}

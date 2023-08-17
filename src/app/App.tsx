@@ -9,12 +9,10 @@ import 'prismjs/themes/prism-twilight.css'
 import Prism from 'prismjs'
 import {useGlobal} from './context/AuthContext'
 import {useAPI} from './api'
-import Cookies from 'js-cookie'
 import AlertImage from '../_metronic/assets/alert.jpg'
 import ModalOther from '../_metronic/layout/components/walletModal/walletModal'
-import {toast} from 'react-toastify'
+import {ToastContainer, toast} from 'react-toastify'
 import CustomModal from '../_metronic/layout/components/walletModal/walletModal'
-import {sign} from 'crypto'
 
 const App = () => {
   const {
@@ -24,7 +22,6 @@ const App = () => {
     activeBalance,
     showErrorImage,
     setShowErrorImage,
-    isLoginMetamask,
     setIsLoginMetamask,
     showGlobalAlert,
     code,
@@ -67,12 +64,23 @@ const App = () => {
     setShowAnnouncement,
     discordRole,
   } = useGlobal()
-  const {getRole, getUserId, updateUser, getUserInfo, getTokenBalance} = useAuthService()
+  const {getRole, getUserId, updateUser, getUserInfo, getTokenBalance, getAllApps} =
+    useAuthService()
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const api = useAPI()
 
   const navigate = useNavigate()
+
+  const location = useLocation()
+
+  const searchParams = new URLSearchParams(location.search)
+
+  const mail = searchParams.get('email')
+
+  useEffect(() => {
+    setMailAccessToken(mail)
+  }, [mail])
 
   useEffect(() => {
     Prism.highlightAll()
@@ -140,10 +148,10 @@ const App = () => {
     } catch (error) {}
   }
 
-  useEffect(() => {
-    if (!accessToken || !activeBalance || !code || !imageData) return
-    getBalance(accessToken)
-  }, [accessToken])
+  // useEffect(() => {
+  //   if (!accessToken || !activeBalance || !code || !imageData) return
+  //   getBalance(accessToken)
+  // }, [accessToken])
 
   const signup = async (
     mailAccessToken: any,
@@ -332,6 +340,11 @@ const App = () => {
     }
   }, [profileAccount])
 
+  useEffect(() => {
+    if (!accessToken) return
+    getAllApps(1, 20)
+  }, [accessToken])
+
   return (
     <Suspense fallback={<LayoutSplashScreen />}>
       {/* <Loading /> */}
@@ -386,6 +399,18 @@ const App = () => {
         </div>
       )}
       <I18nProvider>
+        <ToastContainer
+          position='bottom-right'
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+
         <LayoutProvider>
           <AuthInit>
             {/* {loading ? <Loading /> : <Outlet />} */}

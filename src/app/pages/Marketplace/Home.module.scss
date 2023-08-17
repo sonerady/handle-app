@@ -847,19 +847,7 @@ main {
 }
 
 .spinner {
-  border: 4px solid rgba(0, 0, 0, 0.3);
-  // border-top: 4px solid #007bff;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100px;
-  height: 100px;
   animation: spin 1s linear infinite;
-  margin: auto;
-  margin-top: 350px;
-  background-image: url('../../../_metronic/assets/marketplace/icons/new.svg');
-  background-size: cover;
 }
 
 // ANNOUNCEMENT

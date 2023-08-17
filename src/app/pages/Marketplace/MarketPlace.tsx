@@ -18,6 +18,7 @@ import Logo from '../../../_metronic/assets/marketplace/Logo.svg'
 const Home = () => {
   const [detailData, setDetailData] = useState<any>({})
   const [sliderDatas, setSliderDatas] = useState<any>([])
+  const [sliderCenterDatas, setSliderCenterDatas] = useState<any>([])
   const [loading, setLoading] = useState(true)
 
   const sortedData = [...sliderDatas].sort((a, b) => a.order - b.order)
@@ -33,40 +34,16 @@ const Home = () => {
     }
   })
 
-  const secondCard = [
-    {
-      button: 'Add',
-      icon: <img src={example} alt='robot' />,
-      title: 'Create content easily!',
-      color: '#FFC444',
-      backgroundImage: Bg1,
-      position: 'center',
-      bgSize: 'cover',
-      isCenter: true,
-    },
-    {
-      icon: <img src={example} alt='robot' />,
-      button: 'Add',
-
-      title: 'Need recipe? Do it with Chefff!',
-      color: '#373B71',
-      backgroundImage: Bg2,
-      position: 'center',
-      bgSize: 'cover',
-      isCenter: true,
-    },
-    {
-      button: 'Add',
-
-      icon: <img src={example} alt='robot' />,
-      title: 'Best game assets in one soluiton',
-      color: '#FF9085',
-      backgroundImage: Bg3,
-      position: 'center',
-      bgSize: 'cover',
-      isCenter: true,
-    },
-  ]
+  const processedSecondCard = sliderCenterDatas.map((data: any) => ({
+    button: 'Add',
+    icon: <img src={data.icon || example} alt='robot' />,
+    title: data.title || 'Default Title',
+    color: data.color || '#FF9085',
+    backgroundImage: data.image || Bg3,
+    position: 'center',
+    bgSize: 'cover',
+    isCenter: true,
+  }))
 
   const firstMarketCard = [
     {
@@ -88,26 +65,40 @@ const Home = () => {
   ]
 
   const {accessToken, allApps, account, apps} = useGlobal()
-  const {getAllApps, getApps, getSliderTop} = useAuthService()
+  const {getAllApps, getApps, getSliderTop, getSliderCenter} = useAuthService()
 
   useEffect(() => {
     const loadData = async () => {
       await Promise.all([
-        getAllApps(1, 50),
+        // getAllApps(1, 20),
         getSliderTop().then((res: any) => setSliderDatas(res?.data)),
       ])
-      if (accessToken) {
-        getApps()
-      }
+      // if (accessToken) {
+      //   getApps()
+      // }
       setLoading(false)
     }
     loadData()
   }, [accessToken, account])
 
+  useEffect(() => {
+    const loadData = async () => {
+      await Promise.all([
+        getAllApps(1, 20),
+        getSliderCenter().then((res: any) => setSliderCenterDatas(res?.data)),
+      ])
+      // if (accessToken) {
+      //   getApps()
+      // }
+      setLoading(false)
+    }
+    loadData()
+  }, [accessToken])
+
   return (
     <div>
       {/* {loading ? (
-        <img src={Logo} alt='Logo' className={styles.spinner} />
+        
       ) : ( */}
       <Layout>
         <div className={styles.layout}>
@@ -144,8 +135,8 @@ const Home = () => {
                 )
               })}
             </div>
-            <div className={`${styles.cardContainer} ${styles.bottomImages} `}>
-              {secondCard.map((item: any, index: any) => {
+            <div className={`${styles.cardContainer} ${styles.bottomImages}`}>
+              {processedSecondCard.map((item: any, index: any) => {
                 return (
                   <Card
                     isBottom={true}
@@ -163,6 +154,7 @@ const Home = () => {
                 )
               })}
             </div>
+
             <div className={styles.marketCard}>
               {secondMarketCard.map((item: any, index: any) => {
                 return (

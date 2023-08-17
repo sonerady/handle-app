@@ -1,4 +1,4 @@
-import React, {useState, useEffect, MouseEvent} from 'react'
+import React, {useState, useEffect, MouseEvent, useRef} from 'react'
 import Logo from '../../../../_metronic/assets/marketplace/Logo.svg'
 import UserLogo from '../../../../_metronic/assets/marketplace/UserLogo.svg'
 import styles from '../Home.module.scss'
@@ -53,6 +53,8 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
     handleModalToggle,
   } = useGlobal()
 
+  const wrapperRef = useRef<HTMLElement | null>(null)
+
   const api = useAPI()
 
   const {verifyProfile} = useAuthService()
@@ -97,13 +99,7 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
     } catch (error) {}
   }
 
-  useEffect(() => {
-    if (token) {
-      localStorage.setItem('accessTokenMarketplace', token)
-      setAccessToken(token)
-      getBalance()
-    }
-  }, [token, url_safe])
+  useEffect(() => {}, [])
 
   // useEffect(() => {
   //   if (!accessToken) return
@@ -112,8 +108,12 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
 
   useEffect(() => {
     if (!accessToken) return
+    if (token) {
+      localStorage.setItem('accessTokenMarketplace', token)
+      setAccessToken(token)
+    }
     getBalance()
-  }, [accessToken, isValidate])
+  }, [accessToken, isValidate, token, url_safe])
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen)
@@ -226,11 +226,26 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
 
   const isVerified = userInfo?.data?.is_verified
 
+  useEffect(() => {
+    function handleClickOutside(event: globalThis.MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    // Tıklama olayını dinleyiciye ekleyin
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      // bileşen kaldırıldığında olay dinleyiciyi temizleyin
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [wrapperRef])
+
   return (
     <div className={`${styles.navbarWrapper} ${isSticky ? styles.navbarWrapperSticky : ''}`}>
       <div className={styles.navbar}>
         <div className={styles.right}>
-          <Link to='/marketplace'>
+          <Link to='/'>
             <img src={Logo} alt='Logo' />
           </Link>
           <Filter />
@@ -263,7 +278,7 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
             </span>
           )}
 
-          <span className={styles.dropdown}>
+          <span ref={wrapperRef} className={styles.dropdown}>
             {accessTokenLocal ? (
               <img
                 className={styles.userIcon}

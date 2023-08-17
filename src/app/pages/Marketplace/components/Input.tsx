@@ -25,7 +25,7 @@ const Input: React.FC<InputProps> = ({placeholder, width}) => {
     if (searchTerm && searchTerm !== prevSearchTerm.current) {
       setLoading(true)
       search(searchTerm, 1).then((res) => {
-        setSearchResults(res.result)
+        setSearchResults(res?.result)
         setLoading(false)
       })
       prevSearchTerm.current = searchTerm

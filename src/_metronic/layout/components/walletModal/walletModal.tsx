@@ -52,7 +52,7 @@ const CustomModal: FC<ModalProps> = ({children, openModal, setOpenModal}) => {
   const [passwordInput, setPasswordInput] = useState('')
   const [isSignup, setIsSignup] = React.useState(false)
   const [isLogin, setIsLogin] = useState(true)
-  const clientId = '314565618653-voqdo7h77cd0hahfssqo6d1t3rhpu0pq.apps.googleusercontent.com'
+  const clientId = '271809243258-5n5ub8j1vfhkd71n9j77om3vvnub8djq.apps.googleusercontent.com'
   const [forgot, setForgot] = useState(false)
   const [emailForgot, setEmailForgot] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -164,14 +164,24 @@ const CustomModal: FC<ModalProps> = ({children, openModal, setOpenModal}) => {
 
   const discordClientId = '1121395648437174313'
 
+  // LOCAL
+
   // const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fmarketplace&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
 
-  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=https%3A%2F%2Fhypermarket.azurewebsites.net%2Fmarketplace&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
+  // TEST
+
+  // const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=https%3A%2F%2Fhypermarket.azurewebsites.net%2Fmarketplace&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
+
+  // PROD
+
+  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=https%3A%2F%2Fstore.hypergpt.ai%2Fmarketplace&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
+
+  // const redirectUri = 'http://localhost:8080/marketplace'
+  // const redirectUri = 'https://hypermarket.azurewebsites.net/marketplace'
+  const redirectUri = 'https://store.hypergpt.ai/marketplace'
 
   const url = new URL(window.location.href)
   const code = url.searchParams.get('code')
-  // const redirectUri = 'http://localhost:8080/marketplace'
-  const redirectUri = 'https://hypermarket.azurewebsites.net/marketplace'
 
   useEffect(() => {
     const fetchTokenAndUserData = async () => {

@@ -87,10 +87,12 @@ const Collection: React.FC<CollectionProps> = () => {
       const result = await profileVerification(url_safe)
       if (result?.status === 200) {
         toast.success(result?.Desc)
+        setShowUsernameModal(false)
         getUserInfo()
         setIsValidate(true)
         if (result?.show_popup) {
           setShowPopup(true)
+          setShowUsernameModal(false)
         }
       } else {
         toast.error(result?.Desc)
@@ -105,7 +107,7 @@ const Collection: React.FC<CollectionProps> = () => {
     try {
       if (validEmail.test(verifyEmail)) {
         const response = await verifyProfile(verifyEmail)
-        if (response === 200) {
+        if (response?.status === 200) {
           toast.success(response.desc, {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
@@ -115,6 +117,7 @@ const Collection: React.FC<CollectionProps> = () => {
           toast.error(response.desc, {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
+          handleCloseEmailModal()
         }
       } else {
         toast.error(
@@ -499,6 +502,7 @@ const Collection: React.FC<CollectionProps> = () => {
                   </div>
                 </div>
               )}
+
               {/* <input
                 // value={userInfo?.data?.email ?? verifyEmail}
                 value={verifyEmail}
@@ -514,11 +518,13 @@ const Collection: React.FC<CollectionProps> = () => {
                 type='password'
                 placeholder='Password Password'
               />
+              
               <input
                 onChange={(e) => setVerifyPassword(e.target.value)}
                 type='password'
                 placeholder='Confirm New Password'
               /> */}
+
               {!isVerified && (
                 <Button
                   className={styles.gradiantText}

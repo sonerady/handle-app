@@ -35,7 +35,8 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
 
   const [isMetamask, setIsMetamask] = useState(localStorage.getItem('connect_metamask'))
 
-  const info = userInfo?.data?.discord_logout
+  const info = userInfo?.data?.metamask_logout
+  const id = userInfo?.data?.metamaskID
 
   const [metamaskId, setMetamaskId] = useState('')
   const connectToMetaMask = async () => {
@@ -169,11 +170,11 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
           padding: 'calc(0.775rem + 1px) calc(1.5rem + 1px)',
         }}
         onClick={() => {
-          info ? logoutFromMetaMask() : connectToMetaMask()
+          !info && id ? logoutFromMetaMask() : connectToMetaMask()
         }}
       >
         <img src={metamask} />
-        <span>{info ? 'Disconnect Metamask' : 'Connect Metamask'}</span>
+        <span>{!info && id ? 'Disconnect Metamask' : 'Connect Metamask'}</span>
       </div>
     </div>
   )

@@ -3,7 +3,7 @@ import axios from 'axios'
 import {useGlobal} from '../context/AuthContext'
 
 const instance = axios.create({
-  baseURL: 'https://server.hypergpt.ai',
+  baseURL: 'https://api.hypergpt.ai',
   headers: {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',

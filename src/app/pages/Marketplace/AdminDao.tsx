@@ -149,7 +149,7 @@ const Collection: React.FC<CollectionProps> = () => {
       title: Yup.string().required('Required'),
       description: Yup.string().required('Required'),
       icon: Yup.string().required('Required'),
-      link: Yup.string().url('Must be a valid URL').required('Required'),
+      link: Yup.string().required('Required'),
     }),
     onSubmit: async (values) => {},
   })

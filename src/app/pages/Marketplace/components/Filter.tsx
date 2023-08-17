@@ -20,7 +20,7 @@ const Filter = () => {
     {
       name: 'Verified',
       icon: verified,
-      value: 'verified',
+      value: 'integrated',
     },
     {
       name: 'Trending',
