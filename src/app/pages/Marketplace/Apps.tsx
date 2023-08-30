@@ -6,7 +6,9 @@ import Layout from './Home'
 import {useAuthService} from '../../services/authService'
 import {useGlobal} from '../../context/AuthContext'
 import {useEffect, useState} from 'react'
+import InfiniteScroll from 'react-infinite-scroll-component'
 import {useLocation} from 'react-router-dom'
+import {FiArrowDown} from 'react-icons/fi'
 
 interface PaginationProps {
   currentPage: number
@@ -15,7 +17,7 @@ interface PaginationProps {
 }
 
 const Home = () => {
-  const {accessToken} = useGlobal()
+  const {accessToken, triggerJoin} = useGlobal()
   const {
     getAllApps,
     getApps,
@@ -25,33 +27,40 @@ const Home = () => {
     getUpcoming,
     getIntegrated,
   } = useAuthService()
-  const [cardItems, setCardItems] = useState([])
+  const [cardItems, setCardItems] = useState<any>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalItem, setTotalItem] = useState()
 
   const location = useLocation()
-  // Parse the query string
   const query = new URLSearchParams(location.search)
-  // Get the 'filter' query parameter
   const filter = query.get('filter')
+
   useEffect(() => {
     // Call different functions based on the 'filter' query parameter
     switch (filter) {
       case 'verified':
+        // setCardItems([])
         getVerifiedApp().then((apps) => {
+          setCardItems([])
           const approvedApps = apps?.filter((app: any) => app.status === 'approved')
           setCardItems(approvedApps)
         })
         break
       case 'trending':
+
         getTrendingApps().then((apps) => {
+          setCardItems([])
+
           const approvedApps = apps?.filter((app: any) => app.status === 'approved')
           setCardItems(approvedApps)
         })
         break
       case 'upcomings':
+
         getUpcoming(currentPage, 1000).then(({total_page, result, total}) => {
+          setCardItems([])
+
           const approvedApps = result?.filter((app: any) => app.status === 'approved')
           setCardItems(approvedApps)
           setTotalPages(total_page)
@@ -59,28 +68,37 @@ const Home = () => {
         })
         break
       case 'integrated':
+
         getIntegrated().then((apps) => {
+          setCardItems([])
+
           const approvedApps = apps?.filter((app: any) => app.status === 'approved')
           setCardItems(approvedApps)
         })
         break
 
       case 'new':
+        // setCardItems([])
         getNewApps().then((apps) => {
+          setCardItems([])
+
           const approvedApps = apps?.filter((app: any) => app.status === 'approved')
           setCardItems(approvedApps)
         })
         break
       default:
+        // setCardItems([])
         getAllApps(currentPage, 20).then(({total_page, result, total}) => {
+          setCardItems([])
+
           const approvedApps = result?.filter((app: any) => app.status === 'approved')
-          setCardItems(approvedApps)
+          setCardItems((prevItems: any) => [...prevItems, ...approvedApps])
           setTotalPages(total_page)
           setTotalItem(total)
         })
         break
     }
-  }, [accessToken, filter, currentPage])
+  }, [accessToken, filter, currentPage, triggerJoin])
 
   const handlePageChange = (pageNumber: any) => {
     setCurrentPage(pageNumber)
@@ -133,6 +151,7 @@ const Home = () => {
       })
       break
   }
+
   const Pagination: React.FC<PaginationProps> = ({currentPage, onPageChange, totalPages}) => {
     return (
       <div className={`${styles.pagination} `}>
@@ -157,6 +176,12 @@ const Home = () => {
     )
   }
 
+  const fetchData = () => {
+    if (currentPage < totalPages) {
+      handlePageChange(currentPage + 1)
+    }
+  }
+
   return (
     <Layout>
       <div className={styles.layout}>
@@ -164,23 +189,49 @@ const Home = () => {
           <div className={styles.marketCard}>
             {secondMarketCard.map((item: any, index: any) => {
               return (
-                <MarketCard
-                  totalItem={totalItem}
-                  showAll={false}
-                  placeholder='search apps in your space'
-                  column={4}
-                  gap='30px'
-                  key={index}
-                  headerTitle={item.title}
-                  cardItems={cardItems}
-                  pegination={
-                    <Pagination
-                      currentPage={currentPage}
-                      onPageChange={handlePageChange}
-                      totalPages={totalPages}
-                    />
+                <InfiniteScroll
+                  dataLength={cardItems.length}
+                  next={fetchData}
+                  hasMore={currentPage < totalPages}
+                  loader={
+                    cardItems.length > 20 ? (
+                      <h4
+                        style={{
+                          textAlign: 'center',
+                        }}
+                      >
+                        Loading...
+                      </h4>
+                    ) : (
+                      cardItems.length === 20 && (
+                        <h4
+                          style={{
+                            opacity: '0.8',
+                            marginTop: '15px',
+                            textAlign: 'center',
+                          }}
+                        >
+                          Scroll for more apps <FiArrowDown />
+                        </h4>
+                      )
+                    )
                   }
-                />
+                  endMessage={''}
+                >
+                  <MarketCard
+                    style={{
+                      minWidth: '1280px',
+                    }}
+                    totalItem={totalItem}
+                    showAll={false}
+                    placeholder='search apps in your space'
+                    column={4}
+                    gap='30px'
+                    key={index}
+                    headerTitle={item.title}
+                    cardItems={cardItems}
+                  />
+                </InfiniteScroll>
               )
             })}
           </div>

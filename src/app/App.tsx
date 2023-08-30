@@ -13,7 +13,7 @@ import AlertImage from '../_metronic/assets/alert.jpg'
 import ModalOther from '../_metronic/layout/components/walletModal/walletModal'
 import {ToastContainer, toast} from 'react-toastify'
 import CustomModal from '../_metronic/layout/components/walletModal/walletModal'
-
+import styles from './pages/Marketplace/Home.module.scss'
 const App = () => {
   const {
     setBalance,
@@ -63,6 +63,8 @@ const App = () => {
     showAnnouncement,
     setShowAnnouncement,
     discordRole,
+    setComments,
+    setCommentsOther,
   } = useGlobal()
   const {getRole, getUserId, updateUser, getUserInfo, getTokenBalance, getAllApps} =
     useAuthService()
@@ -200,7 +202,7 @@ const App = () => {
           (discordAccessToken && avatarUrl && discordID) ||
           metamaskAccessToken ||
           googleAccessToken ||
-          mailAccessToken
+          (mailAccessToken && validEmail.test(mailAccessToken))
         ) {
           const addUserResponse = await addUser(
             mailAccessToken, // 1
@@ -240,7 +242,7 @@ const App = () => {
               userInfo?.data?.discord_emaik ? userInfo?.data?.discord_email : discordEmail,
               userInfo?.data?.gmail_email ? userInfo?.data?.gmail_email : gmailEmail,
               userInfo?.data?.discord_id ? userInfo?.data?.discord_id : discordID,
-              userInfo?.data?.discord_role ? userInfo?.data?.discord_id : discordRole
+              userInfo?.data?.discord_roles ? userInfo?.data?.discord_roles : discordRole
             )
           }
           if (
@@ -258,6 +260,11 @@ const App = () => {
             )
             if (mailAccessToken && signupResponse.user === 'User is not active') {
               toast.success('Please check your e-mail address', {
+                position: toast.POSITION.BOTTOM_RIGHT,
+              })
+            }
+            if (mailAccessToken && signupResponse.desc === 'Email is sent') {
+              toast.success('Email is sent', {
                 position: toast.POSITION.BOTTOM_RIGHT,
               })
             }
@@ -344,6 +351,29 @@ const App = () => {
     if (!accessToken) return
     getAllApps(1, 20)
   }, [accessToken])
+
+  function isMobileDevice() {
+    return (
+      typeof window.orientation !== 'undefined' || navigator.userAgent.indexOf('IEMobile') !== -1
+    )
+  }
+
+  function MobileWarning() {
+    return (
+      <div className={styles.mobileWarning}>
+        <h2>HyperGPT | Power Up Web3 with AI!</h2>
+        <p>
+          is currently optimized for desktop usage only. We are working diligently to make it
+          accessible on mobile devices in the near future. Thank you for your understanding and stay
+          tuned for updates!
+        </p>
+      </div>
+    )
+  }
+
+  if (isMobileDevice()) {
+    return <MobileWarning />
+  }
 
   return (
     <Suspense fallback={<LayoutSplashScreen />}>

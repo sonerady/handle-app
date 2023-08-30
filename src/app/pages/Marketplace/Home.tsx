@@ -151,7 +151,7 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
           The file is successfully uploaded.
         </Alert>
       )}
-      {showNotificationForSize && (
+      {/* {showNotificationForSize && (
         <Alert
           style={{
             position: 'fixed',
@@ -167,7 +167,7 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
           Please upload an image with a size of 64x64. The current image has an incorrect size and
           cannot be uploaded.
         </Alert>
-      )}
+      )} */}
       <Navbar isSticky={isSticky} />
       <main>
         {children}

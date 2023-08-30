@@ -2,15 +2,14 @@ import React, {useEffect, useState} from 'react'
 import styles from '../Home.module.scss'
 import Rating from './Rating'
 import circle from '../../../../_metronic/assets/marketplace/icons/circle.svg'
-import {Link, useNavigate} from 'react-router-dom'
+import {Link, useLocation, useNavigate} from 'react-router-dom'
 import Input from './Input'
 import {useAuthService} from '../../../services/authService'
 import {useGlobal} from '../../../context/AuthContext'
 import UserLogo from '../../../../_metronic/assets/marketplace/UserLogo.svg'
 import Logo from '../../../../_metronic/assets/marketplace/Logo.svg'
 import {toast} from 'react-toastify'
-import {OverlayTrigger, Tooltip} from 'react-bootstrap'
-// import ContentLoader from 'react-content-loader'
+import SpinnerLogo from '../../../../_metronic/assets/icons/robot.svg'
 
 interface FilterButton {
   text: string
@@ -52,6 +51,7 @@ interface CardProps {
   pegination?: any
   totalItem?: any
   isListNumber?: boolean
+  style?: any
 }
 
 const Card: React.FC<CardProps> = ({
@@ -68,16 +68,36 @@ const Card: React.FC<CardProps> = ({
   pegination,
   totalItem,
   isListNumber,
+  style,
 }) => {
   const [activeFilter, setActiveFilter] = useState('Month' as string)
   const [searchQuery, setSearchQuery] = useState('') //
   const navigate = useNavigate()
-  const {appJoin, getAllApps} = useAuthService()
-  const {apps, accessToken, isSuccess, setAllApps} = useGlobal()
+  const {
+    appJoin,
+    getAllApps,
+    getNewApps,
+    getIntegrated,
+    getVerifiedApp,
+    getUpcoming,
+    getTrendingApps,
+  } = useAuthService()
+  const {apps, accessToken, isSuccess, setAllApps, setTriggerJoin, triggerJoin} = useGlobal()
+
+  const [loadingAppIds, setLoadingAppIds] = useState<Record<string, boolean>>({})
+
+  const [appName, setAppName] = useState('')
+
   const isSign = localStorage.getItem('login')
+
+  const [joinedApps, setJoinedApps] = useState<Record<string, boolean>>({})
+
   const [hoveredBtns, setHoveredBtns] = useState<any>({})
 
+  const [isHref, setIsHref] = useState(false)
+
   const handleMouseEnter = (itemName: any) => {
+    setIsHref(true)
     setHoveredBtns((prevHoveredBtns: any) => ({
       ...prevHoveredBtns,
       [itemName]: true,
@@ -85,6 +105,7 @@ const Card: React.FC<CardProps> = ({
   }
 
   const handleMouseLeave = (itemName: any) => {
+    setIsHref(false)
     setHoveredBtns((prevHoveredBtns: any) => ({
       ...prevHoveredBtns,
       [itemName]: false,
@@ -108,6 +129,18 @@ const Card: React.FC<CardProps> = ({
 
   const [inAppsStatus, setInAppsStatus] = useState({})
 
+  const location = useLocation()
+
+  const searchParams = new URLSearchParams(location.search)
+
+  const params = searchParams.get('filter')
+
+  useEffect(() => {
+    if (params) {
+      setAppName(params)
+    }
+  }, [params])
+
   useEffect(() => {
     // Define the type for the object
     const newInAppsStatus: {[key: string]: boolean} = {}
@@ -118,6 +151,8 @@ const Card: React.FC<CardProps> = ({
 
     setInAppsStatus(newInAppsStatus)
   }, [apps, cardItems])
+
+  console.log('cardData Updated:', cardItems)
 
   const MAX_CARD_ITEMS = 6
 
@@ -140,23 +175,27 @@ const Card: React.FC<CardProps> = ({
     },
   ]
 
-  const handleAddButtonClick = async (event: any, onAdd: any, appid: any) => {
+  const handleAddButtonClick = async (event: any, onAdd: any, appid: any, appName: string) => {
     event.stopPropagation()
+    setLoadingAppIds((prev) => ({...prev, [appid]: true}))
+
     try {
       if (accessToken) {
         const response = await appJoin(appid)
-        if (response.Status === 200) {
+        if (response.status === true) {
           toast.success(response.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
-
-          setAllApps([])
-          getAllApps(1, 20)
+          setJoinedApps((prev) => ({...prev, [appid]: true}))
+          setTriggerJoin(!triggerJoin)
+          // setAllApps([])
+          // getAllApps(1, 20)
+          // getTrendingApps()
+          // getNewApps()
         } else {
           toast.error(response.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
-          getAllApps(1, 20)
         }
       } else {
         toast.error('Please login first', {
@@ -165,13 +204,15 @@ const Card: React.FC<CardProps> = ({
       }
     } catch (error: string | any) {
       console.error(error)
+    } finally {
+      setLoadingAppIds((prev) => ({...prev, [appid]: false}))
     }
   }
 
   const myspace = window.location.href.includes('space')
 
   return (
-    <div className={`${styles.card} ${styles.filterAppCard} card `}>
+    <div style={style} className={`${styles.card} ${styles.filterAppCard} card `}>
       <div className={styles.cardHeader}>
         <div className={styles.titleWrapper}>
           <div className={styles.top}>
@@ -246,8 +287,14 @@ const Card: React.FC<CardProps> = ({
         })} */}
         {!filteredCardItems || cardItems
           ? (search ? filteredCardItems : cardItems)?.map((item, index) => (
-              <div
-                onClick={() => navigate(`/marketplace/detail/${item?.name}/${item?.appid}`)}
+              <a
+                style={{
+                  textDecoration: 'none',
+                }}
+                href={
+                  isHref ? 'javascript:void(0)' : `/marketplace/detail/${item?.name}/${item?.appid}`
+                }
+                // onClick={() => navigate(`/marketplace/detail/${item?.name}/${item?.appid}`)}
                 key={index}
                 className={styles.cardItem}
               >
@@ -311,22 +358,36 @@ const Card: React.FC<CardProps> = ({
                   onMouseLeave={() => handleMouseLeave(item?.name)}
                   disabled={item?.app_join}
                   style={{
-                    cursor: item?.app_join || myspace ? 'not-allowed' : 'pointer',
+                    cursor:
+                      joinedApps[item?.appid] || item?.app_join || myspace
+                        ? 'not-allowed'
+                        : 'pointer',
                     background:
-                      item?.app_join || hoveredBtns[item?.name] || myspace
+                      joinedApps[item?.appid] ||
+                      item?.app_join ||
+                      hoveredBtns[item?.name] ||
+                      myspace
                         ? 'var(--pink-gradient, linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%))'
                         : 'none',
                     color:
-                      item?.app_join || myspace
+                      joinedApps[item?.appid] || item?.app_join || myspace
                         ? '#fff'
                         : 'var(--pink-gradient, linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%))',
                   }}
                   className={styles.addButton}
-                  onClick={(event) => handleAddButtonClick(event, item?.onAdd, item?.appid)}
+                  onClick={(event) =>
+                    handleAddButtonClick(event, item?.onAdd, item?.appid, appName)
+                  }
                 >
-                  {item?.app_join || myspace ? 'OPEN' : 'Add'}
+                  {loadingAppIds[item?.appid] ? (
+                    <img className={styles.spinner} src={SpinnerLogo} alt='' />
+                  ) : joinedApps[item?.appid] || item?.app_join || myspace ? (
+                    'OPEN'
+                  ) : (
+                    'Add'
+                  )}
                 </button>
-              </div>
+              </a>
             ))
           : 'Loading...'}
       </div>

@@ -1,6 +1,8 @@
-import React, {FC, useState} from 'react'
+import React, {FC, useEffect, useState} from 'react'
 import styles from '../AddApp.module.scss'
 import moment from 'moment'
+import Select from 'react-select'
+
 import {FaRegStar, FaStar} from 'react-icons/fa'
 import Tooltip from 'react-bootstrap/Tooltip'
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
@@ -20,8 +22,13 @@ interface ApproveCommentsProps {
 const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setApprovalReviews}) => {
   const [show, setShow] = useState(false)
   const [selectedApp, setSelectedApp] = useState(null)
-  const {approveReview, getForApprovalReviews, rejectReview, getUserCampaignConditions} =
-    useAuthService()
+  const {
+    approveReview,
+    getForApprovalReviews,
+    rejectReview,
+    getUserCampaignConditions,
+    getVariables,
+  } = useAuthService()
   const [reviews, setReviews] = useState([])
   const navigate = useNavigate()
   const handleClose = () => setShow(false)
@@ -29,10 +36,48 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
     setSelectedApp(app)
     setShow(true)
   }
+
   const [showRejectModal, setShowRejectModal] = useState(false)
 
   const [reason, setReason] = useState('')
   const [inputValue, setInputValue] = useState('')
+
+  const [selectedCategories, setSelectedCategories] = useState<any>(null)
+  const [reasonData, setReasonData] = useState([])
+
+  const selectOptions = reasonData?.map((category: any) => ({
+    value: category.order_value,
+    label: category.name ? category.name : 'No Category',
+  }))
+
+  const handleSelectChange = (selectedOption: any) => {
+    if (selectedOption && selectedOption.length > 1) {
+      toast.error('You can select only one category.', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+      })
+      return
+    }
+    setSelectedCategories(selectedOption || [])
+    setInputValue(selectedOption.label)
+  }
+
+  useEffect(() => {
+    if (inputValue === 'Other') {
+      setInputValue('')
+    }
+  }, [inputValue])
+
+  const getVariable = () => {
+    getVariables('comment_reject_reasons').then((res: any) => {
+      setReasonData(res)
+    })
+  }
+
+  useEffect(() => {
+    if (showRejectModal) {
+      getVariable()
+    }
+  }, [showRejectModal])
 
   const handleShowRejectReason = (app: any) => {
     setSelectedApp(app)
@@ -65,25 +110,31 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
   }
 
   const handleReject = () => {
-    rejectReview(item.id, inputValue)
-      .then((res) => {
-        if (res.Status === 200) {
-          toast.success('Successfully rejected', {
-            position: toast.POSITION.BOTTOM_RIGHT,
-          })
-          getUserCampaignConditions()
-          handleCloseRejectModal()
-        } else {
-          toast.error(res.Description, {
-            position: toast.POSITION.BOTTOM_RIGHT,
-          })
-        }
+    if (inputValue.trim() === '') {
+      toast.error('Please provide a reason for rejection.', {
+        position: toast.POSITION.BOTTOM_RIGHT,
       })
-      .catch((err) => {
-        toast.error('An error occurred while rejecting the review.', {
-          position: toast.POSITION.BOTTOM_RIGHT,
+    } else {
+      rejectReview(item.id, inputValue)
+        .then((res) => {
+          if (res.Status === 200) {
+            toast.success('Successfully rejected', {
+              position: toast.POSITION.BOTTOM_RIGHT,
+            })
+            getUserCampaignConditions()
+            handleCloseRejectModal()
+          } else {
+            toast.error(res.Description, {
+              position: toast.POSITION.BOTTOM_RIGHT,
+            })
+          }
         })
-      })
+        .catch((err) => {
+          toast.error('An error occurred while rejecting the review.', {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          })
+        })
+    }
   }
 
   const handleApprove = (id: any) => {
@@ -109,6 +160,8 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
         })
       })
   }
+
+  console.log('item', item)
 
   return (
     <div>
@@ -140,7 +193,11 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
                   overlay={(props) => <Tooltip {...props}>{item.comment}</Tooltip>}
                   placement='bottom'
                 >
-                  <div>{item.comment}</div>
+                  <div>
+                    {item?.comment.length > 24
+                      ? item?.comment.substring(0, 24) + '...'
+                      : item?.comment}
+                  </div>
                 </OverlayTrigger>
               </li>
               <li>
@@ -148,6 +205,17 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
               </li>
               <li title={item.content}>
                 <span>{item.approves}</span>
+              </li>
+              <li className={styles.viewAppBtn}>
+                <button
+                  style={{
+                    borderColor: 'red',
+                    color: 'red',
+                  }}
+                  onClick={() => navigate(`/marketplace/detail/${item?.name}/${item?.appid}`)}
+                >
+                  View
+                </button>
               </li>
               <li className={styles.approveAppBtn}>
                 <button
@@ -179,15 +247,48 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
           </div>
         </div>
       </div>
-      <Modal show={showRejectModal} onHide={handleCloseRejectModal}>
+      <Modal size='sm' show={showRejectModal} onHide={handleCloseRejectModal}>
         <Modal.Header closeButton>
           <Modal.Title>Reason for rejection</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form.Control type='text' value={inputValue} onChange={handleChange} />
+          <Select
+            value={selectedCategories}
+            styles={{
+              control: (baseStyles, state) => ({
+                marginBottom: '1rem',
+                ...baseStyles,
+                borderColor: state.isFocused ? '#fb6fbb' : 'rgba(128, 128, 128, 0.3411764706)',
+                backgroundColor: 'transparent',
+                width: '100%',
+                color: '#FFF',
+              }),
+              option: (styles, {data, isDisabled, isFocused, isSelected}) => {
+                return {
+                  ...styles,
+                  width: '100%',
+                  color: '#FFF',
+                  backgroundColor: '#1f1f21',
+                  cursor: isDisabled ? 'not-allowed' : 'default',
+                }
+              },
+            }}
+            options={selectOptions}
+            isSearchable // Enable search functionality
+            onChange={handleSelectChange}
+          />
+          {selectedCategories?.value === 99 && (
+            <Form.Control as='textarea' rows={4} value={inputValue} onChange={handleChange} />
+          )}
         </Modal.Body>
         <Modal.Footer>
-          <div className={styles.saveButton} onClick={handleReject}>
+          <div
+            style={{
+              cursor: 'pointer',
+            }}
+            className={styles.saveButton}
+            onClick={handleReject}
+          >
             Save
           </div>
         </Modal.Footer>

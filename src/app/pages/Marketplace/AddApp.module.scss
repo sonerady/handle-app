@@ -16,6 +16,8 @@
   text-align: center;
   text-transform: uppercase;
   transition: 0.5s;
+  position: relative;
+  top: -54px;
   background-size: 200% auto;
   border-radius: 5px;
   height: 50px;
@@ -23,6 +25,8 @@
   font-style: normal;
   font-weight: 700;
   margin-top: 5px;
+  position: relative;
+  top: 0;
   width: 100%;
   margin-top: 1rem;
 }
@@ -48,7 +52,11 @@
   max-width: 1280px;
   display: flex;
   flex-direction: column;
-  input {
+  .descText {
+    height: auto !important;
+  }
+  input,
+  .descText {
     height: 50px;
     border-radius: 5px;
     padding: 1rem;
@@ -550,7 +558,8 @@ label {
 
 // ADD COMMENTS
 .addComment,
-.approveAppBtn {
+.approveAppBtn,
+.viewAppBtn {
   button {
     background: none !important;
     color: #1aaa55;
@@ -562,6 +571,12 @@ label {
     &:hover {
       opacity: 0.8;
     }
+  }
+}
+.viewAppBtn {
+  button {
+    color: #e2678e !important;
+    border: 2px solid #e2678e !important;
   }
 }
 .saveButton {

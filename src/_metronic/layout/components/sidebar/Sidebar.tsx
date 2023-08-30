@@ -21,22 +21,24 @@ const Sidebar = () => {
   }
 
   return (
-    <>
+    <div>
       {(config.layoutType === 'dark-sidebar' || config.layoutType === 'light-sidebar') &&
         !location.pathname.includes('hyperchat') &&
         !location.pathname.includes('marketplace') &&
         !location.pathname.includes('hypercodes') && (
-          <div
-            ref={sidebarRef}
-            id='kt_app_sidebar'
-            className={clsx('app-sidebar', config.app?.sidebar?.default?.class)}
-          >
-            <SidebarLogo sidebarRef={sidebarRef} />
-            <SidebarMenu />
-            {/* <SidebarFooter /> */}
+          <div>
+            <div
+              ref={sidebarRef}
+              id='kt_app_sidebar'
+              className={clsx('app-sidebar', config.app?.sidebar?.default?.class)}
+            >
+              <SidebarLogo sidebarRef={sidebarRef} />
+              <SidebarMenu />
+              {/* <SidebarFooter /> */}
+            </div>
           </div>
         )}
-    </>
+    </div>
   )
 }
 

@@ -1,9 +1,15 @@
 //
 // Light Sidebar(used by Light Sidebar layout only)
 //
-
+#kt_app_sidebar {
+  margin-top: 100px !important;
+  height: fit-content !important;
+}
 #kt_app_sidebar::-webkit-scrollbar {
   display: none !important;
+}
+#kt_app_sidebar_menu_wrapper {
+  height: fit-content !important;
 }
 
 [data-kt-app-layout='light-sidebar'] {
@@ -15,11 +21,11 @@
     margin-right: 0px !important;
     border-radius: 2rem;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-    ::-webkit-scrollbar{
+    ::-webkit-scrollbar {
       display: none !important;
     }
-    ::-webkit-scrollbar-horizontal{
-      display:none !important;
+    ::-webkit-scrollbar-horizontal {
+      display: none !important;
     }
     .hover-scroll-overlay-y {
       @include scrollbar-color(

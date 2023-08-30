@@ -56,8 +56,6 @@ function MetaMaskConnect({title, setOpenModal}) {
     }
   }
 
-  const accountLine = account?.slice(0, 6) + '...' + account?.slice(-4)
-
   return (
     <Button
       className='mt-3 btn btn-dark'

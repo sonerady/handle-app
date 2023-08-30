@@ -5,15 +5,28 @@
 .modal-rounded {
   border-radius: $modal-content-border-radius !important;
 }
+.css-1dimb5e-singleValue {
+  color: white !important;
+}
 .modal-dialog {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1rem !important;
 }
+.fade.modal.show {
+  height: 100% !important;
+}
 .modal-content {
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   border: none !important;
   width: 1300px !important;
+}
+.modal-sm {
+  --bs-modal-width: 550px !important;
 }
 .modal-header {
   border: none !important;

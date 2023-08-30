@@ -99,14 +99,16 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
   const characterCount = editorState.getCurrentContent().getPlainText().length
   const remainingCharacters = maxDescriptionLength - characterCount
 
+  const [originalFileType, setOriginalFileType] = useState<string | null>(null)
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files ? event.currentTarget.files[0] : null
     if (file) {
       setImage(URL.createObjectURL(file))
       setIconImage(URL.createObjectURL(file))
+      setOriginalFileType(file.type)
     }
   }
-
   const handleSelectChange = (selectedOptions: any) => {
     if (selectedOptions && selectedOptions.length > 5) {
       toast.error('You can select up to 5 categories.', {
@@ -128,6 +130,16 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
       if (canvas !== null) {
         const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve))
         if (blob !== null) {
+          const validMimeTypes = ['image/jpeg', 'image/jpg', 'image/bmp', 'image/png', 'image/webp']
+          if (!validMimeTypes.includes(originalFileType || '')) {
+            toast.error(
+              'Invalid image format. Only jpeg, bmp, png, jpg, and webp formats are accepted.',
+              {
+                position: toast.POSITION.BOTTOM_RIGHT,
+              }
+            )
+            return
+          }
           const formData = new FormData()
           formData.append('file', blob, 'image.png')
           const response = await fileUpload(formData)
@@ -316,49 +328,56 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
               type='file'
               hidden
               className='input-field'
-              onChange={async (event) => {
-                const file = event.currentTarget.files ? event.currentTarget.files[0] : null
-                if (file) {
-                  setFileNames((prev: any) => ({...prev, [event.currentTarget.name]: file.name}))
-                  const img = new Image()
-                  img.src = URL.createObjectURL(file)
-                  img.onload = async function () {
-                    if (img.width === 64 && img.height === 64) {
-                      const formData = new FormData()
-                      formData.append('file', file)
-
-                      try {
-                        const imageLink = await fileUpload(formData)
-                        if (imageLink) {
-                          formik.setFieldValue('icon', imageLink.link)
-                          setBackgrounds((prev: any) => ({...prev, ['icon']: imageLink?.link}))
-                          toast.success('Operation completed successfully!', {
-                            position: toast.POSITION.BOTTOM_RIGHT,
-                          })
-                        }
-                      } catch (error) {
-                        setFileNames((prev: any) => ({
-                          ...prev,
-                          [event.currentTarget.name]: '64x64',
-                        }))
-                      }
-                    } else {
-                      toast.error(
-                        'Please upload an image with a size of 64x64. The current image has an incorrect size and cannot be uploaded.',
-                        {
-                          position: toast.POSITION.BOTTOM_RIGHT,
-                        }
-                      )
-                    }
-                  }
-                }
-              }}
+              onChange={handleFileChange}
             />
             <span className={styles.plusIconForImage}>
               <FiPlus />
             </span>
           </div>
-
+          <div
+            onClick={() => {
+              const inputField = document.querySelector('#icon')
+              if (inputField instanceof HTMLInputElement) {
+                inputField.click()
+              }
+              setShowModal('icon')
+            }}
+            className={styles.uploadInfo}
+          >
+            <span className={styles.plusIconForImage}>
+              <FiPlus />
+            </span>
+          </div>
+          <Modal show={showModal === 'icon'} onHide={() => setShowModal(false)}>
+            <Modal.Body>
+              <Modal.Header closeButton>
+                <Modal.Title>Crop Icon</Modal.Title>
+              </Modal.Header>
+              {iconImage && (
+                <>
+                  <FixedCropper
+                    ref={cropperRef}
+                    src={iconImage}
+                    className={'example__cropper-background'}
+                    stencilProps={{
+                      handlers: false,
+                      lines: false,
+                      movable: false,
+                      resizable: false,
+                    }}
+                    stencilSize={{
+                      width: 64,
+                      height: 64,
+                    }}
+                    imageRestriction={ImageRestriction.stencil}
+                  />
+                  <button className={styles.cropButton} onClick={() => handleCrop('icon')}>
+                    Complete Cropping
+                  </button>
+                </>
+              )}
+            </Modal.Body>
+          </Modal>
           <label className={styles.label} htmlFor=''>
             <div className={styles.leftSide}>
               <span>Screenshots</span>

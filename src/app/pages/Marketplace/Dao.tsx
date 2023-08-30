@@ -85,7 +85,7 @@ const Collection: React.FC<CollectionProps> = () => {
   const [addedApp, setAddedApp] = useState(false)
   const [reasonData, setReasonData] = useState('')
   const isDiscordUser = localStorage.getItem('isVerifiedUser')
-  const discordID = localStorage.getItem('discordID')
+  const discordID = userInfo?.data?.discord_id
   const [selectedApp, setSelectedApp] = useState<any>(null)
   const [activeTabApps, setActiveTabApps] = useState(0)
   let searchParams = new URLSearchParams(location.search)
@@ -232,7 +232,6 @@ const Collection: React.FC<CollectionProps> = () => {
     }
   }
 
-
   const handleCategoryClick = (categoryName: string) => {
     if (selectedCategories.includes(categoryName)) {
       setSelectedCategories(selectedCategories.filter((name) => name !== categoryName))
@@ -322,10 +321,17 @@ const Collection: React.FC<CollectionProps> = () => {
     }
   }, [parametre])
 
-  const role = userInfo?.data?.discord_role
+  const role = userInfo?.data?.dao_roles
 
+  // useEffect(() => {
+  //   if (!role?.length) {
+  //     setTimeout(() => {
+  //       navigate('/marketplace')
+  //     }, 2000)
+  //   }
+  // }, [])
 
-  if (!role) {
+  if (!role?.length) {
     return (
       <Layout>
         <div className={styles.noLogin}>
@@ -433,6 +439,7 @@ const Collection: React.FC<CollectionProps> = () => {
                 <li>Comment</li>
                 <li>Type</li>
                 <li>Validates</li>
+                <li>View App</li>
                 <li></li>
                 <li></li>
               </ul>
@@ -638,10 +645,17 @@ const Collection: React.FC<CollectionProps> = () => {
         <Modal
           show={showReasonModal}
           onHide={handleCloseReasonModal}
-          size='lg'
+          size='sm'
           style={{padding: '2rem'}}
         >
-          <Modal.Body>
+          <Modal.Header closeButton>
+            <Modal.Title>Reject Reason</Modal.Title>
+          </Modal.Header>
+          <Modal.Body
+            style={{
+              paddingTop: '0',
+            }}
+          >
             <div className={`${styles.profileWrapper} ${styles.modalProfile}`}>
               <div style={{border: 'none'}} className={`${styles.card} ${styles.top} card`}>
                 <span>{reasonData}</span>

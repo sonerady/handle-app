@@ -18,6 +18,7 @@ import {reInitMenu} from '../helpers'
 import {ToolbarWrapper} from './components/toolbar'
 import {useGlobal} from '../../app/context/AuthContext'
 import Important from '../../app/pages/Marketplace/components/Important'
+import Navbar from '../../app/pages/Marketplace/components/Navbar'
 
 const MasterLayout = () => {
   const {openModal, setOpenModal} = useGlobal()
@@ -70,8 +71,8 @@ const MasterLayout = () => {
         <div className='d-flex flex-column flex-root app-root' id='kt_app_root'>
           <div className='app-page flex-column flex-column-fluid' id='kt_app_page'>
             {/* <Navbar/> */}
-            {!isMarketplace && <HeaderWrapper />}
-
+            {/* {!isMarketplace && <HeaderWrapper />} */}
+            <Navbar />
             <div
               style={style}
               className='app-wrapper flex-column flex-row-fluid'

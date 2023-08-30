@@ -14,9 +14,9 @@ import Layout from './Home'
 import {useGlobal} from '../../context/AuthContext'
 import {useAuthService} from '../../services/authService'
 import Logo from '../../../_metronic/assets/marketplace/Logo.svg'
+import {useLocation} from 'react-router-dom'
 
 const Home = () => {
-  const [detailData, setDetailData] = useState<any>({})
   const [sliderDatas, setSliderDatas] = useState<any>([])
   const [sliderCenterDatas, setSliderCenterDatas] = useState<any>([])
   const [loading, setLoading] = useState(true)
@@ -64,8 +64,18 @@ const Home = () => {
     },
   ]
 
-  const {accessToken, allApps, account, apps} = useGlobal()
-  const {getAllApps, getApps, getSliderTop, getSliderCenter} = useAuthService()
+  const {
+    accessToken,
+    allApps,
+    account,
+    apps,
+    newApps,
+    upComingApp,
+    trendingApps,
+    verifiedApps,
+    integratedApp,
+  } = useGlobal()
+  const {getAllApps, getSliderTop, getSliderCenter} = useAuthService()
 
   useEffect(() => {
     const loadData = async () => {
@@ -95,6 +105,30 @@ const Home = () => {
     loadData()
   }, [accessToken])
 
+  const location = useLocation()
+  const searchParams = new URLSearchParams(location.search)
+  const filter = searchParams.get('filter')
+
+  let cardData: any
+  switch (filter) {
+    case 'new':
+      cardData = newApps
+      break
+    case 'upcomings':
+      cardData = upComingApp
+      break
+    case 'trending':
+      cardData = trendingApps
+      break
+    case 'verified':
+      cardData = verifiedApps
+      break
+    case 'integrated':
+      cardData = integratedApp
+      break
+    default:
+      cardData = allApps?.result?.filter((app: any) => app.status === 'approved')
+  }
   return (
     <div>
       {/* {loading ? (
@@ -160,7 +194,6 @@ const Home = () => {
                 return (
                   <MarketCard
                     linkData={item.title === 'Ranking' ? 'ranking' : 'all'}
-                    // isFilter={item.isFilter}
                     isListNumber={true}
                     showAll={true}
                     column={4}
@@ -168,7 +201,7 @@ const Home = () => {
                     key={index}
                     headerTitle={item.title}
                     headerIcon={item.icons}
-                    cardItems={allApps?.result?.filter((app: any) => app.status === 'approved')}
+                    cardItems={cardData}
                   />
                 )
               })}
@@ -176,7 +209,6 @@ const Home = () => {
           </div>
         </div>
       </Layout>
-      {/* )} */}
     </div>
   )
 }

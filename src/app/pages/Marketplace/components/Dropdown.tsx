@@ -43,8 +43,6 @@ const Dropdown: React.FC<DropdownProps> = ({isOpen, onClose}) => {
     }
   }, [onClose])
 
-  const isAdmin = roles?.sonuc?.role
-
   const isDiscordUser = localStorage.getItem('discordAccessToken')
 
   if (!isOpen) return null
@@ -60,27 +58,33 @@ const Dropdown: React.FC<DropdownProps> = ({isOpen, onClose}) => {
           <Link className={styles.leaderboard} to={'/leaderboard'}>
             Leaderboard
           </Link>
-          {/* {userInfo?.data.discord_role === 'HyperAdmin' && isDiscordUser && (
-            <Link className={styles.leaderboard} to={'/add-campaign'}>
-              Add Campaign
-            </Link>
-          )} */}
-          {/* <Link to={'/balance'}>Balance</Link> */}
-          {userInfo?.data.discordToken && isDiscordUser && (
+
+          {userInfo?.data?.admin_roles?.length ? (
             <span
-              className={styles.submenuTitle}
-              onClick={(event) => {
-                event.stopPropagation()
-                setSubmenuOpen(!isSubmenuOpen)
+              style={{
+                fontWeight: 'bold',
               }}
+              onClick={() => navigate('/admin-dao')}
             >
-              {userInfo?.data.discord_role === 'HyperAdmin' && isDiscordUser ? (
-                <p onClick={() => navigate('/admin-dao')}>Admin Dao</p>
-              ) : (
-                <p>Dao</p>
+              Admin Dao
+            </span>
+          ) : (
+            ''
+          )}
+          {userInfo?.data?.dao_roles?.length ? (
+            <span className={styles.submenuTitle}>
+              {userInfo?.data?.dao_roles?.length && (
+                <p
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    setSubmenuOpen(!isSubmenuOpen)
+                  }}
+                >
+                  Dao
+                </p>
               )}
 
-              {userInfo?.data.discord_role !== 'HyperAdmin' && isDiscordUser && (
+              {!userInfo?.data.admin_roles?.length && isDiscordUser && (
                 <img
                   className={`${styles.arrow} ${isSubmenuOpen ? styles.arrowDown : styles.arrowUp}`}
                   src={arrow}
@@ -88,19 +92,20 @@ const Dropdown: React.FC<DropdownProps> = ({isOpen, onClose}) => {
                 />
               )}
             </span>
+          ) : (
+            ''
           )}
 
-          {isSubmenuOpen &&
-            userInfo?.data.discordToken &&
-            userInfo?.data.discord_role !== 'HyperAdmin' &&
-            isDiscordUser && (
-              <div className={styles.submenu}>
-                <Link to={'/dao?task=add-app'}>Add App</Link>
-                {/* <Link to={'/dao?task=add-comment'}>Add Comment</Link> */}
-                <Link to={'/dao?task=approve-comment'}>Approve Comment</Link>
-                <Link to={'/dao?task=approve-app'}>Approve App</Link>
-              </div>
-            )}
+          {isSubmenuOpen && userInfo?.data?.dao_roles?.length ? (
+            <div className={styles.submenu}>
+              <Link to={'/dao?task=add-app'}>Add App</Link>
+              {/* <Link to={'/dao?task=add-comment'}>Add Comment</Link> */}
+              <Link to={'/dao?task=approve-comment'}>Approve Comment</Link>
+              <Link to={'/dao?task=approve-app'}>Approve App</Link>
+            </div>
+          ) : (
+            ''
+          )}
           {accessTokenLocal && (
             <button
               onClick={async () => {

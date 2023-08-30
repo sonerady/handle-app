@@ -5,6 +5,18 @@ main {
   width: 38px;
   height: 38px;
 }
+.mobileWarning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  flex-direction: column;
+  margin: 0 4rem;
+  text-align: center;
+  p {
+    font-size: 2rem;
+  }
+}
 
 .resendEmailContainer {
   display: flex;
@@ -560,7 +572,7 @@ main {
 // MARKET CARD
 
 .filterAppCard {
-  min-height: calc(100vh - 140px);
+  min-height: 700px;
 }
 .marketCard {
   display: flex;
@@ -837,6 +849,13 @@ main {
   cursor: pointer;
 }
 
+.spinner {
+  animation: spin 1s linear infinite;
+
+  width: 20px !important;
+  height: 20px !important;
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -844,10 +863,6 @@ main {
   100% {
     transform: rotate(360deg);
   }
-}
-
-.spinner {
-  animation: spin 1s linear infinite;
 }
 
 // ANNOUNCEMENT

@@ -50,7 +50,6 @@
       padding: 2rem;
       width: 619px;
       max-height: 350px;
-      min-height: 350px;
       border-radius: 2rem;
       display: flex;
       gap: 1rem;
@@ -114,10 +113,7 @@
             border-radius: 50%;
           }
         }
-        .descWrapper {
-          border-top: 2px solid #fb71b8;
-          margin-top: 1.5rem;
-        }
+
         .headerContainer {
           display: flex;
           align-items: start !important;
@@ -187,7 +183,7 @@
             color: #000;
             padding: 2px 12px;
             border-radius: 1rem;
-            padding: 5px 15px;
+            padding: 5 15px;
             font-weight: 700;
             font-size: 12px;
             line-height: 16px;
@@ -627,6 +623,8 @@
   .headerContainerReview {
     .headerContainer {
       display: flex;
+      position: relative;
+      top: -9px;
       flex-direction: column;
       gap: 0.5rem;
       display: flex;
@@ -648,10 +646,9 @@
   width: 100%;
   display: flex;
   justify-content: end;
-  position: sticky;
-  top: 0;
   z-index: 9999;
   .rejectButton {
+    height: 40px;
     color: red !important;
     border: 2px solid red !important;
   }
@@ -661,6 +658,7 @@
     border: 2px solid #1aaa55;
     border-radius: 2rem;
     backdrop-filter: blur(10px);
+    height: 40px;
 
     padding: 5px 10px;
     cursor: pointer;

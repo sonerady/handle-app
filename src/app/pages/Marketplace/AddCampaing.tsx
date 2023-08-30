@@ -23,15 +23,18 @@ const validationSchema = Yup.object({
 interface CollectionProps {}
 
 const Collection: React.FC<CollectionProps> = () => {
-  const {accessToken} = useGlobal()
+  const {accessToken, userInfo} = useGlobal()
   const {addCampaign} = useAuthService()
   const navigate = useNavigate()
 
   const isLogin = localStorage.getItem('login') || ''
-  const isAdmin = localStorage.getItem('role') || ''
   const [counter, setCounter] = useState(5)
 
-  if (isAdmin !== 'HyperAdmin') {
+  const isAdmin = userInfo?.data?.admin_roles
+
+  console.log('isAdmin', isAdmin.length)
+
+  if (!isAdmin?.includes('Admin')) {
     return (
       <Layout>
         <div className={styles.noLogin}>

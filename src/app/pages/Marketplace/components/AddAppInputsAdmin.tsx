@@ -98,9 +98,13 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
     setIsTrending(value)
   }
 
+  const [iconImage, setIconImage] = useState<string | null>(null)
+
   const maxDescriptionLength = 1000
   const maxNameLength = 50
   const maxTitleLength = 100
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const [showModal, setShowModal] = useState<any>()
 
@@ -112,10 +116,14 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
 
   const [image, setImage] = useState<string | null>(null)
 
+  const [originalFileType, setOriginalFileType] = useState<string | null>(null)
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files ? event.currentTarget.files[0] : null
     if (file) {
       setImage(URL.createObjectURL(file))
+      setIconImage(URL.createObjectURL(file))
+      setOriginalFileType(file.type)
     }
   }
 
@@ -130,6 +138,16 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
       if (canvas !== null) {
         const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve))
         if (blob !== null) {
+          const validMimeTypes = ['image/jpeg', 'image/jpg', 'image/bmp', 'image/png', 'image/webp']
+          if (!validMimeTypes.includes(originalFileType || '')) {
+            toast.error(
+              'Invalid image format. Only jpeg, bmp, png, jpg, and webp formats are accepted.',
+              {
+                position: toast.POSITION.BOTTOM_RIGHT,
+              }
+            )
+            return
+          }
           const formData = new FormData()
           formData.append('file', blob, 'image.png')
           const response = await fileUpload(formData)
@@ -148,27 +166,8 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
     }
   }
 
-  const handleEditorChange = (editorState: any) => {
-    const contentState = editorState.getCurrentContent()
-    const plainText = contentState.getPlainText()
-
-    if (plainText.length <= maxDescriptionLength) {
-      setDescState(editorState)
-    } else {
-      // Discard additional characters
-      const truncatedPlainText = plainText.slice(0, maxDescriptionLength)
-      const truncatedContentState = contentState.createFromText(truncatedPlainText)
-      setDescState(EditorState.createWithContent(truncatedContentState))
-    }
-  }
-
   const characterCount = descState.getCurrentContent().getPlainText().length
   const remainingCharacters = maxDescriptionLength - characterCount
-
-  useEffect(() => {
-    // Update formik values whenever the editor content changes
-    formik.setFieldValue('description', draftToHtml(convertToRaw(descState.getCurrentContent())))
-  }, [descState])
 
   const handleSelectChange = (selectedOptions: any) => {
     if (selectedOptions && selectedOptions.length > 5) {
@@ -242,37 +241,23 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
               <span>Description</span>
               <span className={styles.required}>*</span>
             </div>
-            <div className={styles.lengthText}>
-              {characterCount}/{maxDescriptionLength}{' '}
-              {remainingCharacters < 0 ? <span style={{color: 'red'}}>Over Limit</span> : null}
-            </div>
+            <label className={styles.label} htmlFor=''>
+              <div className={styles.lengthText}>{formik.values.description.length}/1000</div>
+            </label>
           </label>
-          <Editor
-            toolbar={{
-              options: [
-                'inline',
-                'blockType',
-                'fontSize',
-                'list',
-                'textAlign',
-                'history',
-                'colorPicker',
-                'fontFamily',
-              ],
-              inline: {inDropdown: true},
-              list: {inDropdown: true},
-              textAlign: {inDropdown: true},
-              history: {inDropdown: true},
-              colorPicker: {inDropdown: true},
-              fontFamily: {inDropdown: true},
-              fontSize: {inDropdown: true},
-            }}
-            editorState={descState}
-            toolbarClassName='toolbarClassName'
-            wrapperClassName='wrapperClassName'
-            editorClassName='editorClassName'
-            onEditorStateChange={handleEditorChange}
+          <textarea
+            className={styles.descText}
+            rows={8}
+            maxLength={maxDescriptionLength}
+            placeholder='App description'
+            id='description'
+            name='description'
+            onChange={formik.handleChange}
+            value={formik.values.description}
           />
+          {formik.errors.description && formik.touched.description && (
+            <div className={styles.error}>{formik.errors.description}</div>
+          )}
 
           <label className={styles.label} htmlFor=''>
             <div className={styles.leftSide}>
@@ -282,9 +267,9 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
           </label>
           <div className={styles.categoryContainer}>
             <Select
-              value={selectedCategories.map((category: any) => ({
-                value: category.id,
-                label: category.id,
+              value={selectedCategories?.map((categoryName: any) => ({
+                value: categoryName,
+                label: categoryName,
               }))}
               styles={{
                 control: (baseStyles, state) => ({
@@ -297,7 +282,7 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
                 option: (styles, {data, isDisabled, isFocused, isSelected}) => {
                   return {
                     ...styles,
-                    width: '100%',
+                    width: '50%',
                     color: '#FFF',
                     backgroundColor: '#1f1f21',
                     cursor: isDisabled ? 'not-allowed' : 'default',
@@ -399,57 +384,58 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
               if (inputField instanceof HTMLInputElement) {
                 inputField.click()
               }
+              setShowModal('icon')
             }}
           >
             <input
+              ref={fileInputRef}
               id='icon'
               name='icon'
               type='file'
               hidden
               className='input-field'
-              onChange={async (event) => {
-                const file = event.currentTarget.files ? event.currentTarget.files[0] : null
-                if (file) {
-                  setFileNames((prev: any) => ({...prev, [event.currentTarget.name]: file.name}))
-                  const img = new Image()
-                  img.src = URL.createObjectURL(file)
-                  img.onload = async function () {
-                    if (img.width === 64 && img.height === 64) {
-                      const formData = new FormData()
-                      formData.append('file', file)
-
-                      try {
-                        const imageLink = await fileUpload(formData)
-                        if (imageLink) {
-                          formik.setFieldValue('icon', imageLink.link)
-                          setBackgrounds((prev: any) => ({...prev, ['icon']: imageLink?.link}))
-                          alert(backgrounds.icon)
-                          toast.success('Operation completed successfully!', {
-                            position: toast.POSITION.BOTTOM_RIGHT,
-                          })
-                        }
-                      } catch (error) {
-                        setFileNames((prev: any) => ({
-                          ...prev,
-                          [event.currentTarget.name]: '64x64',
-                        }))
-                      }
-                    } else {
-                      toast.error(
-                        'Please upload an image with a size of 64x64. The current image has an incorrect size and cannot be uploaded.',
-                        {
-                          position: toast.POSITION.BOTTOM_RIGHT,
-                        }
-                      )
-                    }
-                  }
-                }
-              }}
+              onChange={handleFileChange}
             />
             <span className={styles.plusIconForImage}>
               <FiPlus />
             </span>
           </div>
+          <Modal show={showModal === 'icon'} onHide={() => setShowModal(false)}>
+            <Modal.Body
+              style={{
+                width: '750px',
+                height: '624px',
+              }}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Crop Image</Modal.Title>
+              </Modal.Header>
+
+              {iconImage && (
+                <>
+                  <FixedCropper
+                    ref={cropperRef}
+                    src={iconImage}
+                    className={'example__cropper-background'}
+                    stencilProps={{
+                      handlers: false,
+                      lines: false,
+                      movable: false,
+                      resizable: false,
+                    }}
+                    stencilSize={{
+                      width: 64,
+                      height: 64,
+                    }}
+                    imageRestriction={ImageRestriction.stencil}
+                  />
+                  <button className={styles.cropButton} onClick={() => handleCrop('icon')}>
+                    Complete Cropping
+                  </button>
+                </>
+              )}
+            </Modal.Body>
+          </Modal>
           <label className={styles.label} htmlFor=''>
             <div className={styles.leftSide}>
               <span>Screenshots</span>
@@ -459,7 +445,12 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
           <div className={styles.imageWrapper}>
             <div className={styles.uploadImageWrapper}>
               <Modal show={showModal === 1} onHide={() => setShowModal(false)}>
-                <Modal.Body>
+                <Modal.Body
+                  style={{
+                    width: '750px',
+                    height: '624px',
+                  }}
+                >
                   <Modal.Header closeButton>
                     <Modal.Title>Crop Image</Modal.Title>
                   </Modal.Header>
@@ -524,7 +515,12 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
 
             <div className={styles.uploadImageWrapper}>
               <Modal show={showModal === 2} onHide={() => setShowModal(false)}>
-                <Modal.Body>
+                <Modal.Body
+                  style={{
+                    width: '750px',
+                    height: '624px',
+                  }}
+                >
                   <Modal.Header closeButton>
                     <Modal.Title>Crop Image</Modal.Title>
                   </Modal.Header>
@@ -596,7 +592,12 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
 
             <div className={styles.uploadImageWrapper}>
               <Modal show={showModal === 3} onHide={() => setShowModal(false)}>
-                <Modal.Body>
+                <Modal.Body
+                  style={{
+                    width: '750px',
+                    height: '624px',
+                  }}
+                >
                   <Modal.Header closeButton>
                     <Modal.Title>Crop Image</Modal.Title>
                   </Modal.Header>
@@ -668,7 +669,12 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
 
             <div className={styles.uploadImageWrapper}>
               <Modal show={showModal === 4} onHide={() => setShowModal(false)}>
-                <Modal.Body>
+                <Modal.Body
+                  style={{
+                    width: '750px',
+                    height: '624px',
+                  }}
+                >
                   <Modal.Header closeButton>
                     <Modal.Title>Crop Image</Modal.Title>
                   </Modal.Header>
@@ -740,7 +746,12 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
 
             <div className={styles.uploadImageWrapper}>
               <Modal show={showModal === 5} onHide={() => setShowModal(false)}>
-                <Modal.Body>
+                <Modal.Body
+                  style={{
+                    width: '750px',
+                    height: '624px',
+                  }}
+                >
                   <Modal.Header closeButton>
                     <Modal.Title>Crop Image</Modal.Title>
                   </Modal.Header>

@@ -9,6 +9,23 @@
   height: 40px;
   border: none;
 }
+.cropButton {
+  background-image: linear-gradient(to right, #fb6fbb 0%, #ff9085 51%, #fa1191 100%);
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  border-radius: 5px;
+  height: 50px;
+  border: none;
+  position: relative;
+  top: -62px;
+  font-style: normal;
+  font-weight: 700;
+  margin-top: 5px;
+  width: 100%;
+  margin-top: 1rem;
+}
 .closeButton {
   background: none;
   font-weight: bold;

@@ -52,6 +52,15 @@ const ApproveComments: React.FC<ApproveCommentsProps> = ({
         })
       })
   }
+  const handleSave = () => {
+    if (inputValue.trim() === '') {
+      toast.error('Please provide a reason for rejection.', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+      })
+    } else {
+      handleReject()
+    }
+  }
 
   const handleReject = () => {
     rejectReview(item.id, inputValue)
@@ -75,10 +84,6 @@ const ApproveComments: React.FC<ApproveCommentsProps> = ({
           position: toast.POSITION.BOTTOM_RIGHT,
         })
       })
-  }
-
-  const handleSave = () => {
-    handleReject()
   }
 
   const handleClose = () => {
@@ -146,7 +151,7 @@ const ApproveComments: React.FC<ApproveCommentsProps> = ({
 
         <span>{new Date(item.createdAt).toLocaleDateString()}</span>
       </p>
-      <Modal show={show} onHide={handleClosePopup}>
+      <Modal size='sm' show={show} onHide={handleClosePopup}>
         <Modal.Header closeButton>
           <Modal.Title>Reason for rejection</Modal.Title>
         </Modal.Header>
@@ -154,7 +159,13 @@ const ApproveComments: React.FC<ApproveCommentsProps> = ({
           <Form.Control type='text' value={inputValue} onChange={handleChange} />
         </Modal.Body>
         <Modal.Footer>
-          <div className={styles.saveButton} onClick={handleSave}>
+          <div
+            style={{
+              cursor: 'pointer',
+            }}
+            className={styles.saveButton}
+            onClick={handleSave}
+          >
             Save
           </div>
         </Modal.Footer>

@@ -71,7 +71,11 @@ const ApproveApp: FC<ApproveAppProps> = ({
                     <ul>
                       <li className={styles.icons}>
                         <span className={styles.icon}>
-                          <img src={app.icon ? app.icon : RobotIcon} alt='' />
+                          <img
+                            src={app.icon ? app.icon : RobotIcon}
+                            alt=''
+                            onError={(e: any) => (e.target.src = RobotIcon)}
+                          />
                         </span>
                       </li>
                       <li title={moment(app.created_at).format('DD.MM.YYYY')}>
@@ -105,33 +109,14 @@ const ApproveApp: FC<ApproveAppProps> = ({
         show={show}
         onHide={handleClose}
       >
-        <Modal.Header
-          style={{
-            background: '#161617',
-          }}
-          closeButton
-        >
-          <Modal.Title>
-            Review App{' '}
-            <span
-              style={{
-                cursor: 'pointer',
-                color: '#6c757d',
-              }}
-              onClick={() => {
-                navigator?.clipboard?.writeText(selectedApp?.appid)
-                toast.success('App ID copied to clipboard', {
-                  position: toast.POSITION.BOTTOM_RIGHT,
-                })
-              }}
-            >
-              ({selectedApp?.appid})
-            </span>
-          </Modal.Title>
-        </Modal.Header>
         <Modal.Body
           style={{
-            background: '#161617',
+            width: '650px',
+            display: 'flex',
+            flexDirection: 'column',
+            overflowY: 'scroll',
+            overflowX: 'hidden',
+            height: '600px',
           }}
         >
           <Review

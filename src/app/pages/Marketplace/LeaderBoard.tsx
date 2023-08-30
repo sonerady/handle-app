@@ -34,6 +34,7 @@ const Collection: React.FC<CollectionProps> = () => {
     getCampigns,
     getReviewsPublished,
     getUserRanking,
+    getUserCampaignConditions,
   } = useAuthService()
 
   const [params, setParams] = useState<{
@@ -50,9 +51,9 @@ const Collection: React.FC<CollectionProps> = () => {
       const timer = setTimeout(() => {
         setError(null)
       }, 2000)
-      return () => clearTimeout(timer) // Cleanup function
+      return () => clearTimeout(timer)
     }
-  }, [error]) // Hata durumu değiştiğinde bu Hook çalışır
+  }, [error])
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
@@ -73,7 +74,7 @@ const Collection: React.FC<CollectionProps> = () => {
     getRanking()
     getCampigns()
     getReviewsPublished()
-    getUserRanking()
+    // getUserRanking()
   }, [])
 
   useEffect(() => {
@@ -94,17 +95,20 @@ const Collection: React.FC<CollectionProps> = () => {
     return () => clearInterval(interval)
   }, [campaigns])
 
-  const roles = userInfo?.data?.discord_role
+  const roles = userInfo?.data?.dao_roles
   const accessTokenMarketplace = localStorage.getItem('accessTokenMarketplace')
 
-  if (!appValidation) {
-    return <div className={styles.loading}>Loading...</div>
-  }
+  // if (!appValidation) {
+  //   return <div className={styles.loading}>Loading...</div>
+  // }
 
-  const numberFormatter = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
+  useEffect(() => {
+    if (!accessTokenMarketplace) {
+      setTimeout(() => {
+        navigate('/marketplace')
+      })
+    }
+  }, [])
 
   const isDiscord = localStorage.getItem('discordAccessToken')
 
@@ -114,7 +118,16 @@ const Collection: React.FC<CollectionProps> = () => {
         <div style={{border: 'none'}} className={`${styles.card} card`}>
           <h1>User Role</h1>
           <div className={styles.daoContent}>
-            <div className={styles.daoContentTitle}>{roles ?? 'No Role'}</div>
+            <div className={styles.daoContentTitle}>
+              {roles?.map((role: any, index: number, arr: any[]) => {
+                return (
+                  <span key={index}>
+                    {role}
+                    {index !== arr.length - 1 ? ', ' : ''}
+                  </span>
+                )
+              })}
+            </div>
           </div>
         </div>
         <div style={{border: 'none'}} className={`${styles.card} card`}>
@@ -209,11 +222,10 @@ const Collection: React.FC<CollectionProps> = () => {
           <thead>
             <tr>
               <th className={styles.rankTitle}>Rank</th>
-              <th className={styles.rankTitle}>DAO Member</th>
+              <th className={styles.rankTitle}>Username</th>
               <th className={styles.rankTitle}>Role</th>
               <th className={styles.rankTitle}>Share</th>
               <th className={styles.rankTitle}>XP</th>
-              <th className={styles.rankTitle}>Reward</th>
             </tr>
           </thead>
           <tbody>
@@ -224,10 +236,26 @@ const Collection: React.FC<CollectionProps> = () => {
               >
                 <td>#{item?.ranking}</td>
                 <td>{item?.username ? item.username : item.email ?? 'No name'} </td>
-                <td>{item.discord_role ?? 'No role'}</td>
-                <td>{item.share}%</td>
+                <td>
+                  {item.discord_role
+                    ? item.discord_role
+                        .filter((role: any) => role !== 'HyperAdmin')
+                        .map(
+                          (role: any, index: number, arr: any[]) =>
+                            role + (index !== arr.length - 1 ? ', ' : '')
+                        )
+                        .join('')
+                    : 'No role'}
+                </td>
+
+                <td>
+                  {parseFloat(item.share).toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }) ?? '0.00'}
+                  %
+                </td>
                 <td>{item.total_bonus}</td>
-                <td>{numberFormatter.format(item?.reward)} HGPT</td>
               </tr>
             ))}
           </tbody>

@@ -84,6 +84,14 @@ export const useAuthService = () => {
       console.error(error)
     }
   }
+  // const getUserCampaignConditions = async () => {
+  //   try {
+  //     const response = await api.get(`/campaign/getUserCampaignConditions?&token=${accessToken}`)
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // }
+
   const getRating = async (id) => {
     try {
       const response = await api.get(`/app/app_ratings?&appid=${id}`)
@@ -337,22 +345,36 @@ export const useAuthService = () => {
 
   const getTrendingApps = async () => {
     try {
-      const response = await api.get(`/app/getTrendingApps?`, {
+      let url = `/app/getTrendingApps?`
+
+      if (accessToken) {
+        url += `token=${accessToken}`
+      }
+
+      const response = await api.get(url, {
         headers: {
           'Content-Type': 'application/json',
         },
       })
+
       setTrendingApps(response.data)
       return response.data
     } catch (error) {}
   }
   const getUpcoming = async (page, count) => {
     try {
-      const response = await api.get(`/user/upcomingApps?page=${page}&count=${count}`, {
+      let url = `/user/upcomingApps?page=${page}&count=${count}`
+
+      if (accessToken) {
+        url += `&token=${accessToken}`
+      }
+
+      const response = await api.get(url, {
         headers: {
           'Content-Type': 'application/json',
         },
       })
+
       setUpComingApp(response.data)
       return response.data
     } catch (error) {}
@@ -360,11 +382,18 @@ export const useAuthService = () => {
 
   const getIntegrated = async (page, count) => {
     try {
-      const response = await api.get(`/app/getIntegratedApps`, {
+      let url = `/app/getIntegratedApps?`
+
+      if (accessToken) {
+        url += `token=${accessToken}`
+      }
+
+      const response = await api.get(url, {
         headers: {
           'Content-Type': 'application/json',
         },
       })
+
       setIntegratedApp(response.data)
       return response.data
     } catch (error) {}
@@ -372,11 +401,18 @@ export const useAuthService = () => {
 
   const getNewApps = async () => {
     try {
-      const response = await api.get(`/app/getNewApps?`, {
+      let url = `/app/getNewApps?`
+
+      if (accessToken) {
+        url += `token=${accessToken}`
+      }
+
+      const response = await api.get(url, {
         headers: {
           'Content-Type': 'application/json',
         },
       })
+
       setNewApps(response.data)
       return response.data
     } catch (error) {}
@@ -384,11 +420,18 @@ export const useAuthService = () => {
 
   const getVerifiedApp = async () => {
     try {
-      const response = await api.get(`/app/getVerifiedApps?`, {
+      let url = `/app/getVerifiedApps?`
+
+      if (accessToken) {
+        url += `token=${accessToken}`
+      }
+
+      const response = await api.get(url, {
         headers: {
           'Content-Type': 'application/json',
         },
       })
+
       setVerifiedApps(response.data)
       return response.data
     } catch (error) {}
@@ -397,6 +440,17 @@ export const useAuthService = () => {
   const getValidators = async (id) => {
     try {
       const response = await api.get(`/app/validators?token=${accessToken}&app_id=${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      return response.data
+    } catch (error) {}
+  }
+
+  const getVariables = async (type) => {
+    try {
+      const response = await api.get(`/app/getVariables?type=${type}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -463,6 +517,17 @@ export const useAuthService = () => {
         },
       })
       setApps(response.data)
+      return response.data
+    } catch (error) {}
+  }
+  const getView = async (id) => {
+    try {
+      const response = await api.get(`/user/hasReviewOrComment?app_id=${id}&token=${accessToken}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      })
       return response.data
     } catch (error) {}
   }
@@ -788,6 +853,21 @@ export const useAuthService = () => {
     try {
       const response = await api.post(
         `/user/approveApp?token=${accessToken}&app_id=${id}&publish_date=${publish_date}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      return response.data
+    } catch (error) {
+      setShowErrorImage(true)
+    }
+  }
+  const approveAppAdmin = async (id, publish_date) => {
+    try {
+      const response = await api.post(
+        `/user/approveAppAdmin?token=${accessToken}&app_id=${id}&publish_date=${publish_date}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -1607,5 +1687,8 @@ export const useAuthService = () => {
     metamaskLogout,
     getSliderCenter,
     removeJoin,
+    getView,
+    approveAppAdmin,
+    getVariables,
   }
 }

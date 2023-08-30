@@ -85,26 +85,16 @@ const ApproveApp: FC<ApproveAppProps> = ({
         show={show}
         onHide={handleClose}
       >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            Review App{' '}
-            <span
-              style={{
-                cursor: 'pointer',
-                color: '#6c757d',
-              }}
-              onClick={() => {
-                navigator?.clipboard?.writeText(selectedApp?.appid)
-                toast.success('App ID copied to clipboard', {
-                  position: toast.POSITION.BOTTOM_RIGHT,
-                })
-              }}
-            >
-              ({selectedApp?.appid})
-            </span>
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+        <Modal.Body
+          style={{
+            width: '650px',
+            display: 'flex',
+            flexDirection: 'column',
+            overflowY: 'scroll',
+            overflowX: 'hidden',
+            height: '600px',
+          }}
+        >
           <Review
             getWaitingForAdmin={getWaitingForAdmin}
             setWaitingAppsAdmin={setWaitingAppsAdmin}

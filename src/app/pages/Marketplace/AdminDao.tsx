@@ -92,8 +92,8 @@ const Collection: React.FC<CollectionProps> = () => {
   const [istrending, setIstrending] = useState(false)
 
   const navigate = useNavigate()
-  const discordID = localStorage.getItem('discordID')
-  const isAdmin = userInfo?.data?.discord_role
+  const discordID = userInfo?.data?.discord_id
+
   const [counter, setCounter] = useState(5)
 
   const [descState, setDescState] = useState(EditorState.createEmpty())
@@ -301,7 +301,15 @@ const Collection: React.FC<CollectionProps> = () => {
     }
   }, [parametre])
 
-  if (isAdmin !== 'HyperAdmin') {
+  const isAdmin = userInfo?.data?.admin_roles
+
+  // useEffect(() => {
+  //   if (!isAdmin?.length) {
+  //     navigate('/marketplace')
+  //   }
+  // }, [])
+
+  if (!isAdmin?.length) {
     return (
       <Layout>
         <div className={styles.noLogin}>

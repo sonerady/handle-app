@@ -47,6 +47,7 @@ const CustomModal: FC<ModalProps> = ({children, openModal, userInfo}) => {
     localStorage.setItem('googleAccessToken', googleAccessToken)
     const googleProfile = res?.profileObj
     if (googleProfile) {
+      getUserInfo()
       const decodedName = decodeURIComponent(googleProfile.name)
       const decodedImageUrl = decodeURIComponent(googleProfile.imageUrl)
       setUserName && setUserName(decodedName)
@@ -62,6 +63,7 @@ const CustomModal: FC<ModalProps> = ({children, openModal, userInfo}) => {
       )
       if (response.success) {
         toast.success('Google account connected successfully')
+        getUserInfo()
       }
     }
   }

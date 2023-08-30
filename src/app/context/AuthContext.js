@@ -21,6 +21,7 @@ export const TokenProvider = ({children}) => {
   const [promptTitle, setPromptTitle] = useState('')
   const [contractData, setContractData] = useState([])
   const [postData, setPostData] = useState('')
+  const [triggerJoin, setTriggerJoin] = useState(false)
   const [code, setCode] = useState('')
   const [imagePreview, setImagePreview] = useState(null)
   const [showAlert, setShowAlert] = useState('')
@@ -125,7 +126,10 @@ export const TokenProvider = ({children}) => {
   const [gmailIcon, setGmailIcon] = useState('')
   const [integratedApp, setIntegratedApp] = useState([])
   const [spaceCount, setSpaceCount] = useState(0)
-  const validEmail = new RegExp('^[a-zA-Z0-9._:$!%-]+@[a-zA-Z0-9.-]+.[a-zA-Z]$')
+  const validEmail = new RegExp(
+    '^(?!0x[a-fA-F0-9]{40})[a-zA-Z0-9._:$!%-]+@[a-zA-Z0-9.-]+.[a-zA-Z]$'
+  )
+
   const validUsername = new RegExp('^[A-Za-z][A-Za-z0-9_]{4,29}$')
 
   const [roles, setRoles] = useState([])
@@ -347,6 +351,8 @@ export const TokenProvider = ({children}) => {
         setCampaignsUser,
         successTrigger,
         setSuccessTrigger,
+        triggerJoin,
+        setTriggerJoin,
       }}
     >
       {children}

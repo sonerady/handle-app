@@ -1,14 +1,10 @@
 import React, {useEffect, useState} from 'react'
 import {useLocation, useParams} from 'react-router-dom'
 import Layout from './Home'
-import styles from './Detail.module.scss'
-import visit from '../../../_metronic/assets/marketplace/icons/visit.svg'
-import open from '../../../_metronic/assets/marketplace/icons/open.svg'
-import showMore from '../../../_metronic/assets/marketplace/button/showMore.svg'
-import addComment from '../../../_metronic/assets/marketplace/button/addComment.svg'
-import defaults from '../../../_metronic/assets/marketplace/icons/defaults.svg'
-import pinkCircle from '../../../_metronic/assets/marketplace/icons/pinkCircle.svg'
-import Rating from './components/Rating'
+import Select from 'react-select'
+
+import styles from './Review.module.scss'
+import RobotIcon from '../../../_metronic/assets/icons/robot.svg'
 import {useAuthService} from '../../services/authService'
 import {useGlobal} from '../../context/AuthContext'
 import {AiOutlineHeart, AiTwotoneHeart} from 'react-icons/ai'
@@ -21,6 +17,8 @@ import moment from 'moment'
 
 import 'react-datepicker/dist/react-datepicker.css'
 import {Button, Form, Modal} from 'react-bootstrap'
+import {MdOutlineFileCopy} from 'react-icons/md'
+import {TbWorldWww} from 'react-icons/tb'
 
 interface ReviewProps {
   app?: any
@@ -51,7 +49,14 @@ const Review: React.FC<ReviewProps> = ({
     appid?: string
   }>({})
 
-  const {approveApp, rejectApp, getWaitingApps, getUserCampaignConditions} = useAuthService()
+  const {
+    approveApp,
+    approveAppAdmin,
+    rejectApp,
+    getWaitingApps,
+    getUserCampaignConditions,
+    getVariables,
+  } = useAuthService()
 
   const [hoverValue, setHoverValue] = useState(null)
   const {likeCount, visitCount, alertComment, comments, userInfo} = useGlobal()
@@ -76,34 +81,79 @@ const Review: React.FC<ReviewProps> = ({
   const [show, setShow] = useState(false)
   const [inputValue, setInputValue] = useState('')
 
+  const [reasonData, setReasonData] = useState([])
+
   const handleClosePopup = () => setShow(false)
   const handleShow = () => setShow(true)
   const handleSave = () => {
-    handleReject()
+    if (inputValue.trim() === '') {
+      toast.error('Please provide a reason for rejection.', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+      })
+    } else {
+      handleReject()
+    }
   }
+
+  const [selectedCategories, setSelectedCategories] = useState<any>(null)
+
+  const [selectedReason, setSelectedReason] = useState<number | null>(null)
+
   const [publishDate, setPublishDate] = useState<Date | null>(new Date())
 
   const [showDatePicker, setShowDatePicker] = useState(false)
 
   const handleChange = (e: any) => setInputValue(e.target.value)
-  const ratingsCount: {[index: number]: number} = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
-  // const totalRatings = comments?.reduce((total: any, comment: any) => total + comment.rating, 0)
-  // let averageRating = comments?.length ? totalRatings / comments.length : 0
 
-  // if (isNaN(averageRating)) {
-  //   averageRating = 0
-  // }
+  const getVariable = () => {
+    getVariables('app_reject_reasons').then((res: any) => {
+      setReasonData(res)
+    })
+  }
 
-  // comments?.forEach((comment: any) => {
-  //   if (comment.rating >= 1 && comment.rating <= 5) {
-  //     ratingsCount[comment.rating]++
-  //   }
-  // })
+  useEffect(() => {
+    if (show) {
+      getVariable()
+    }
+  }, [show])
 
+  const selectOptions = reasonData?.map((category: any) => ({
+    value: category.order_value,
+    label: category.name ? category.name : 'No Category',
+  }))
+
+  const handleSelectChange = (selectedOption: any) => {
+    if (selectedOption && selectedOption.length > 1) {
+      toast.error('You can select only one category.', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+      })
+      return
+    }
+    setSelectedCategories(selectedOption || [])
+    setInputValue(selectedOption.label)
+  }
+
+  useEffect(() => {
+    if (inputValue === 'Other') {
+      setInputValue('')
+    }
+  }, [inputValue])
+
+  console.log('inputValue', inputValue)
   const performApproval = (id: any) => {
-    approveApp(id, isRole === 'HyperAdmin' ? moment(publishDate).format('YYYY-MM-DD') : 'None')
+    let approvalFunction
+    if (window.location.pathname !== '/dao') {
+      approvalFunction = approveAppAdmin
+    } else {
+      approvalFunction = approveApp
+    }
+
+    approvalFunction(
+      id,
+      window.location.pathname !== '/dao' ? moment(publishDate).format('YYYY-MM-DD') : 'None'
+    )
       .then((res: any) => {
-        if (res.Status === true) {
+        if (res.Status === 200) {
           handleClose()
           toast.success(res.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
@@ -112,7 +162,7 @@ const Review: React.FC<ReviewProps> = ({
           getWaitingApps().then((res) => {
             setWaitingApps(res)
           })
-          if (isRole === 'HyperAdmin') {
+          if (isRole?.length) {
             getWaitingForAdmin().then((res: any) => {
               setWaitingAppsAdmin(res)
             })
@@ -144,7 +194,7 @@ const Review: React.FC<ReviewProps> = ({
   }
 
   const handleApprove = (id: any) => {
-    if (isRole === 'HyperAdmin') {
+    if (window.location.pathname !== '/dao') {
       setShowDatePicker(true)
     } else {
       const formattedDate = publishDate
@@ -177,8 +227,9 @@ const Review: React.FC<ReviewProps> = ({
       })
   }
 
-  const isRole = userInfo?.data?.discord_role
+  const isRole = userInfo?.data?.admin_roles
 
+  console.log('selectedCategories', selectedCategories)
   return (
     <div
       style={{
@@ -188,126 +239,142 @@ const Review: React.FC<ReviewProps> = ({
         flexDirection: 'column',
       }}
     >
-      <div className={styles.approveButtonWrapper}>
-        <button
-          onClick={() => {
-            handleShow && handleShow()
-            // handleReject(app.appid)
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+        className={`${styles.approveButtonWrapper} ${styles.approveButtonWrapperReview}`}
+      >
+        <div
+          className={styles.headerContainerReview}
+          style={{
+            display: 'flex',
+            gap: '1rem',
           }}
-          className={`${styles.approveButton} ${styles.rejectButton}`}
         >
-          Reject
-        </button>
-        <button
-          onClick={() => {
-            handleApprove(app.appid)
+          {app?.icon && (
+            <img
+              style={{
+                height: '35px',
+                width: '35px',
+                borderRadius: '50%',
+              }}
+              onError={(e: any) => (e.target.src = RobotIcon)}
+              src={app?.icon ? app?.icon : ''}
+              alt='Icon'
+            />
+          )}
+          <div className={styles.headerContainer}>
+            <div className={styles.titleWrapper}>
+              <div className={styles.titleContent}>
+                <div
+                  className={styles.title}
+                  title={app?.name} // full text will be shown as a tooltip on hover
+                >
+                  {app?.name}
+                </div>
+                <div
+                  className={styles.subTitle}
+                  dangerouslySetInnerHTML={{__html: app?.title || 'No Content'}}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            gap: '1rem',
           }}
-          className={styles.approveButton}
         >
-          Approve
-        </button>
+          <span
+            style={{
+              cursor: 'pointer',
+              color: '#6c757d',
+              gap: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              position: 'relative',
+              top: '-4px',
+            }}
+            onClick={() => {
+              navigator?.clipboard?.writeText(app?.appid)
+              toast.success('App ID copied to clipboard', {
+                position: toast.POSITION.BOTTOM_RIGHT,
+              })
+            }}
+          >
+            <MdOutlineFileCopy size={30} color='#6c757d' />
+          </span>
+          <span
+            style={{
+              cursor: 'pointer',
+              color: '#6c757d',
+              gap: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              position: 'relative',
+              top: '-4px',
+            }}
+            onClick={() => {
+              window.open(`${app?.link}`, '_blank')
+            }}
+          >
+            <TbWorldWww size={30} color='#6c757d' />
+          </span>
+          <button
+            onClick={() => {
+              handleShow && handleShow()
+              // handleReject(app.appid)
+            }}
+            className={`${styles.approveButton} ${styles.rejectButton}`}
+          >
+            Reject
+          </button>
+          <button
+            onClick={() => {
+              handleApprove(app.appid)
+            }}
+            className={styles.approveButton}
+          >
+            Approve
+          </button>
+        </div>
       </div>
-      <div className={`${styles.container}`}>
-        <div className={styles.header}>
-          <div className={`${styles.leftHeader} card`}>
+      <div
+        style={{
+          marginTop: '0',
+          marginBottom: '0',
+        }}
+        className={`${styles.container}`}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column-reverse',
+            gap: '1rem',
+          }}
+          className={styles.header}
+        >
+          <div
+            style={{
+              minHeight: 'none',
+            }}
+            className={`${styles.leftHeader} ${styles.leftHeaderReview} card`}
+          >
             <div className={`${styles.rightContent} fs-2hx fw-bold text-gray-800`}>
-              <div className={styles.headerContainer}>
-                <div className={styles.titleWrapper}>
-                  {app?.icon && <img src={app?.icon ? app?.icon : ''} alt='Icon' />}
-                  <div className={styles.titleContent}>
-                    <div
-                      className={styles.title}
-                      title={app?.name} // full text will be shown as a tooltip on hover
-                    >
-                      {app?.name
-                        ? app.name.length > 8
-                          ? app.name.substring(0, 8) + '...'
-                          : app.name
-                        : ''}
-                    </div>
-                    <span className={styles.priceBadge}>Free</span>
-                    <div
-                      style={{
-                        color: '#898990',
-                        fontSize: '12px',
-                      }}
-                      dangerouslySetInnerHTML={{__html: app?.title || 'No Content'}}
-                    />
-                  </div>
-                </div>
-                <div className={styles.rightBottom}>
-                  <div className={styles.rigthTextItem}>
-                    <div
-                      style={{
-                        position: 'relative',
-                        top: '5px',
-                        right: '-9px',
-                        cursor: isLiked ? 'not-allowed' : 'pointer',
-                        fontSize: '1.7rem',
-                        display: 'flex',
-                      }}
-                    >
-                      {isLiked ? <AiTwotoneHeart /> : <AiOutlineHeart />}
-                    </div>
-                  </div>
-                  <img
-                    onClick={() => {
-                      window.open(app?.url, '_blank')
-                    }}
-                    src={visit}
-                    alt=''
-                  />
-
-                  <img
-                    style={{cursor: isHave === 'OPEN' ? 'not-allowed' : 'pointer'}}
-                    src={open}
-                    alt=''
-                  />
-                </div>
-              </div>
-              <div className={styles.ratingInfo}>
-                <div className={styles.rating}>
-                  <Rating
-                    rate={5}
-                    style={{
-                      marginTop: '0rem',
-                      fontSize: '1.1rem',
-                      width: '100px',
-                      alignItems: 'end',
-                    }}
-                  />
-                  <p
-                    style={{
-                      whiteSpace: 'nowrap',
-                      margin: '0',
-                      position: 'relative',
-                      top: '6px',
-                    }}
-                  >
-                    / 10.10
-                  </p>
-                </div>
-                <div className={styles.rightText}>
-                  <div className={styles.rigthTextItem}>
-                    <img src={pinkCircle} alt='' />
-                    <span>{visitCount?.count ? visitCount?.count : '0'} added to space</span>
-                  </div>
-                  <div className={styles.rigthTextItem}>
-                    <img src={pinkCircle} alt='' />
-                    <strong>{likeCount?.count ? likeCount?.count : '0'}</strong> <span>like</span>
-                  </div>
-
-                  <div className={styles.rigthTextItem}>
-                    <img src={pinkCircle} alt='' />
-                    <span>{'0'} Validated</span>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.descWrapper}>
+              <div
+                style={{
+                  borderColor: 'none',
+                  border: 'none',
+                }}
+                className={styles.descWrapper}
+              >
                 <div className={styles.description}>
                   <span className={styles.descTitle}>Description</span>
                   <p className={styles.desc}>
-                    <div dangerouslySetInnerHTML={{__html: app?.content || 'No Content'}} />
+                    <div dangerouslySetInnerHTML={{__html: app?.description || 'No Content'}} />
                   </p>
                 </div>
                 <div className={styles.tagsContainer}>
@@ -426,7 +493,14 @@ const Review: React.FC<ReviewProps> = ({
           </div>
         </div>
       </div>
-      <Modal show={showDatePicker} onHide={handleDatePickerClose}>
+      <Modal
+        style={{
+          height: 'fit-content',
+        }}
+        size='sm'
+        show={showDatePicker}
+        onHide={handleDatePickerClose}
+      >
         <Modal.Header closeButton>
           <Modal.Title>Publish Date</Modal.Title>
         </Modal.Header>
@@ -435,27 +509,49 @@ const Review: React.FC<ReviewProps> = ({
           <DatePicker selected={publishDate} onChange={handleDateChange} dateFormat='yyyy-MM-dd' />
         </Modal.Body>
         <Modal.Footer>
-          <div
-            className={`${styles.saveButton} ${styles.closeButton}`}
-            onClick={handleDatePickerClose}
-          >
-            Close
-          </div>
           <div className={styles.saveButton} onClick={handleDatePickerSave}>
-            Save
+            Submit
           </div>
         </Modal.Footer>
       </Modal>
-      <Modal show={show} onHide={handleClosePopup}>
+      <Modal size='sm' show={show} onHide={handleClosePopup}>
         <Modal.Header closeButton>
           <Modal.Title>Reason for rejection</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form.Control type='text' value={inputValue} onChange={handleChange} />
+          <Select
+            value={selectedCategories}
+            styles={{
+              control: (baseStyles, state) => ({
+                marginBottom: '1rem',
+                ...baseStyles,
+                borderColor: state.isFocused ? '#fb6fbb' : 'rgba(128, 128, 128, 0.3411764706)',
+                backgroundColor: 'transparent',
+                width: '100%',
+                color: '#FFF',
+              }),
+              option: (styles, {data, isDisabled, isFocused, isSelected}) => {
+                return {
+                  ...styles,
+                  width: '100%',
+                  color: '#FFF',
+                  backgroundColor: '#1f1f21',
+                  cursor: isDisabled ? 'not-allowed' : 'default',
+                }
+              },
+            }}
+            options={selectOptions}
+            isSearchable // Enable search functionality
+            onChange={handleSelectChange}
+          />
+          {selectedCategories?.value === 99 && (
+            <Form.Control as='textarea' rows={4} value={inputValue} onChange={handleChange} />
+          )}
         </Modal.Body>
+
         <Modal.Footer>
           <div className={styles.saveButton} onClick={handleSave}>
-            Save
+            Submit
           </div>
         </Modal.Footer>
       </Modal>

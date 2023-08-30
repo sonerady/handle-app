@@ -16,7 +16,7 @@ import moment from 'moment'
 import Carousel from 'react-bootstrap/Carousel'
 import {toast} from 'react-toastify'
 import UserLogo from '../../../_metronic/assets/marketplace/UserLogo.svg'
-
+import SpinnerLogo from '../../../_metronic/assets/icons/robot.svg'
 interface DetailsProps {}
 
 const Details: React.FC<DetailsProps> = () => {
@@ -43,6 +43,7 @@ const Details: React.FC<DetailsProps> = () => {
     getAppInSpace,
     addReview,
     removeJoin,
+    getView,
   } = useAuthService()
   const [showModal, setShowModal] = useState(false)
   const {
@@ -69,7 +70,8 @@ const Details: React.FC<DetailsProps> = () => {
   const [page, setPage] = useState(1)
   const [contLength, setContLength] = useState(0)
   const accessTokenMarketplace = localStorage.getItem('accessTokenMarketplace')
-  const role = localStorage.getItem('role')
+  const isDao = userInfo?.data?.dao_roles
+
   const [activeTab, setActiveTab] = useState(1)
   const [isHave, setIsHave] = useState('')
   const appid = new URLSearchParams(location.search).get('appid')
@@ -78,13 +80,15 @@ const Details: React.FC<DetailsProps> = () => {
   const isDiscord = localStorage.getItem('discordAccessToken')
   const {id} = useParams<{id: string}>()
   const [appLink, setAppLink] = useState('')
+  const [handleLoading, setHandleLoading] = useState(false)
   const appsNames = apps.map((app: any) => app.name)
   const [isOpen, setIsOpen] = useState(false)
-
+  const [loadingJoin, setLoadingJoin] = useState(false)
   const [show, setShow] = useState(false)
 
   const [openReviewInput, setOpenReviewInput] = useState(true)
   const [openCommentInput, setOpenCommentInput] = useState(true)
+  const [isView, setIsView] = useState<any>()
 
   useEffect(() => {
     // Sayfa yüklendiğinde en üstte olacak şekilde kaydırma yapılır
@@ -130,14 +134,14 @@ const Details: React.FC<DetailsProps> = () => {
 
       setComments((prevComments: any) => {
         // Önceki yorumların ID'lerini bir küme içerisinde saklayalım
-        const existingIds = new Set(prevComments.result.map((comment: any) => comment.id))
+        const existingIds = new Set(prevComments?.result?.map((comment: any) => comment.id))
 
         // Sadece yeni yorumları ekleyelim
         const uniqueNewComments = newComments.filter((comment: any) => !existingIds.has(comment.id))
 
         return {
           ...prevComments,
-          result: [...prevComments.result, ...uniqueNewComments],
+          result: [...prevComments?.result, ...uniqueNewComments],
         }
       })
     })
@@ -156,29 +160,37 @@ const Details: React.FC<DetailsProps> = () => {
 
       setCommentsOther((prevComments: any) => {
         // Önceki yorumların ID'lerini bir küme içerisinde saklayalım
-        const existingIds = new Set(prevComments?.result.map((comment: any) => comment.id))
+        const existingIds = new Set(prevComments?.result?.map((comment: any) => comment.id))
 
         // Sadece yeni yorumları ekleyelim
         const uniqueNewComments = newComments.filter((comment: any) => !existingIds.has(comment.id))
 
         return {
           ...prevComments,
-          result: [...prevComments.result, ...uniqueNewComments],
+          result: [...prevComments?.result, ...uniqueNewComments],
         }
       })
     })
   }
 
   useEffect(() => {
-    // Sayfa ilk yüklendiğinde yorumları getir
     handleShowComment(0) // 1: İlk sayfa numarası
     handleShowReview(0) // 1: İlk sayfa numarası
+    if (accessToken) {
+      getView(id).then((response) => {
+        setIsView(response)
+      })
+    }
   }, [])
+
+  console.log('isView', isView)
 
   useEffect(() => {
     if (id) {
       getAppsById(id)
     }
+    setComments({result: []})
+    setCommentsOther({result: []})
   }, [id])
 
   useEffect(() => {
@@ -193,12 +205,14 @@ const Details: React.FC<DetailsProps> = () => {
   }, [])
 
   const handleAddApp = async (id: any) => {
+    setLoadingJoin(true)
     try {
       if (isLogin) {
         const repsonse = await appJoin(id)
-        if (repsonse.Status === 200) {
+        if (repsonse.status === true) {
           setSetBgJoin(true)
           getAppsById(id)
+          getAppInSpace(id)
           toast.success(repsonse.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
@@ -211,9 +225,12 @@ const Details: React.FC<DetailsProps> = () => {
         toast.error('Please login first', {
           position: toast.POSITION.BOTTOM_RIGHT,
         })
+        getAppInSpace(id)
       }
     } catch (error: string | any) {
       console.error(error)
+    } finally {
+      setLoadingJoin(false)
     }
   }
 
@@ -307,15 +324,22 @@ const Details: React.FC<DetailsProps> = () => {
   }, [id, allApps])
 
   const handleComment = async (e: any) => {
+    setHandleLoading(true)
     if (isLogin || id === undefined) {
       try {
         const response = await addComment(commentData)
         setLoading(!loading)
-        setOpenCommentInput(false)
-        if (response.status === 200) {
+        if (response.status) {
           toast.success(response.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
+          toast.success('Comment added success.', {
+            position: toast.POSITION.BOTTOM_RIGHT,
+          })
+          getView(id).then((response) => {
+            setIsView(response)
+          })
+          setOpenCommentInput(false)
         } else {
           toast.error(response.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
@@ -326,6 +350,8 @@ const Details: React.FC<DetailsProps> = () => {
         toast.error('Comment could not be added', {
           position: toast.POSITION.BOTTOM_RIGHT,
         })
+      } finally {
+        setHandleLoading(false)
       }
     } else {
       toast.error('Please login first', {
@@ -335,6 +361,7 @@ const Details: React.FC<DetailsProps> = () => {
   }
 
   const handleReview = async (e: any) => {
+    setHandleLoading(true)
     if (isLogin || id === undefined) {
       try {
         const response = await addReview({
@@ -343,17 +370,21 @@ const Details: React.FC<DetailsProps> = () => {
           rating: reviewData.rating,
           comment: reviewData.comment,
         })
-        setOpenReviewInput(false)
         setLoading(!loading)
         if (response.description === 'This user already added a review for this app') {
           toast.error('You already added a review for this app', {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
+          setOpenReviewInput(false)
         }
         if (response.status === true) {
           toast.success('Review added success.', {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
+          getView(id).then((response) => {
+            setIsView(response)
+          })
+          setOpenReviewInput(false)
         } else {
           toast.error(response.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
@@ -364,6 +395,8 @@ const Details: React.FC<DetailsProps> = () => {
         toast.error(error, {
           position: toast.POSITION.BOTTOM_RIGHT,
         })
+      } finally {
+        setHandleLoading(false)
       }
     } else {
       toast.error('Please login first', {
@@ -383,6 +416,26 @@ const Details: React.FC<DetailsProps> = () => {
     appsById?.image4,
     appsById?.image5,
   ]
+
+  if (!appsById) {
+    return (
+      <Layout>
+        <div className={`${styles.container} ${styles.notAuth}`}>
+          <span>Loading...</span>
+        </div>
+      </Layout>
+    )
+  }
+
+  if (appsById?.status !== 'approved') {
+    return (
+      <Layout>
+        <div className={`${styles.container} ${styles.notAuth}`}>
+          <span>You are not authorized</span>
+        </div>
+      </Layout>
+    )
+  }
 
   return (
     <Layout>
@@ -447,16 +500,21 @@ const Details: React.FC<DetailsProps> = () => {
                       {isLiked ? <AiTwotoneHeart /> : <AiOutlineHeart />}
                     </div>
                   </div>
-                  <a target='_blank' href={appsById?.link}>
-                    <img
-                      // onClick={() => {
-                      //   window.open(appsById?.link, '_blank')
-                      //   handleVisit()
-                      // }}
-                      src={visit}
-                      alt=''
-                    />
-                  </a>
+                  {!appsById?.is_upcoming && (
+                    <a target='_blank' href={appsById?.link}>
+                      <img
+                        // onClick={() => {
+                        //   window.open(appsById?.link, '_blank')
+                        //   handleVisit()
+                        // }}
+                        style={{
+                          width: '96px',
+                        }}
+                        src={visit}
+                        alt=''
+                      />
+                    </a>
+                  )}
                   {/* <img
                     style={{cursor: isHave === 'OPEN' ? 'not-allowed' : 'pointer'}}
                     onClick={() => handleAddApp(id)}
@@ -466,9 +524,9 @@ const Details: React.FC<DetailsProps> = () => {
                   <div>
                     <button
                       className={styles.btn}
-                      disabled={isHave === 'OPEN'}
+                      // disabled={isHave === 'OPEN'}
                       style={{
-                        cursor: isVisited || bgJoin ? 'default' : 'pointer',
+                        // cursor: isVisited || bgJoin ? 'default' : 'pointer',
                         background:
                           isVisited || bgJoin
                             ? 'linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%)'
@@ -482,11 +540,20 @@ const Details: React.FC<DetailsProps> = () => {
                         if (!isVisited) {
                           handleAddApp(id)
                         }
+                        if (isVisited) {
+                          window.open(appsById?.link, '_blank')
+                        }
                       }}
                     >
-                      {isVisited || bgJoin ? 'OPEN' : 'ADD'}
+                      {loadingJoin ? (
+                        <img className={styles.spinner} src={SpinnerLogo} alt='' />
+                      ) : isVisited || bgJoin ? (
+                        'OPEN'
+                      ) : (
+                        'ADD'
+                      )}
                     </button>
-                    {/* {isVisited && (
+                    {isVisited && (
                       <span
                         onClick={() => {
                           removeApp(id)
@@ -504,7 +571,7 @@ const Details: React.FC<DetailsProps> = () => {
                       >
                         Discard
                       </span>
-                    )} */}
+                    )}
                   </div>
                 </div>
               </div>
@@ -775,27 +842,47 @@ const Details: React.FC<DetailsProps> = () => {
                     {activeTab === 1 && (
                       <div className={styles.think}>
                         <span>What do you think ?</span>
-                        {role !== 'HyperAdmin' && accessTokenMarketplace && (
-                          <button
-                            onClick={() => setVisibleComment(true)}
-                            className={styles.addComment}
-                          >
-                            {isLogin ? 'Add Comment' : 'Login to comment'}
-                          </button>
-                        )}
+                        <button
+                          onClick={() => {
+                            if (!isLogin && !userInfo?.data?.dao_roles.length) {
+                              toast.error('Please first login')
+                            } else if (isView?.comment) {
+                              toast.error('You already added a comment for this app')
+                            } else if (!userInfo?.data?.dao_roles.length) {
+                              toast.error('You are not a dao user')
+                            } else if (
+                              isLogin &&
+                              userInfo?.data?.dao_roles.length &&
+                              !isView.comment
+                            ) {
+                              setVisibleComment(true)
+                            }
+                          }}
+                          className={styles.addComment}
+                        >
+                          {isLogin ? 'Add Comment' : 'Login to comment'}
+                        </button>
                       </div>
                     )}
                     {activeTab === 2 && (
                       <div className={styles.think}>
                         <span>What do you think ?</span>
-                        {role !== 'HyperAdmin' && accessTokenMarketplace && (
-                          <button
-                            onClick={() => setVisibleReview(true)}
-                            className={styles.addComment}
-                          >
-                            {isLogin ? 'Add Review' : 'Login to Review'}
-                          </button>
-                        )}
+                        <button
+                          onClick={() => {
+                            if (!isLogin) {
+                              toast.error('Please first login')
+                            } else if (isView?.review) {
+                              toast.error('You already added a review for this app')
+                            } else if (!isVisited) {
+                              toast.error('This app is not in your space')
+                            } else if (isVisited && !isView?.review && isLogin) {
+                              setVisibleReview(true)
+                            }
+                          }}
+                          className={styles.addComment}
+                        >
+                          {isLogin ? 'Add Review' : 'Login to Review'}
+                        </button>
                       </div>
                     )}
                     <div
@@ -804,49 +891,58 @@ const Details: React.FC<DetailsProps> = () => {
                       }}
                       className={styles.footerLeft}
                     >
-                      {visibleReview && activeTab === 2 && isVisited && openReviewInput && (
-                        <div className={styles.commentContainer}>
-                          <label
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              gap: '5px',
-                            }}
-                          >
-                            Rating
-                            <div
+                      {visibleReview &&
+                        activeTab === 2 &&
+                        isVisited &&
+                        openReviewInput &&
+                        !isView?.review && (
+                          <div className={styles.commentContainer}>
+                            <label
                               style={{
-                                fontSize: '1.5rem',
-                                marginBottom: '1rem',
-                                cursor: 'pointer',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '5px',
                               }}
                             >
-                              {stars?.map((_, i) => (
-                                <FaStar
-                                  key={i}
-                                  color={i < reviewData.rating ? '#FD7DA4' : 'gray'}
-                                  onClick={() => handleStarClick(i)}
-                                />
-                              ))}
-                            </div>
-                            <label htmlFor=''>Plain Text</label>
-                            <textarea
-                              value={reviewData.comment}
-                              rows={5}
-                              placeholder='Comment'
-                              onChange={(e) =>
-                                setReviewData({...reviewData, comment: e.target.value})
-                              }
-                            />
-                          </label>
-                          {alertComment === false && (
-                            <span className={styles.alert}>{'Already voted !'}</span>
-                          )}
-                          <button className={styles.sendComment} onClick={handleReview}>
-                            Send Review
-                          </button>
-                        </div>
-                      )}
+                              Rating
+                              <div
+                                style={{
+                                  fontSize: '1.5rem',
+                                  marginBottom: '1rem',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                {stars?.map((_, i) => (
+                                  <FaStar
+                                    key={i}
+                                    color={i < reviewData.rating ? '#FD7DA4' : 'gray'}
+                                    onClick={() => handleStarClick(i)}
+                                  />
+                                ))}
+                              </div>
+                              <label htmlFor=''>Plain Text</label>
+                              <textarea
+                                value={reviewData.comment}
+                                rows={5}
+                                placeholder='Comment'
+                                onChange={(e) =>
+                                  setReviewData({...reviewData, comment: e.target.value})
+                                }
+                              />
+                            </label>
+                            {alertComment === false && (
+                              <span className={styles.alert}>{'Already voted !'}</span>
+                            )}
+                            <button
+                              style={handleLoading ? {cursor: 'not-allowed'} : {cursor: 'pointer'}}
+                              disabled={handleLoading}
+                              className={styles.sendComment}
+                              onClick={handleReview}
+                            >
+                              Send Review
+                            </button>
+                          </div>
+                        )}
 
                       {activeTab === 2 && (
                         <div
@@ -954,7 +1050,11 @@ const Details: React.FC<DetailsProps> = () => {
                             display: activeTab === 1 ? 'block' : 'none',
                           }}
                         >
-                          {visibleComment && activeTab === 1 && openReviewInput && (
+                          {visibleComment &&
+                          activeTab === 1 &&
+                          openCommentInput &&
+                          isDao.length &&
+                          !isView?.comment ? (
                             <div className={styles.commentContainer}>
                               <label>
                                 Comment
@@ -970,10 +1070,19 @@ const Details: React.FC<DetailsProps> = () => {
                               {alertComment === false && (
                                 <span className={styles.alert}>{'Already voted !'}</span>
                               )}
-                              <button className={styles.sendComment} onClick={handleComment}>
+                              <button
+                                style={
+                                  handleLoading ? {cursor: 'not-allowed'} : {cursor: 'pointer'}
+                                }
+                                disabled={handleLoading}
+                                className={styles.sendComment}
+                                onClick={handleComment}
+                              >
                                 Send Comment
                               </button>
                             </div>
+                          ) : (
+                            ''
                           )}
                           <div className={styles.footerLeftBottom}>
                             <div

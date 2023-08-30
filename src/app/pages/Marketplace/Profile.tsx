@@ -13,6 +13,7 @@ import {toast} from 'react-toastify'
 import {Modal, Button, InputGroup, FormControl} from 'react-bootstrap'
 import {BsCheckCircleFill} from 'react-icons/bs'
 import {AiFillCloseCircle} from 'react-icons/ai'
+import {CropperRef, Cropper, FixedCropper, ImageRestriction} from 'react-advanced-cropper'
 
 interface CollectionProps {}
 
@@ -27,6 +28,10 @@ const Collection: React.FC<CollectionProps> = () => {
   const [newPassword, setNewPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showModal, setShowModal] = useState(false)
+  const [profileImage, setProfileImage] = useState<string | null>(null)
+
+  const cropperRef = useRef<CropperRef | any>(null)
 
   const {
     setAllCollection,
@@ -319,11 +324,57 @@ const Collection: React.FC<CollectionProps> = () => {
       : gmail_username !== '' && gmail_username !== null
       ? gmail_username
       : 'Username'
-  // useEffect(() => {
-  //   if (userInfo?.data?.email) {
-  //     setVerifyEmail(userInfo.data.email)
-  //   }
-  // }, [userInfo?.data?.email])
+
+  const handleProfileImageChange = (event: any) => {
+    const file = event.currentTarget.files ? event.currentTarget.files[0] : null
+    if (file) {
+      setProfileImage(URL.createObjectURL(file))
+      setShowModal(true)
+    }
+  }
+
+  const handleProfileImageCrop = async () => {
+    if (cropperRef.current) {
+      const canvas = cropperRef.current.getCanvas()
+      if (canvas !== null) {
+        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve))
+        if (blob !== null) {
+          const formData = new FormData()
+          formData.append('file', blob, 'profile-image.png')
+
+          // You would need to have a method `fileUpload` to handle the upload.
+          const imageLink = await fileUpload(formData)
+
+          if (imageLink) {
+            // Update the profile image URL with the response link.
+            toast.success('Profile Image Upload completed successfully!', {
+              position: toast.POSITION.BOTTOM_RIGHT,
+            })
+            getUserInfo()
+            setShowModal(false)
+            setProfileImage(null)
+            getUserInfo()
+
+            const response = await updateUser(
+              userInfo?.data.uid,
+              userInfo?.data.gmailToken ?? 'None',
+              userInfo?.data.discordToken ?? 'None',
+              userInfo?.data.metamaskID ?? 'None',
+              imageLink.link,
+              userInfo?.data.username ?? 'None',
+              userInfo?.data.discord_username ?? 'None',
+              userInfo?.data.discord_icon ?? 'None',
+              userInfo?.data.gmail_username ?? 'None',
+              userInfo?.data.gmail_icon ?? 'None'
+            )
+            if (response) {
+              getUserInfo()
+            }
+          }
+        }
+      }
+    }
+  }
 
   useEffect(() => {
     if (!isLogin && !userInfo?.data?.uid) {
@@ -406,7 +457,7 @@ const Collection: React.FC<CollectionProps> = () => {
             <div className={styles.profileImage}>
               <input
                 type='file'
-                onChange={handleFileUpload}
+                onChange={handleProfileImageChange}
                 style={{display: 'none'}}
                 id='profile-image-upload'
               />
@@ -417,20 +468,53 @@ const Collection: React.FC<CollectionProps> = () => {
                     alt=''
                     style={{cursor: 'pointer'}}
                     className={styles.profileImg}
-                    onError={(e: React.ChangeEvent<HTMLImageElement>) => {
-                      e.target.onerror = null
-                      e.target.src = UserLogo
-                    }}
+                    // onError={(e: React.ChangeEvent<HTMLImageElement>) => {
+                    //   e.target.onerror = null
+                    //   e.target.src = UserLogo
+                    // }}
                   />
                 ) : (
-                  <img
-                    src={UserLogo}
-                    alt='User Logo'
-                    style={{cursor: 'pointer'}}
-                    className={styles.profileImg}
-                  />
+                  ''
                 )}
               </label>
+              <div>
+                <Modal show={showModal} onHide={() => setShowModal(false)}>
+                  <Modal.Header closeButton>
+                    <Modal.Title>Crop Profile Image</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body
+                    style={{
+                      width: '750px',
+                      height: '500px',
+                    }}
+                  >
+                    {' '}
+                    {profileImage && (
+                      <>
+                        <FixedCropper
+                          ref={cropperRef}
+                          src={profileImage}
+                          className={'example__cropper-background'}
+                          stencilProps={{
+                            handlers: false,
+                            lines: false,
+                            movable: false,
+                            resizable: false,
+                          }}
+                          stencilSize={{
+                            width: 128,
+                            height: 128,
+                          }}
+                          imageRestriction={ImageRestriction.stencil}
+                        />
+                        <button className={styles.cropButton} onClick={handleProfileImageCrop}>
+                          Complete Cropping
+                        </button>
+                      </>
+                    )}
+                  </Modal.Body>
+                </Modal>
+              </div>
             </div>
             <div className={styles.profileInfo}>
               <div className={styles.profileContent}>

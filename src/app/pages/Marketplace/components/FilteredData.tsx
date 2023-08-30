@@ -16,16 +16,20 @@ interface Props {
 }
 
 const Home: React.FC<Props> = ({linkItems, headerTitle, headerIcon, showAll}) => {
-  const {accessToken, allApps} = useGlobal()
-  const {getAllApps} = useAuthService()
+  const {accessToken, allApps, trendingApps, newApps} = useGlobal()
+  const {getAllApps, getTrendingApps, getNewApps} = useAuthService()
 
   const location = useLocation()
   const query = new URLSearchParams(location.search)
 
-  // useEffect(() => {
-  //   if (!accessToken) return
-  //   getAllApps(1, 20)
-  // }, [accessToken])
+  useEffect(() => {
+    if (headerTitle === 'New Arrivals') {
+      getNewApps()
+    }
+    if (headerTitle === 'Trending') {
+      getTrendingApps()
+    }
+  }, [])
 
   interface App {
     isverified: boolean
@@ -40,10 +44,10 @@ const Home: React.FC<Props> = ({linkItems, headerTitle, headerIcon, showAll}) =>
     filteredApps = allApps?.result?.filter((app: App) => app.isverified === true)
     title = 'Verified Apps'
   } else if (query.get('new') === 'true' || headerTitle?.includes('New')) {
-    filteredApps = allApps?.result?.filter((app: App) => app.isnew === true)
+    filteredApps = newApps.filter((app: App) => app.isnew === true).slice(0, 6)
     title = 'New Apps'
   } else if (query.get('trending') === 'true' || headerTitle === 'Trending') {
-    filteredApps = allApps?.result?.filter((app: App) => app.istrending === true)
+    filteredApps = trendingApps.filter((app: App) => app.istrending === true).slice(0, 6)
     title = 'Trending Apps'
   } else {
     filteredApps = allApps?.result
@@ -58,12 +62,11 @@ const Home: React.FC<Props> = ({linkItems, headerTitle, headerIcon, showAll}) =>
 
   const MIN_CARD_ITEMS = 6
 
-  if (filteredApps && filteredApps.length < MIN_CARD_ITEMS) {
-    const itemsNeeded = MIN_CARD_ITEMS - filteredApps.length
+  if (filteredApps && filteredApps?.length < MIN_CARD_ITEMS) {
+    const itemsNeeded = MIN_CARD_ITEMS - filteredApps?.length
 
-    const additionalItems = allApps?.result
-      ?.filter((app: App) => !filteredApps.includes(app))
-      .slice(0, itemsNeeded)
+    const additionalItems =
+      allApps?.result?.filter((app: App) => !filteredApps.includes(app)).slice(0, itemsNeeded) || []
 
     filteredApps = [...filteredApps, ...additionalItems]
   }
