@@ -71,6 +71,10 @@ const Review: React.FC<ReviewProps> = ({
   const [activeTab, setActiveTab] = useState(1)
   const [isLiked, setIsLiked] = useState(false)
   const [isVisited, setIsVisited] = useState(false)
+
+  const [approveLoading, setApproveLoading] = useState(false)
+  const [rejectLoading, setRejectLoading] = useState(false)
+
   const [visibleComment, setVisibleComment] = useState(false)
   const [page, setPage] = useState(1)
   // const displayedComments = comments ? comments?.slice(0, page * 5) : []
@@ -102,6 +106,8 @@ const Review: React.FC<ReviewProps> = ({
   const [publishDate, setPublishDate] = useState<Date | null>(new Date())
 
   const [showDatePicker, setShowDatePicker] = useState(false)
+
+  const [loadingSubmit, setLoadingSubmit] = useState(false)
 
   const isDao = window.location.pathname === '/dao'
 
@@ -142,6 +148,10 @@ const Review: React.FC<ReviewProps> = ({
   }, [inputValue])
 
   const performApproval = (id: any) => {
+    if (isDao) {
+      setApproveLoading(true)
+    }
+    setApproveLoading(true)
     let approvalFunction
     if (window.location.pathname !== '/dao') {
       approvalFunction = approveAppAdmin
@@ -154,6 +164,10 @@ const Review: React.FC<ReviewProps> = ({
       window.location.pathname !== '/dao' ? moment(publishDate).format('YYYY-MM-DD') : 'None'
     )
       .then((res: any) => {
+        setLoadingSubmit(false)
+        if (isDao) {
+          setApproveLoading(false)
+        }
         if (res.Status === 200) {
           handleClose()
           toast.success(res.Description, {
@@ -176,6 +190,10 @@ const Review: React.FC<ReviewProps> = ({
       })
       .catch((err: any) => {
         console.log(err)
+        if (isDao) {
+          setApproveLoading(false)
+        }
+        setLoadingSubmit(false)
       })
   }
 
@@ -187,6 +205,7 @@ const Review: React.FC<ReviewProps> = ({
 
   const handleDatePickerSave = () => {
     setShowDatePicker(false)
+    setLoadingSubmit(true)
     performApproval(app.appid)
   }
 
@@ -205,8 +224,10 @@ const Review: React.FC<ReviewProps> = ({
   }
 
   const handleReject = () => {
+    setRejectLoading(true)
     rejectApp(app.appid, inputValue)
       .then((res: any) => {
+        setRejectLoading(false)
         if (res.Status === 200) {
           console.log('res', res)
           setShow(false)
@@ -233,6 +254,7 @@ const Review: React.FC<ReviewProps> = ({
       })
       .catch((err: any) => {
         console.log(err)
+        setRejectLoading(false)
       })
   }
 
@@ -346,7 +368,7 @@ const Review: React.FC<ReviewProps> = ({
             }}
             className={styles.approveButton}
           >
-            Approve
+            {approveLoading || loadingSubmit ? 'Approving...' : 'Approve'}
           </button>
         </div>
       </div>
@@ -559,7 +581,7 @@ const Review: React.FC<ReviewProps> = ({
 
         <Modal.Footer>
           <div className={styles.saveButton} onClick={handleSave}>
-            Submit
+            {rejectLoading ? 'Rejecting...' : 'Submit'}
           </div>
         </Modal.Footer>
       </Modal>

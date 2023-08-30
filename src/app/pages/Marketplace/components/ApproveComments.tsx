@@ -22,6 +22,10 @@ interface ApproveCommentsProps {
 const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setApprovalReviews}) => {
   const [show, setShow] = useState(false)
   const [selectedApp, setSelectedApp] = useState(null)
+
+  const [approvingLoading, setApprovingLoading] = useState(false)
+  const [rejectingLoading, setRejectingLoading] = useState(false)
+
   const {
     approveReview,
     getForApprovalReviews,
@@ -115,13 +119,18 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
         position: toast.POSITION.BOTTOM_RIGHT,
       })
     } else {
+      setRejectingLoading(true)
       rejectReview(item.id, inputValue)
         .then((res) => {
           if (res.Status === 200) {
+            setRejectingLoading(false)
             toast.success('Successfully rejected', {
               position: toast.POSITION.BOTTOM_RIGHT,
             })
             getUserCampaignConditions()
+            getForApprovalReviews().then((res) => {
+              setApprovalReviews(res)
+            })
             handleCloseRejectModal()
           } else {
             toast.error(res.Description, {
@@ -133,13 +142,16 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
           toast.error('An error occurred while rejecting the review.', {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
+          setRejectingLoading(false)
         })
     }
   }
 
   const handleApprove = (id: any) => {
+    setApprovingLoading(true)
     approveReview(id)
       .then((res) => {
+        setApprovingLoading(false)
         if (res.Status === 400) {
           toast.error(res.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
@@ -158,9 +170,9 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
         toast.error('An error occurred while approving the review.', {
           position: toast.POSITION.BOTTOM_RIGHT,
         })
+        setApprovingLoading(false)
       })
   }
-
 
   return (
     <div>
@@ -239,7 +251,7 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
                     handleApprove(item.id)
                   }}
                 >
-                  Approve
+                  {approvingLoading ? 'Approving...' : 'Approve'}
                 </button>
               </li>
             </ul>
@@ -288,7 +300,7 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
             className={styles.saveButton}
             onClick={handleReject}
           >
-            Save
+            {rejectingLoading ? 'Rejecting...' : 'Submit'}
           </div>
         </Modal.Footer>
       </Modal>

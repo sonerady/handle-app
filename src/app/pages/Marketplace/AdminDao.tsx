@@ -125,6 +125,10 @@ const Collection: React.FC<CollectionProps> = () => {
     }
   }, [error]) // Hata durumu değiştiğinde bu Hook çalışır
 
+  useEffect(() => {
+    formik.setFieldValue('discordid', discordID)
+  }, [discordID])
+
   const formik = useFormik({
     initialValues: {
       discordid: discordID,
