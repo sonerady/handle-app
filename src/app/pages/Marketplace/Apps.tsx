@@ -42,25 +42,22 @@ const Home = () => {
       case 'verified':
         // setCardItems([])
         getVerifiedApp().then((apps) => {
-          setCardItems([])
           const approvedApps = apps?.filter((app: any) => app.status === 'approved')
           setCardItems(approvedApps)
         })
         break
       case 'trending':
+        // setCardItems([])
 
         getTrendingApps().then((apps) => {
-          setCardItems([])
-
           const approvedApps = apps?.filter((app: any) => app.status === 'approved')
           setCardItems(approvedApps)
         })
         break
       case 'upcomings':
+        // setCardItems([])
 
         getUpcoming(currentPage, 1000).then(({total_page, result, total}) => {
-          setCardItems([])
-
           const approvedApps = result?.filter((app: any) => app.status === 'approved')
           setCardItems(approvedApps)
           setTotalPages(total_page)
@@ -68,10 +65,9 @@ const Home = () => {
         })
         break
       case 'integrated':
+        // setCardItems([])
 
         getIntegrated().then((apps) => {
-          setCardItems([])
-
           const approvedApps = apps?.filter((app: any) => app.status === 'approved')
           setCardItems(approvedApps)
         })
@@ -80,8 +76,6 @@ const Home = () => {
       case 'new':
         // setCardItems([])
         getNewApps().then((apps) => {
-          setCardItems([])
-
           const approvedApps = apps?.filter((app: any) => app.status === 'approved')
           setCardItems(approvedApps)
         })
@@ -89,8 +83,6 @@ const Home = () => {
       default:
         // setCardItems([])
         getAllApps(currentPage, 20).then(({total_page, result, total}) => {
-          setCardItems([])
-
           const approvedApps = result?.filter((app: any) => app.status === 'approved')
           setCardItems((prevItems: any) => [...prevItems, ...approvedApps])
           setTotalPages(total_page)

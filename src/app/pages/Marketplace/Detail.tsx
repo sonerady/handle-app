@@ -183,7 +183,6 @@ const Details: React.FC<DetailsProps> = () => {
     }
   }, [])
 
-  console.log('isView', isView)
 
   useEffect(() => {
     if (id) {

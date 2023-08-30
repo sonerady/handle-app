@@ -156,9 +156,6 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
     setDescState(EditorState.createWithContent(ContentState.createFromText('')))
   }
 
-  console.log('select', selectedCategories)
-  console.log('select2', selectOptions)
-
   return (
     <div>
       <div style={{border: 'none'}} className={`${styles.card} ${styles.left} card`}>

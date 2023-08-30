@@ -65,6 +65,7 @@ export const useAuthService = () => {
     setCommentLength,
     campaignsUser,
     setCampaignsUser,
+    setWaitingAppsAdmin,
   } = useGlobal()
 
   const checkBalance = () => {
@@ -1239,7 +1240,7 @@ export const useAuthService = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       })
-
+      setWaitingAppsAdmin(response.data)
       return response.data
     } catch (error) {
       console.error(error)

@@ -32,7 +32,6 @@ const Collection: React.FC<CollectionProps> = () => {
 
   const isAdmin = userInfo?.data?.admin_roles
 
-  console.log('isAdmin', isAdmin.length)
 
   if (!isAdmin?.includes('Admin')) {
     return (

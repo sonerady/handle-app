@@ -250,13 +250,13 @@ const Collection: React.FC<CollectionProps> = () => {
   // CATEGORY SETTINS
 
   useEffect(() => {
-    if (accessToken) {
+    if (accessToken && task === 4) {
       getCategories().then((res) => {
         setCategories(res)
       })
       getUserCampaignConditions()
     }
-  }, [accessToken])
+  }, [accessToken, task])
 
   useEffect(() => {
     if (accessToken) {

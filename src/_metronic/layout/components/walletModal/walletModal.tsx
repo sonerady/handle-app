@@ -166,18 +166,18 @@ const CustomModal: FC<ModalProps> = ({children, openModal, setOpenModal}) => {
 
   // LOCAL
 
-  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fmarketplace&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
+  // const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fmarketplace&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
 
   // TEST
 
-  // const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=https%3A%2F%2Fhypermarket.azurewebsites.net%2Fmarketplace&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
+  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=https%3A%2F%2Fhypermarket.azurewebsites.net%2Fmarketplace&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
 
   // PROD
 
   // const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=https%3A%2F%2Fstore.hypergpt.ai%2Fmarketplace&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
 
-  const redirectUri = 'http://localhost:8080/marketplace'
-  // const redirectUri = 'https://hypermarket.azurewebsites.net/marketplace'
+  // const redirectUri = 'http://localhost:8080/marketplace'
+  const redirectUri = 'https://hypermarket.azurewebsites.net/marketplace'
   // const redirectUri = 'https://store.hypergpt.ai/marketplace'
 
   const url = new URL(window.location.href)

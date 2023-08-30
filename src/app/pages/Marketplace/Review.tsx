@@ -103,6 +103,8 @@ const Review: React.FC<ReviewProps> = ({
 
   const [showDatePicker, setShowDatePicker] = useState(false)
 
+  const isDao = window.location.pathname === '/dao'
+
   const handleChange = (e: any) => setInputValue(e.target.value)
 
   const getVariable = () => {
@@ -139,7 +141,6 @@ const Review: React.FC<ReviewProps> = ({
     }
   }, [inputValue])
 
-  console.log('inputValue', inputValue)
   const performApproval = (id: any) => {
     let approvalFunction
     if (window.location.pathname !== '/dao') {
@@ -158,14 +159,14 @@ const Review: React.FC<ReviewProps> = ({
           toast.success(res.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
-          getUserCampaignConditions()
-          getWaitingApps().then((res) => {
-            setWaitingApps(res)
-          })
-          if (isRole?.length) {
-            getWaitingForAdmin().then((res: any) => {
-              setWaitingAppsAdmin(res)
+          if (isDao) {
+            getWaitingApps().then((res) => {
+              setWaitingApps(res)
             })
+            getUserCampaignConditions()
+          }
+          if (isRole?.length && !isDao) {
+            getWaitingForAdmin()
           }
         } else {
           toast.error(res.Description, {
@@ -207,19 +208,27 @@ const Review: React.FC<ReviewProps> = ({
     rejectApp(app.appid, inputValue)
       .then((res: any) => {
         if (res.Status === 200) {
+          console.log('res', res)
           setShow(false)
-          handleClose()
           toast.success(res.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
-          getWaitingForAdmin().then((res: any) => {
-            setWaitingAppsAdmin(res)
-          })
-          getUserCampaignConditions()
+          if (!isDao) {
+            getWaitingForAdmin()
+          } else {
+            getWaitingApps().then((res) => {
+              setWaitingApps(res)
+            })
+            getUserCampaignConditions()
+          }
+
+          handleClose()
         } else {
           toast.error(res.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
+
+          // handleClose()
         }
       })
       .catch((err: any) => {
@@ -229,7 +238,6 @@ const Review: React.FC<ReviewProps> = ({
 
   const isRole = userInfo?.data?.admin_roles
 
-  console.log('selectedCategories', selectedCategories)
   return (
     <div
       style={{

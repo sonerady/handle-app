@@ -161,7 +161,6 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
       })
   }
 
-  console.log('item', item)
 
   return (
     <div>

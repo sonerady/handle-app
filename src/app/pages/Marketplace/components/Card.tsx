@@ -152,8 +152,6 @@ const Card: React.FC<CardProps> = ({
     setInAppsStatus(newInAppsStatus)
   }, [apps, cardItems])
 
-  console.log('cardData Updated:', cardItems)
-
   const MAX_CARD_ITEMS = 6
 
   const filteredCardItems = cardItems

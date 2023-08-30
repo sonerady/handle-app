@@ -225,33 +225,33 @@ const Collection: React.FC<CollectionProps> = () => {
   const [categories, setCategories] = useState<Category[]>([])
 
   useEffect(() => {
-    if (accessToken) {
+    if (accessToken && task === 4) {
       getCategories().then((res) => {
         setCategories(res)
       })
 
       getUserCampaignConditions()
     }
-  }, [accessToken])
+  }, [accessToken, task])
 
-  useEffect(() => {
-    if (accessToken) {
-      if (activeTab === 0 || task === 1) {
-        getWaitingForAdmin().then((res) => {
-          setWaitingAppsAdmin(res)
-        })
-      } else if (activeTab === 2) {
-        getRejectedApps().then((res) => {
-          setRejectedApps(res)
-        })
-      }
-      if (task === 2 || activeTab === 1) {
-        getApprovedApps().then((res) => {
-          setApprovedApps(res)
-        })
-      }
-    }
-  }, [activeTab, task, addedApp, accessToken])
+  // useEffect(() => {
+  //   if (accessToken) {
+  //     if (activeTab === 0 || task === 1) {
+  //       getWaitingForAdmin().then((res) => {
+  //         setWaitingAppsAdmin(res)
+  //       })
+  //     } else if (activeTab === 2) {
+  //       getRejectedApps().then((res) => {
+  //         setRejectedApps(res)
+  //       })
+  //     }
+  //     if (task === 2 || activeTab === 1) {
+  //       getApprovedApps().then((res) => {
+  //         setApprovedApps(res)
+  //       })
+  //     }
+  //   }
+  // }, [activeTab, task, addedApp, accessToken])
 
   useEffect(() => {
     if (accessToken) {
@@ -269,7 +269,7 @@ const Collection: React.FC<CollectionProps> = () => {
         })
       }
     }
-  }, [activeTab, task, addedApp, accessToken])
+  }, [addedApp, accessToken])
 
   useEffect(() => {
     if (accessToken) {
@@ -408,7 +408,7 @@ const Collection: React.FC<CollectionProps> = () => {
           <div style={{border: 'none'}} className={`${styles.card} ${styles.left} card`}>
             <ApproveApp
               getWaitingForAdmin={getWaitingForAdmin}
-              setWaitingApps={setWaitingAppsAdmin}
+              setWaitingAppsAdmin={setWaitingAppsAdmin}
               waitingApps={waitingAppsAdmin}
               task={task}
               activeTab={activeTab}
