@@ -15,6 +15,7 @@ interface CardProps {
   isBottom?: boolean
   link?: string
   order?: any
+  linkCentered?: string
 }
 
 const Card: React.FC<CardProps> = ({
@@ -30,6 +31,7 @@ const Card: React.FC<CardProps> = ({
   isBottom,
   link,
   order,
+  linkCentered,
 }) => {
   const cardStyle = {
     backgroundImage: `url(${backgroundImage})`,
@@ -44,7 +46,7 @@ const Card: React.FC<CardProps> = ({
   return (
     <div
       onClick={() => {
-        window.open(link, '_blank')
+        window.open(linkCentered ?? link, '_blank')
       }}
       className={`${styles.imageCard} ${isCenter && styles.darkBg}`}
       style={cardStyle}
@@ -60,7 +62,16 @@ const Card: React.FC<CardProps> = ({
       {icon && button && (
         <div className={styles.iconAndButton}>
           <div className={styles.icon}>{icon}</div>
-          {<button className={styles.button}>{button}</button>}
+          {
+            <button
+              onClick={() => {
+                window.open(linkCentered, '_blank')
+              }}
+              className={styles.button}
+            >
+              {button}
+            </button>
+          }
         </div>
       )}
     </div>

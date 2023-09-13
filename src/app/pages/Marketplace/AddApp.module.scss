@@ -560,6 +560,7 @@ label {
 .addComment,
 .approveAppBtn,
 .viewAppBtn {
+  list-style: none;
   button {
     background: none !important;
     color: #1aaa55;
@@ -568,6 +569,10 @@ label {
     padding: 5px 10px;
     cursor: pointer;
     transition: all 0.1s ease-in-out;
+    height: 29px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     &:hover {
       opacity: 0.8;
     }
@@ -598,7 +603,16 @@ label {
 .label {
   color: white;
 }
+.viewButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 28px;
+}
 .approveAppBtn {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
   button {
     color: #fc9403;
     border: 2px solid #fc9403;

@@ -54,6 +54,7 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
         localStorage.setItem('connect_metamask', accounts[0])
         setMetamaskId(accounts[0])
         setLoginMetamask(true)
+        getUserInfo()
         toast.success('Metamask connected successfully', {
           position: toast.POSITION.BOTTOM_RIGHT,
         })
@@ -88,14 +89,14 @@ function MetaMaskConnect({title, userInfo, imageLink}) {
     setIsMetamask(null)
   }
 
-  useEffect(() => {
-    const isLoginDiscord = localStorage.getItem('connect_metamask')
-    if (isLoginDiscord) {
-      setLoginText('Disconnect Metamask')
-    } else {
-      setLoginText('Connect Metamask')
-    }
-  })
+  // useEffect(() => {
+  //   const isLoginDiscord = localStorage.getItem('connect_metamask')
+  //   if (isLoginDiscord) {
+  //     setLoginText('Disconnect Metamask')
+  //   } else {
+  //     setLoginText('Connect Metamask')
+  //   }
+  // })
 
   // const accountLine = profileAccount?.slice(0, 6) + '...' + profileAccount?.slice(-4)
 

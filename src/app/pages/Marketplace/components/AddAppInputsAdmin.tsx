@@ -276,13 +276,11 @@ const AddAppInputs: React.FC<AddAppInputsProps> = ({
                   ...baseStyles,
                   borderColor: state.isFocused ? '#fb6fbb' : 'rgba(128, 128, 128, 0.3411764706)',
                   backgroundColor: 'transparent',
-                  width: '50%',
                   color: '#FFF',
                 }),
                 option: (styles, {data, isDisabled, isFocused, isSelected}) => {
                   return {
                     ...styles,
-                    width: '50%',
                     color: '#FFF',
                     backgroundColor: '#1f1f21',
                     cursor: isDisabled ? 'not-allowed' : 'default',

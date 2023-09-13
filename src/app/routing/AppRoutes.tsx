@@ -28,6 +28,7 @@ import AdminDao from '../pages/Marketplace/AdminDao'
 import Apps from '../pages/Marketplace/Apps'
 import HyperAppList from '../pages/Marketplace/HyperAppList'
 import SearchResults from '../pages/Marketplace/SearchResults'
+import MyAcitivities from '../pages/Marketplace/MyActivities'
 
 /**
  * Base URL of the website.
@@ -72,6 +73,7 @@ const AppRoutes: FC = () => {
             <Route path='review/:id' element={<Review />} />
             <Route path='dao' element={<AddApp />} />
             <Route path='admin-dao' element={<AdminDao />} />
+            <Route path='my-activities' element={<MyAcitivities />} />
             {/* <Route path='balance' element={<Balance />} /> */}
             <Route path='leaderboard' element={<Dao />} />
             <Route path='space' element={<Space />} />

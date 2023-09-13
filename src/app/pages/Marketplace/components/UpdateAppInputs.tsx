@@ -1,27 +1,17 @@
-import React, {useEffect, useState, useRef} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import styles from '../AddApp.module.scss'
 import Title from '../components/Title'
-import {useGlobal} from '../../../context/AuthContext'
-import {useAuthService} from '../../../services/authService'
-import {useFormik} from 'formik'
-import * as Yup from 'yup'
-import robotIcon from '../../../_metronic/assets/icons/robot.svg'
 import {convertToRaw, EditorState, ContentState} from 'draft-js'
-import 'react-tagsinput/react-tagsinput.css'
-import {FiEdit} from 'react-icons/fi'
-import {AiOutlineEye} from 'react-icons/ai'
 import draftToHtml from 'draftjs-to-html'
 import {Editor} from 'react-draft-wysiwyg'
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import {FiPlus} from 'react-icons/fi'
-import ApproveComments from '../components/ApproveComments'
-import ApproveApp from '../components/ApproveApp'
-import AddComment from '../components/AddReview'
 import {toast} from 'react-toastify'
-import {useNavigate, useLocation} from 'react-router-dom'
-import Select from 'react-select'
 import {CropperRef, Cropper, FixedCropper, ImageRestriction} from 'react-advanced-cropper'
+import 'react-advanced-cropper/dist/style.css'
+import Select from 'react-select'
 import {Modal} from 'react-bootstrap'
+import {useGlobal} from '../../../context/AuthContext'
+import {useAuthService} from '../../../services/authService'
 interface AddAppInputsProps {
   formik: any
   descState: any
@@ -35,46 +25,53 @@ interface AddAppInputsProps {
   fileUpload: any
   backgrounds: any
   setBackgrounds: any
-  selectedCategories: any
   setSelectedCategories: any
-
+  selectedCategories: any
   handleCategoryClick: (category: string) => void
   categories: any
   setCategories: any
   setContentState: any
   contentState: any
-  selectedApp: any
+  appId?: any
 }
 
-const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
+const AddAppInputs: React.FC<AddAppInputsProps> = ({
   handleCategoryClick,
   setContentState,
   fileUpload,
   contentState,
   selectedCategories,
-  setSelectedCategories,
-
   formik,
   backgrounds,
   setBackgrounds,
+  setSelectedCategories,
   handleAddApp,
+
   descState,
   setDescState,
   fileNames,
   setFileNames,
   categories,
-  selectedApp,
+  appId,
 }) => {
+  const [showModal, setShowModal] = useState<any>()
+
+  const {successTrigger, setSuccessTrigger} = useGlobal()
+
+  const [croppedImage, setCroppedImage] = useState<HTMLCanvasElement | null>(null)
+
   const maxNameLength = 50
   const maxTitleLength = 100
+
+  console.log('appId', appId)
+
+  const {getAppsById} = useAuthService()
+
+  const [iconImage, setIconImage] = useState<string | null>(null)
+
   const maxDescriptionLength = 1000
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
-  const [iconImage, setIconImage] = useState<string | null>(null)
-  const [image, setImage] = useState<string | null>(null)
-  const [showModal, setShowModal] = useState<any>()
   const [link, setLink] = useState('')
-
-  const cropperRef = useRef<CropperRef | any>(null)
 
   const handleEditorChange = (editorState: any) => {
     const contentState = editorState.getCurrentContent()
@@ -91,13 +88,12 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
     setDescState(editorState)
   }
 
-  useEffect(() => {
-    // Update formik values whenever the editor content changes
-    formik.setFieldValue('description', draftToHtml(convertToRaw(editorState.getCurrentContent())))
-  }, [editorState])
-
   const characterCount = editorState.getCurrentContent().getPlainText().length
   const remainingCharacters = maxDescriptionLength - characterCount
+
+  const cropperRef = useRef<CropperRef | any>(null)
+
+  const [image, setImage] = useState<string | null>(null)
 
   const [originalFileType, setOriginalFileType] = useState<string | null>(null)
 
@@ -109,6 +105,11 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
       setOriginalFileType(file.type)
     }
   }
+
+  // useEffect(() => {
+  //   setSelectedCategories()
+  // }, [appId])
+
   const handleSelectChange = (selectedOptions: any) => {
     if (selectedOptions && selectedOptions.length > 5) {
       toast.error('You can select up to 5 categories.', {
@@ -123,6 +124,25 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
     value: category.name,
     label: category.isactive ? category.name : 'No Category',
   }))
+
+  useEffect(() => {
+    getAppsById(appId, true).then((res: any) => {
+      formik.setFieldValue('name', res[0]?.name)
+      formik.setFieldValue('title', res[0]?.title)
+      formik.setFieldValue('link', res[0]?.link)
+      formik.setFieldValue('description', res[0]?.description)
+      formik.setFieldValue('icon', res[0]?.icon)
+      formik.setFieldValue('image1', res[0]?.image1)
+      formik.setFieldValue('image2', res[0]?.image2)
+      formik.setFieldValue('image3', res[0]?.image3)
+      formik.setFieldValue('image4', res[0]?.image4)
+      formik.setFieldValue('image5', res[0]?.image5)
+      formik.setFieldValue('category', res[0]?.category)
+      setSelectedCategories(res[0]?.category)
+    })
+  }, [appId])
+
+  console.log('formiks', formik.values)
 
   const handleCrop = async (imageName: any) => {
     if (cropperRef.current) {
@@ -161,16 +181,14 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
   }
 
   const handleSubmit = () => {
-    const contentState = descState.getCurrentContent()
-    const htmlContent = draftToHtml(convertToRaw(contentState))
-    handleAddApp('fix', selectedApp?.appid)
+    handleAddApp('fix', appId)
+    setDescState(EditorState.createWithContent(ContentState.createFromText('')))
   }
 
   return (
     <div>
-      {' '}
       <div style={{border: 'none'}} className={`${styles.card} ${styles.left} card`}>
-        <Title>ADD YOUR APP</Title>
+        <Title>UPDATE YOUR APP</Title>
 
         <form className={styles.formWrapper} onSubmit={formik.handleSubmit}>
           <label className={styles.label} htmlFor=''>
@@ -178,8 +196,9 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
               <span>Name</span>
               <span className={styles.required}>*</span>
             </div>
-            <div className={styles.lengthText}>{formik.values.name.length}/50</div>
+            {/* <div className={styles.lengthText}>{formik.values.name.length}/50</div> */}
           </label>
+
           <input
             maxLength={maxNameLength}
             placeholder='App Name'
@@ -197,7 +216,7 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
               <span>Title</span>
               <span className={styles.required}>*</span>
             </div>
-            <div className={styles.lengthText}>{formik.values.title.length}/100</div>
+            {/* <div className={styles.lengthText}>{formik.values.title.length}/100</div> */}
           </label>
           <input
             maxLength={maxTitleLength}
@@ -222,7 +241,6 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
             onChange={formik.handleChange}
             value={formik.values.link}
           />
-
           {formik.errors.link && formik.touched.link && (
             <div className={styles.error}>{formik.errors.link}</div>
           )}
@@ -231,37 +249,23 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
               <span>Description</span>
               <span className={styles.required}>*</span>
             </div>
-            <div className={styles.lengthText}>
-              {characterCount}/{maxDescriptionLength}{' '}
-              {remainingCharacters < 0 ? <span style={{color: 'red'}}>Over Limit</span> : null}
-            </div>
+            <label className={styles.label} htmlFor=''>
+              {/* <div className={styles.lengthText}>{formik.values.description.length}/1000</div> */}
+            </label>
           </label>
-          <Editor
-            toolbar={{
-              options: [
-                'inline',
-                'blockType',
-                'fontSize',
-                'list',
-                'textAlign',
-                'history',
-                'colorPicker',
-                'fontFamily',
-              ],
-              inline: {inDropdown: true},
-              list: {inDropdown: true},
-              textAlign: {inDropdown: true},
-              history: {inDropdown: true},
-              colorPicker: {inDropdown: true},
-              fontFamily: {inDropdown: true},
-              fontSize: {inDropdown: true},
-            }}
-            editorState={descState}
-            toolbarClassName='toolbarClassName'
-            wrapperClassName='wrapperClassName'
-            editorClassName='editorClassName'
-            onEditorStateChange={handleEditorChange}
+          <textarea
+            className={styles.descText}
+            rows={8}
+            maxLength={maxDescriptionLength}
+            placeholder='App description'
+            id='description'
+            name='description'
+            onChange={formik.handleChange}
+            value={formik.values.description}
           />
+          {formik.errors.description && formik.touched.description && (
+            <div className={styles.error}>{formik.errors.description}</div>
+          )}
 
           <label className={styles.label} htmlFor=''>
             <div className={styles.leftSide}>
@@ -271,22 +275,20 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
           </label>
           <div className={styles.categoryContainer}>
             <Select
-              value={selectedCategories.map((category: any) => ({
-                value: category,
-                label: category,
+              value={selectedCategories?.map((categoryName: any) => ({
+                value: categoryName,
+                label: categoryName,
               }))}
               styles={{
                 control: (baseStyles, state) => ({
                   ...baseStyles,
                   borderColor: state.isFocused ? '#fb6fbb' : 'rgba(128, 128, 128, 0.3411764706)',
                   backgroundColor: 'transparent',
-                  width: '50%',
                   color: '#FFF',
                 }),
                 option: (styles, {data, isDisabled, isFocused, isSelected}) => {
                   return {
                     ...styles,
-                    width: '100%',
                     color: '#FFF',
                     backgroundColor: '#1f1f21',
                     cursor: isDisabled ? 'not-allowed' : 'default',
@@ -303,7 +305,6 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
               <div className={styles.selectedCategories}>{selectedCategories.join(' + ')}</div>
             )}
           </div>
-
           <label className={styles.label} htmlFor=''>
             <div className={styles.leftSide}>
               <span>Icon (must be 64x64) </span>
@@ -320,6 +321,7 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
               if (inputField instanceof HTMLInputElement) {
                 inputField.click()
               }
+              setShowModal('icon')
             }}
           >
             <input
@@ -334,25 +336,17 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
               <FiPlus />
             </span>
           </div>
-          <div
-            onClick={() => {
-              const inputField = document.querySelector('#icon')
-              if (inputField instanceof HTMLInputElement) {
-                inputField.click()
-              }
-              setShowModal('icon')
-            }}
-            className={styles.uploadInfo}
-          >
-            <span className={styles.plusIconForImage}>
-              <FiPlus />
-            </span>
-          </div>
           <Modal show={showModal === 'icon'} onHide={() => setShowModal(false)}>
-            <Modal.Body>
+            <Modal.Body
+              style={{
+                width: '750px',
+                height: '624px',
+              }}
+            >
               <Modal.Header closeButton>
-                <Modal.Title>Crop Icon</Modal.Title>
+                <Modal.Title>Crop Image</Modal.Title>
               </Modal.Header>
+
               {iconImage && (
                 <>
                   <FixedCropper
@@ -378,6 +372,7 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
               )}
             </Modal.Body>
           </Modal>
+
           <label className={styles.label} htmlFor=''>
             <div className={styles.leftSide}>
               <span>Screenshots</span>
@@ -387,7 +382,12 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
           <div className={styles.imageWrapper}>
             <div className={styles.uploadImageWrapper}>
               <Modal show={showModal === 1} onHide={() => setShowModal(false)}>
-                <Modal.Body>
+                <Modal.Body
+                  style={{
+                    width: '750px',
+                    height: '624px',
+                  }}
+                >
                   <Modal.Header closeButton>
                     <Modal.Title>Crop Image</Modal.Title>
                   </Modal.Header>
@@ -452,7 +452,12 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
 
             <div className={styles.uploadImageWrapper}>
               <Modal show={showModal === 2} onHide={() => setShowModal(false)}>
-                <Modal.Body>
+                <Modal.Body
+                  style={{
+                    width: '750px',
+                    height: '624px',
+                  }}
+                >
                   <Modal.Header closeButton>
                     <Modal.Title>Crop Image</Modal.Title>
                   </Modal.Header>
@@ -524,7 +529,12 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
 
             <div className={styles.uploadImageWrapper}>
               <Modal show={showModal === 3} onHide={() => setShowModal(false)}>
-                <Modal.Body>
+                <Modal.Body
+                  style={{
+                    width: '750px',
+                    height: '624px',
+                  }}
+                >
                   <Modal.Header closeButton>
                     <Modal.Title>Crop Image</Modal.Title>
                   </Modal.Header>
@@ -596,7 +606,12 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
 
             <div className={styles.uploadImageWrapper}>
               <Modal show={showModal === 4} onHide={() => setShowModal(false)}>
-                <Modal.Body>
+                <Modal.Body
+                  style={{
+                    width: '750px',
+                    height: '624px',
+                  }}
+                >
                   <Modal.Header closeButton>
                     <Modal.Title>Crop Image</Modal.Title>
                   </Modal.Header>
@@ -668,7 +683,12 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
 
             <div className={styles.uploadImageWrapper}>
               <Modal show={showModal === 5} onHide={() => setShowModal(false)}>
-                <Modal.Body>
+                <Modal.Body
+                  style={{
+                    width: '750px',
+                    height: '624px',
+                  }}
+                >
                   <Modal.Header closeButton>
                     <Modal.Title>Crop Image</Modal.Title>
                   </Modal.Header>
@@ -745,4 +765,4 @@ const UpdateAppInputs: React.FC<AddAppInputsProps> = ({
   )
 }
 
-export default UpdateAppInputs
+export default AddAppInputs

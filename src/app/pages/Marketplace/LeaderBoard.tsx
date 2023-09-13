@@ -17,6 +17,8 @@ const Collection: React.FC<CollectionProps> = () => {
   const isDiscordUser = localStorage.getItem('role')
   const [countdowns, setCountdowns] = useState<any>({})
   const [error, setError] = useState<string | null>(null)
+  const [userCampaigns, setUserCampaigns] = useState<any[]>([])
+
   const {
     published,
     appValidation,
@@ -25,17 +27,9 @@ const Collection: React.FC<CollectionProps> = () => {
     campaigns,
     reviewsPublished,
     userInfo,
+    accessToken,
   } = useGlobal()
-  const {
-    getPublished,
-    getAppValidation,
-    getReviewValidation,
-    getRanking,
-    getCampigns,
-    getReviewsPublished,
-    getUserRanking,
-    getUserCampaignConditions,
-  } = useAuthService()
+  const {getRanking, getCampigns, getUserRanking, getUserCampaignConditions} = useAuthService()
 
   const [params, setParams] = useState<{
     name?: string
@@ -68,12 +62,12 @@ const Collection: React.FC<CollectionProps> = () => {
   }, [location.search])
 
   useEffect(() => {
-    getPublished()
-    getAppValidation()
-    getReviewValidation()
+    // getPublished()
+    // getAppValidation()
+    // getReviewValidation()
     getRanking()
     getCampigns()
-    getReviewsPublished()
+    // getReviewsPublished()
     // getUserRanking()
   }, [])
 
@@ -95,12 +89,20 @@ const Collection: React.FC<CollectionProps> = () => {
     return () => clearInterval(interval)
   }, [campaigns])
 
+  useEffect(() => {
+    if (accessTokenMarketplace) {
+      getUserCampaignConditions().then((res) => {
+        if (res && Array.isArray(res)) {
+          setUserCampaigns(res)
+        } else {
+          console.error('API did not return an array for userCampaigns')
+        }
+      })
+    }
+  }, [])
+
   const roles = userInfo?.data?.dao_roles
   const accessTokenMarketplace = localStorage.getItem('accessTokenMarketplace')
-
-  // if (!appValidation) {
-  //   return <div className={styles.loading}>Loading...</div>
-  // }
 
   useEffect(() => {
     if (!accessTokenMarketplace) {
@@ -110,7 +112,13 @@ const Collection: React.FC<CollectionProps> = () => {
     }
   }, [])
 
-  const isDiscord = localStorage.getItem('discordAccessToken')
+  const taskOrder = ['Add App', 'Approve App', 'Add Comment', 'Approve Comment']
+
+  const sortedCampaigns = (userCampaigns as {task_name: string}[]).sort((a, b) => {
+    const aIndex = taskOrder.indexOf(a.task_name)
+    const bIndex = taskOrder.indexOf(b.task_name)
+    return aIndex - bIndex
+  })
 
   return (
     <Layout>
@@ -144,7 +152,9 @@ const Collection: React.FC<CollectionProps> = () => {
                     HGPT
                   </div>
                 </div>
-              ) : null}
+              ) : (
+                'Capmaings Loading...'
+              )}
             </div>
             {/* <button className={styles.daoContentButton}>Claim Rewards</button> */}
           </div>
@@ -155,7 +165,17 @@ const Collection: React.FC<CollectionProps> = () => {
             ${styles.subCard}
         `}
       >
-        <div className={`${styles.card} card`}>
+        {sortedCampaigns
+          ? sortedCampaigns?.map((item: any, index: number) => {
+              return (
+                <div className={`${styles.card} card`} key={index}>
+                  <h3>{item?.task_name}</h3>
+                  <span>{item?.number}</span>
+                </div>
+              )
+            })
+          : ''}
+        {/* <div className={`${styles.card} card`}>
           <h3>ADD APP</h3>
           <span>{published ? published.Result : 'Loading...'}</span>
         </div>
@@ -170,7 +190,7 @@ const Collection: React.FC<CollectionProps> = () => {
         <div className={`${styles.card} card`}>
           <h3>APPROVE COMMENT</h3>
           <span>{reviewValidation ? reviewValidation.Result : 'Loading...'}</span>
-        </div>
+        </div> */}
       </div>
       <div style={{border: 'none'}} className={`${styles.card} ${styles.tableCard} card`}>
         <div className={styles.topBoard}>

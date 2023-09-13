@@ -47,17 +47,12 @@ const CustomModal: FC<ModalProps> = ({children, openModal, setOpenModal}) => {
     validUsername,
     setDiscordRole,
   } = useGlobal()
-  const {getRole, sendForgot} = useAuthService()
+  const {getRole, sendForgot, discordLogout} = useAuthService()
   const [emailInput, setEmailInput] = useState('')
   const [passwordInput, setPasswordInput] = useState('')
   const [isSignup, setIsSignup] = React.useState(false)
   const [isLogin, setIsLogin] = useState(true)
-
-  // PROD
   const clientId = '271809243258-5n5ub8j1vfhkd71n9j77om3vvnub8djq.apps.googleusercontent.com'
-
-  //TEST
-  // const clientId = '279751245565-og702v9ag0i0th14uaan19js2hq3nt12.apps.googleusercontent.com'
   const [forgot, setForgot] = useState(false)
   const [emailForgot, setEmailForgot] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -250,139 +245,62 @@ const CustomModal: FC<ModalProps> = ({children, openModal, setOpenModal}) => {
     fetchTokenAndUserData()
   }, [code])
 
-  useEffect(() => {}, [discordAccessToken])
-
   return (
     <Modal
       className={styles.modalWrapper}
       show={openModal}
-      onHide={() => setOpenModal && setOpenModal(false)}
+      onHide={() => {
+        setOpenModal && setOpenModal(false)
+      }}
     >
-      <Modal.Body className={styles.modalBody}>
+      <Modal.Body
+        style={{
+          overflow: 'hidden',
+          height: '350px',
+        }}
+        className={styles.modalBody}
+      >
         <div>
-          <img src={robotLogin} alt='' />
+          <img
+            style={{
+              position: 'relative',
+              top: '75px',
+            }}
+            src={robotLogin}
+            alt=''
+          />
         </div>
         <div className={styles.modalContentWrapper}>
-          <h3>Welcome to HyperStore!</h3>
+          <h3>Welcome back to HyperStore</h3>
           <p>
-            Are you ready to explore the most popular and cutting-edge AI applications? Join our
-            community and be a part of the future of AI.
+            Your Discord Token has expired. You need to reconnect Discord for DAO related
+            authorizations.
           </p>
           <div className={styles.modalButtons}>
-            <GoogleLogin
-              clientId={clientId}
-              onSuccess={onSuccess}
-              onFailure={onFailure}
-              cookiePolicy='single_host_origin'
-              isSignedIn={false}
-              render={(renderProps: any) => (
-                <button
-                  className={styles.googleButton}
-                  onClick={renderProps.onClick}
-                  disabled={renderProps.disabled}
-                >
-                  <div className={styles.buttonContent}>
-                    <img src={google} alt='' />
-                    Continue with Google
-                  </div>
-                </button>
-              )}
-            />
-
             <Button
               className='mt-3'
               variant='dark'
-              onClick={() => (window.location.href = discordAuthUrl)}
+              onClick={async () => {
+                const connect = await discordLogout()
+                if (connect.success) {
+                  localStorage.removeItem('connect_discord')
+                  localStorage.removeItem('discordAccessToken')
+                  localStorage.removeItem('discordID')
+                }
+                if (!connect.success) {
+                  return
+                } else {
+                  window.location.href = discordAuthUrl
+                }
+              }}
             >
               <div className={styles.buttonContent}>
                 <span className={styles.discordIcon}>
                   <BsDiscord />
                 </span>
-                <span>Continue with Discord</span>
+                <span>Reconnect to Discord</span>
               </div>
             </Button>
-            <MetaMaskConnect setOpenModal={setOpenModal} title='Continue with Metamask' />
-          </div>
-
-          {/* <ReCAPTCHA sitekey='6LdFHggnAAAAAMZcMxW-sC5jq4mnKtA4Jh1pORUl' onChange={handleRecaptcha} /> */}
-          <div className={styles.bottomModal}>
-            <p>Continue with email</p>
-            {isLogin && !forgot ? (
-              // Login Form
-              <div className={styles.emailWrapper}>
-                <input
-                  value={emailInput}
-                  onChange={handleEmailChange}
-                  type='text'
-                  placeholder='Please enter your email address'
-                />
-
-                <button onClick={handleLogin} className={styles.loginButton}>
-                  Continue
-                </button>
-
-                <a
-                  target='_blank'
-                  href='https://metamask.io/download/'
-                  className={styles.downloadMetamask}
-                  rel='noreferrer'
-                  style={{marginLeft: '300px'}}
-                >
-                  Download Metamask
-                </a>
-              </div>
-            ) : (
-              // Register Form
-              !forgot && (
-                <div>
-                  <form className={styles.emailWrapper} onSubmit={handleSubmit}>
-                    <input
-                      onChange={handleEmailChange}
-                      value={emailInput}
-                      type='text'
-                      placeholder='Please enter your email address'
-                    />
-                    <input
-                      onChange={handlePasswordChange}
-                      value={passwordInput}
-                      type='password'
-                      placeholder='Please enter your password'
-                    />
-                    <input
-                      onChange={handleConfirmPasswordChange}
-                      value={confirmPassword}
-                      type='password'
-                      placeholder='Please re-enter your password'
-                    />
-                    <button type='submit' className={styles.loginButton}>
-                      Sign Up
-                    </button>
-                  </form>
-                  <div className={styles.authText}>
-                    Already have an account?{' '}
-                    <span className={styles.login} onClick={() => setIsLogin(true)}>
-                      Login
-                    </span>
-                  </div>
-                </div>
-              )
-            )}
-            {forgot && (
-              <div>
-                <form className={styles.emailWrapper} onSubmit={handleForgot}>
-                  <input
-                    onChange={(event: any) => setEmailForgot(event.target.value)}
-                    value={emailForgot}
-                    type='text'
-                    placeholder='Please enter your email address'
-                  />
-
-                  <button type='submit' className={styles.loginButton}>
-                    Reset Password
-                  </button>
-                </form>
-              </div>
-            )}
           </div>
         </div>
       </Modal.Body>

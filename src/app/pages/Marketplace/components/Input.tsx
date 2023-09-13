@@ -17,24 +17,36 @@ const Input: React.FC<InputProps> = ({placeholder, width}) => {
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
 
-  const [isSearching, setIsSearching] = useState(false)
-
   const prevSearchTerm = useRef('')
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     if (searchTerm && searchTerm !== prevSearchTerm.current) {
-      setLoading(true)
-      search(searchTerm, 1).then((res) => {
-        setSearchResults(res?.result)
-        setLoading(false)
-      })
-      prevSearchTerm.current = searchTerm
+      if (searchTimeout.current) {
+        clearTimeout(searchTimeout.current)
+      }
+
+      searchTimeout.current = setTimeout(() => {
+        setLoading(true)
+        search(searchTerm, 1).then((res) => {
+          setSearchResults(res?.result)
+          setLoading(false)
+        })
+        prevSearchTerm.current = searchTerm
+      }, 1000)
+    }
+
+    return () => {
+      if (searchTimeout.current) {
+        clearTimeout(searchTimeout.current)
+      }
     }
   }, [searchTerm, search])
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value)
   }
+
   const resultsWrapperRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

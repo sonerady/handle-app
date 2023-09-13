@@ -1,4 +1,4 @@
-import React, {FC, useState} from 'react'
+import React, {FC, useEffect, useState} from 'react'
 import {AiOutlineEye} from 'react-icons/ai'
 import styles from '../AddApp.module.scss'
 import RobotIcon from '../../../../_metronic/assets/icons/robot.svg'
@@ -6,6 +6,7 @@ import Review from '../Review'
 import {Button, Modal} from 'react-bootstrap'
 import moment from 'moment'
 import {toast} from 'react-toastify'
+import Griddle, {ColumnDefinition, RowDefinition, plugins} from 'griddle-react'
 interface ApproveAppProps {
   task?: any
   activeTab?: number
@@ -23,7 +24,7 @@ const ApproveApp: FC<ApproveAppProps> = ({
 }) => {
   const [show, setShow] = useState(false)
   const [selectedApp, setSelectedApp] = useState<any>(null)
-
+  const [appId, setAppId] = useState<any>(null)
   const handleClose = () => setShow(false)
   const handleShow = (app: any) => {
     setSelectedApp(app)
@@ -37,68 +38,152 @@ const ApproveApp: FC<ApproveAppProps> = ({
     return str.slice(0, num) + '...'
   }
 
+  const styleConfig = {
+    classNames: {
+      Row: 'row-class',
+    },
+    styles: {
+      Filter: {
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '1rem',
+        alignItems: 'center',
+        height: '30px',
+        borderRadius: '10px',
+        background: '#1a1c21',
+        border: '1px solid rgba(128, 128, 128, 0.179)',
+        fontSize: '16px',
+        lineHeight: '24px',
+        color: '#CD6094',
+        width: '250px',
+        marginRight: '10px',
+        marginBottom: '10px',
+      },
+      Row: {
+        height: '42px',
+      },
+      Cell: {
+        border: '1px solid #80808024',
+        width: '10%',
+      },
+      TableHeading: {
+        backgroundColor: '#15171b',
+        border: 'none',
+        height: '42px',
+      },
+      SettingsToggle: {
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '1rem',
+        alignItems: 'center',
+        height: '40px',
+        borderRadius: '10px',
+        background: 'var(--neutral-neutral, #232325)',
+        border: 'none',
+        fontSize: '16px',
+        lineHeight: '24px',
+        color: '#CD6094',
+      },
+    },
+  }
+
+  useEffect(() => {
+    const inputElement = document.querySelector('.griddle-filter') as HTMLInputElement
+
+    if (inputElement) {
+      inputElement.placeholder = 'Search'
+    }
+  })
+
   return (
     <div>
-      {' '}
       {task > 0 && (
         <div className={styles.tabContent}>
-          <ul
-            className={`${styles.header}
-    ${
-      activeTab === 0
-        ? styles.waiting
-        : activeTab === 1
-        ? styles.success
-        : activeTab === 2
-        ? styles.rejected
-        : ''
-    }
-      `}
-          >
-            <li>App Icon</li>
-            <li>Created Date</li>
-            <li>Name</li>
-            <li>Title</li>
-            <li>Approves</li>
-            <li></li>
-          </ul>
-
-          {activeTab === 0 && (
-            <div>
-              {waitingApps?.length > 0 ? (
-                waitingApps.map((app: any, index: any) => (
-                  <div key={index} className={`${styles.row}`}>
-                    <ul>
-                      <li className={styles.icons}>
-                        <span className={styles.icon}>
+          {activeTab === 0 &&
+            (waitingApps.length > 0 ? (
+              <Griddle
+                enableSettings={false}
+                styleConfig={styleConfig}
+                data={waitingApps}
+                plugins={[plugins.LocalPlugin]}
+              >
+                <RowDefinition>
+                  <ColumnDefinition
+                    id='icon'
+                    title='App Icon'
+                    customComponent={(props: any) => {
+                      return (
+                        <div>
                           <img
-                            src={app.icon ? app.icon : RobotIcon}
+                            style={{width: '35px', height: '35px', borderRadius: '50%'}}
+                            src={props.value ?? RobotIcon}
                             alt=''
-                            onError={(e: any) => (e.target.src = RobotIcon)}
+                            onError={(e: any) => {
+                              e.target.onerror = null
+                              e.target.src = RobotIcon
+                            }}
                           />
-                        </span>
+                        </div>
+                      )
+                    }}
+                  />
+
+                  <ColumnDefinition
+                    id='date'
+                    title='Date'
+                    customComponent={(props: any) => (
+                      <span>{moment(props).format('DD-MM-YYYY')}</span>
+                    )}
+                  />
+                  <ColumnDefinition
+                    id='name'
+                    title='App Name'
+                    customComponent={(props: any) => <span>{truncate(props.value, 15)}</span>}
+                  />
+                  <ColumnDefinition
+                    id='title'
+                    title='Title'
+                    customComponent={(props: any) => <span>{truncate(props.value, 15)}</span>}
+                  />
+                  <ColumnDefinition id='approves' title='Approves' />
+                  <ColumnDefinition
+                    id='appid'
+                    title='View App'
+                    customComponent={(props: any) => (
+                      <li
+                        style={{
+                          listStyle: 'none',
+                        }}
+                        className={styles.approveAppBtn}
+                      >
+                        <button
+                          className={styles.viewButton}
+                          onClick={() => {
+                            handleShow(props.value)
+                            setAppId(props.value)
+                          }}
+                        >
+                          View App
+                        </button>
                       </li>
-                      <li title={moment(app.created_at).format('DD.MM.YYYY')}>
-                        {moment(app.created_at).format('DD.MM.YYYY')}
-                      </li>
-                      <li title={app.name}>{truncate(app.name, 20)}</li>
-                      <li title={app.title}>
-                        <div dangerouslySetInnerHTML={{__html: truncate(app.title, 20)}} />
-                      </li>
-                      <li title={app.content}>
-                        <span>{app.approves}</span>
-                      </li>
-                      <li className={styles.approveAppBtn}>
-                        <button onClick={() => handleShow(app)}>View App</button>
-                      </li>
-                    </ul>
-                  </div>
-                ))
-              ) : (
-                <div className={styles.noData}>No Data</div>
-              )}
-            </div>
-          )}
+                    )}
+                  />
+                </RowDefinition>
+              </Griddle>
+            ) : (
+              <span
+                style={{
+                  height: '100vh',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  color: '#fff',
+                  fontSize: '20px',
+                }}
+              >
+                No Data
+              </span>
+            ))}
         </div>
       )}
       <Modal
@@ -123,7 +208,7 @@ const ApproveApp: FC<ApproveAppProps> = ({
             handleClose={handleClose}
             waitingApps={waitingApps}
             setWaitingApps={setWaitingApps}
-            app={selectedApp}
+            app={waitingApps.find((app: any) => app.appid === appId)}
           />
         </Modal.Body>
       </Modal>

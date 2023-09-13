@@ -1,15 +1,11 @@
 .slick-dots li button:before {
-    font-size: 18px;
-    color: #373B71;
-  }
-  .slick-dots li.slick-active button:before {
-    color: #373B71
-    ;
-  }
-  
+  font-size: 18px;
+  color: #373b71;
+}
+.slick-dots li.slick-active button:before {
+  color: #373b71;
+}
 
-  .carousel-container{
-    margin-bottom: 2.2rem;
-  }
-
-   
+.carousel-container {
+  margin-bottom: 2.2rem;
+}

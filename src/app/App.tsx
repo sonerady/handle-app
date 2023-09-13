@@ -8,6 +8,7 @@ import {useAuthService} from './services/authService'
 import 'prismjs/themes/prism-twilight.css'
 import Prism from 'prismjs'
 import {useGlobal} from './context/AuthContext'
+import ReopenModal from '../_metronic/layout/components/walletModal/reopenModal'
 import {useAPI} from './api'
 import AlertImage from '../_metronic/assets/alert.jpg'
 import ModalOther from '../_metronic/layout/components/walletModal/walletModal'
@@ -65,6 +66,8 @@ const App = () => {
     discordRole,
     setComments,
     setCommentsOther,
+    reopenModal,
+    setReopenModal,
   } = useGlobal()
   const {getRole, getUserId, updateUser, getUserInfo, getTokenBalance, getAllApps} =
     useAuthService()
@@ -159,7 +162,8 @@ const App = () => {
     mailAccessToken: any,
     metamask: any,
     discordAccessToken: any,
-    googleAccessToken: any
+    googleAccessToken: any,
+    gmailUsername: any
   ) => {
     setLoading(true)
     try {
@@ -171,6 +175,7 @@ const App = () => {
         gmailToken: googleAccessToken || 'None',
         icon: 'None',
         valid: true,
+        gmail_username: gmailUsername || 'None',
       }
 
       // Check if both mailAccessToken and password are not 'None'
@@ -178,7 +183,6 @@ const App = () => {
         requestBody.email = mailAccessToken ? mailAccessToken : 'None'
         requestBody.password = password ? password : 'None'
       }
-
       const response = await api.post(`/user/signup`, requestBody)
       return response.data
     } catch (error) {
@@ -253,10 +257,11 @@ const App = () => {
             metamaskAccessToken
           ) {
             const signupResponse = await signup(
-              mailAccessToken,
+              mailAccessToken ?? gmailEmail,
               metamaskAccessToken,
               discordAccessToken,
-              googleAccessToken
+              googleAccessToken,
+              gmailUsername
             )
             if (mailAccessToken && signupResponse.user === 'User is not active') {
               toast.success('Please check your e-mail address', {
@@ -452,6 +457,7 @@ const App = () => {
       </I18nProvider>
 
       {openModal && <ModalOther openModal={openModal} setOpenModal={setOpenModal} />}
+      {reopenModal && <ReopenModal openModal={reopenModal} setOpenModal={setReopenModal} />}
     </Suspense>
   )
 }

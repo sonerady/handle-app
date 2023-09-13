@@ -82,10 +82,10 @@ const CustomModal: FC<CustomModalProps> = ({userInfo}) => {
 
   // TEST
 
-  // const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=https%3A%2F%2Fhypermarket.azurewebsites.net%2Fprofile&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
+  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=https%3A%2F%2Fhypermarket.azurewebsites.net%2Fprofile&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
 
   // PROD
-  const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=https%3A%2F%2Fstore.hypergpt.ai%2Fprofile&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
+  // const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=1121395648437174313&redirect_uri=https%3A%2F%2Fstore.hypergpt.ai%2Fprofile&response_type=code&scope=identify%20guilds%20email%20guilds.join%20connections%20guilds.members.read`
 
   const url = new URL(window.location.href)
   const code = url.searchParams.get('code')
@@ -94,8 +94,8 @@ const CustomModal: FC<CustomModalProps> = ({userInfo}) => {
   const discordId = userInfo?.data?.discord_id
 
   // const redirectUri = 'http://localhost:8080/profile'
-  // const redirectUri = 'https://hypermarket.azurewebsites.net/profile'
-  const redirectUri = 'https://store.hypergpt.ai/profile'
+  const redirectUri = 'https://hypermarket.azurewebsites.net/profile'
+  // const redirectUri = 'https://store.hypergpt.ai/profile'
 
   useEffect(() => {
     const fetchTokenAndUserData = async () => {

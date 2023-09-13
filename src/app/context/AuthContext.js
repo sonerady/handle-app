@@ -77,10 +77,11 @@ export const TokenProvider = ({children}) => {
   const [appSlider, setAppSlider] = useState([])
   const [imageId, setImageId] = useState()
   const [openModal, setOpenModal] = useState(false)
+  const [reopenModal, setReopenModal] = useState(false)
   const [googleAccessToken, setGoogleAccessToken] = useState('')
   const [searchData, setSearchData] = useState([])
   const [discordAccessToken, setDiscordAccessToken] = useState('')
-  const [mailAccessToken, setMailAccessToken] = useState('')
+  const [mailAccessToken, setMailAccessToken] = useState()
   const [password, setPassword] = useState('')
   const [metamaskAccessToken, setMetamaskAccessToken] = useState('')
   const [waitingApps, setWaitingApps] = useState([])
@@ -95,6 +96,7 @@ export const TokenProvider = ({children}) => {
   const [userWaitingApps, setUserWaitingApps] = useState([])
   const [userApprovedApps, setUserApprovedApps] = useState([])
   const [userRejectedApps, setUserRejectedApps] = useState([])
+  const [datas, setDatas] = useState([])
   const [daoDatas, setDaoDatas] = useState([])
   const [triggerLogin, setTriggerLogin] = useState(false)
   const [profileAccount, setProfileAccount] = useState('')
@@ -117,6 +119,7 @@ export const TokenProvider = ({children}) => {
   const [isVisited, setIsVisited] = useState(false)
   const [ratingCount, setRatingCount] = useState(0)
   const [upComingApp, setUpComingApp] = useState()
+  const [rankingApp, setRankingApp] = useState()
   const [raitingDatas, setRaitingDatas] = useState(0)
   const [discordUsername, setDiscordUsername] = useState('')
   const [gmailUsername, setGmailUsername] = useState('')
@@ -353,6 +356,12 @@ export const TokenProvider = ({children}) => {
         setSuccessTrigger,
         triggerJoin,
         setTriggerJoin,
+        setRankingApp,
+        rankingApp,
+        datas,
+        setDatas,
+        reopenModal,
+        setReopenModal,
       }}
     >
       {children}

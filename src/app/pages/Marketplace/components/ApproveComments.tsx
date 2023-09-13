@@ -13,8 +13,11 @@ import {useAuthService} from '../../../services/authService'
 import {toast} from 'react-toastify'
 import review from '../../../../_metronic/assets/marketplace/icons/review.svg'
 import {useNavigate} from 'react-router-dom'
+import {useGlobal} from '../../../context/AuthContext'
+import Griddle, {ColumnDefinition, RowDefinition, plugins} from 'griddle-react'
+
 interface ApproveCommentsProps {
-  item: any
+  item?: any
   approvalReviews: any
   setApprovalReviews: any
 }
@@ -25,7 +28,7 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
 
   const [approvingLoading, setApprovingLoading] = useState(false)
   const [rejectingLoading, setRejectingLoading] = useState(false)
-
+  const {setReopenModal} = useGlobal()
   const {
     approveReview,
     getForApprovalReviews,
@@ -113,6 +116,14 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
     setShowRejectModal(false)
   }
 
+  useEffect(() => {
+    const inputElement = document.querySelector('.griddle-filter') as HTMLInputElement
+
+    if (inputElement) {
+      inputElement.placeholder = 'Search'
+    }
+  })
+
   const handleReject = () => {
     if (inputValue.trim() === '') {
       toast.error('Please provide a reason for rejection.', {
@@ -120,8 +131,11 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
       })
     } else {
       setRejectingLoading(true)
-      rejectReview(item.id, inputValue)
+      rejectReview(selectedApp, inputValue)
         .then((res) => {
+          if (res.discord_unauthorized) {
+            setReopenModal(true)
+          }
           if (res.Status === 200) {
             setRejectingLoading(false)
             toast.success('Successfully rejected', {
@@ -152,6 +166,9 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
     approveReview(id)
       .then((res) => {
         setApprovingLoading(false)
+        if (res.discord_unauthorized) {
+          setReopenModal(true)
+        }
         if (res.Status === 400) {
           toast.error(res.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
@@ -174,10 +191,73 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
       })
   }
 
+  const styleConfig = {
+    // icons: {
+    //   TableHeadingCell: {
+    //     sortDescendingIcon: <small>(desc)</small>,
+    //     sortAscendingIcon: <small>(asc)</small>,
+    //   },
+    // },
+    classNames: {
+      Row: 'row-class',
+    },
+    styles: {
+      Filter: {
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '1rem',
+        alignItems: 'center',
+        height: '30px',
+        borderRadius: '10px',
+        background: '#1a1c21',
+        border: '1px solid rgba(128, 128, 128, 0.179)',
+        fontSize: '16px',
+        lineHeight: '24px',
+        color: '#CD6094',
+        width: '250px',
+        marginRight: '10px',
+        marginBottom: '10px',
+      },
+      Row: {
+        height: '42px',
+      },
+      Cell: {
+        border: '1px solid #80808024',
+        width: '10%',
+      },
+      TableHeading: {
+        backgroundColor: '#15171b',
+        border: 'none',
+        height: '42px',
+      },
+      SettingsToggle: {
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '1rem',
+        alignItems: 'center',
+        height: '40px',
+        borderRadius: '10px',
+        background: 'var(--neutral-neutral, #232325)',
+        border: 'none',
+        fontSize: '16px',
+        lineHeight: '24px',
+        color: '#CD6094',
+      },
+    },
+  }
+
+  useEffect(() => {
+    const inputElement = document.querySelector('.griddle-filter') as HTMLInputElement
+
+    if (inputElement) {
+      inputElement.placeholder = 'Search'
+    }
+  })
+
   return (
     <div>
       <div className={styles.tabContent}>
-        <div>
+        {/* <div>
           <div className={`${styles.row}`}>
             <ul>
               <li title={moment(item.created_at).format('DD.MM.YYYY')}>
@@ -256,7 +336,130 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
               </li>
             </ul>
           </div>
-        </div>
+        </div> */}
+        {approvalReviews.length > 0 ? (
+          <Griddle
+            enableSettings={false}
+            styleConfig={styleConfig}
+            data={approvalReviews}
+            plugins={[plugins.LocalPlugin]}
+          >
+            <RowDefinition>
+              <ColumnDefinition
+                id='createdAt'
+                title='Date'
+                customComponent={(props: any) => <span>{moment(props).format('DD-MM-YYYY')}</span>}
+              />
+              <ColumnDefinition
+                id='rating'
+                title='Rating'
+                customComponent={(props: any) =>
+                  !props.value
+                    ? () => <span></span>
+                    : Array(5)
+                        .fill(0)
+                        .map((_, i) =>
+                          i < props.value ? (
+                            <span className={styles.activeRating}>
+                              <FaStar />
+                            </span>
+                          ) : (
+                            <FaRegStar />
+                          )
+                        )
+                }
+              />
+              <ColumnDefinition
+                id='comment'
+                title='Comment'
+                customComponent={(props: any) => (
+                  <OverlayTrigger
+                    delay={{hide: 450, show: 300}}
+                    overlay={(props) => <Tooltip {...props}>{props.value}</Tooltip>}
+                    placement='bottom'
+                  >
+                    <div>
+                      {props?.value.length > 24
+                        ? props?.value.substring(0, 20) + '...'
+                        : props?.value}
+                    </div>
+                  </OverlayTrigger>
+                )}
+              />
+              <ColumnDefinition
+                id='type'
+                title='Type'
+                customComponent={(props: any) => <span>{props.value ? 'Comment' : 'Review'}</span>}
+              />
+              <ColumnDefinition
+                id='approves'
+                title='Approves'
+                customComponent={(props: any) => <span>{props.value}</span>}
+              />
+              <ColumnDefinition
+                id='appid'
+                title='View App'
+                customComponent={(props: any) => (
+                  <li className={styles.viewAppBtn}>
+                    <button
+                      style={{
+                        borderColor: 'red',
+                        color: 'red',
+                      }}
+                      onClick={() => navigate(`/marketplace/detail/${props?.name}/${props?.value}`)}
+                    >
+                      View
+                    </button>
+                  </li>
+                )}
+              />
+              <ColumnDefinition
+                id='id'
+                title='Action'
+                customComponent={(props: any) => (
+                  <li className={styles.approveAppBtn}>
+                    <button
+                      style={{
+                        borderColor: 'red',
+                        color: 'red',
+                      }}
+                      onClick={() => {
+                        handleShowRejectModal(props.value)
+                      }}
+                    >
+                      Reject
+                    </button>
+                    <button
+                      style={{
+                        borderColor: '#1aaa55',
+                        color: '#1aaa55',
+                      }}
+                      onClick={() => {
+                        setApprovingLoading(true)
+                        handleApprove(props.value)
+                      }}
+                    >
+                      {approvingLoading ? 'Approving...' : 'Approve'}
+                    </button>
+                  </li>
+                )}
+              />
+            </RowDefinition>
+          </Griddle>
+        ) : (
+          <span
+            style={{
+              height: '100vh',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              color: '#fff',
+              fontSize: '20px',
+            }}
+          >
+            No Data
+          </span>
+        )}
       </div>
       <Modal size='sm' show={showRejectModal} onHide={handleCloseRejectModal}>
         <Modal.Header closeButton>

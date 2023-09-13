@@ -11,6 +11,7 @@ import {useAuthService} from '../../services/authService'
 import {useGlobal} from '../../context/AuthContext'
 import {AiOutlineHeart, AiTwotoneHeart} from 'react-icons/ai'
 import {FaStar} from 'react-icons/fa'
+import {Helmet} from 'react-helmet'
 import 'bootstrap/dist/css/bootstrap.css'
 import moment from 'moment'
 import Carousel from 'react-bootstrap/Carousel'
@@ -62,6 +63,7 @@ const Details: React.FC<DetailsProps> = () => {
     setComments,
     setCommentsOther,
     commentLength,
+    setReopenModal,
   } = useGlobal()
 
   const [isLiked, setIsLiked] = useState(false)
@@ -182,7 +184,6 @@ const Details: React.FC<DetailsProps> = () => {
       })
     }
   }, [])
-
 
   useEffect(() => {
     if (id) {
@@ -328,6 +329,9 @@ const Details: React.FC<DetailsProps> = () => {
       try {
         const response = await addComment(commentData)
         setLoading(!loading)
+        if (response.discord_unauthorized) {
+          setReopenModal(true)
+        }
         if (response.status) {
           toast.success(response.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
@@ -376,6 +380,9 @@ const Details: React.FC<DetailsProps> = () => {
           })
           setOpenReviewInput(false)
         }
+        if (response.discord_unauthorized) {
+          setReopenModal(true)
+        }
         if (response.status === true) {
           toast.success('Review added success.', {
             position: toast.POSITION.BOTTOM_RIGHT,
@@ -416,6 +423,8 @@ const Details: React.FC<DetailsProps> = () => {
     appsById?.image5,
   ]
 
+  const filledImagesCount = images.filter(Boolean).length
+
   if (!appsById) {
     return (
       <Layout>
@@ -436,8 +445,27 @@ const Details: React.FC<DetailsProps> = () => {
     )
   }
 
+  console.log(
+    'commentss',
+    commentsOther &&
+      commentsOther?.result &&
+      commentsOther.result.length > 0 &&
+      commentsOther?.result?.map((item: any, index: any) => item.comment)
+  )
+
   return (
     <Layout>
+      <Helmet>
+        <title>{appsById.name} on HyperSTORE</title>
+        <meta name='description' content={textDescription} />
+        <meta name='rating' content={appsById?.average_rate} />
+        <meta
+          name='comments'
+          content={commentsOther && commentsOther?.result && commentsOther.result.length}
+        />
+        <meta name='price' content={appsById?.isfree ? '0' : appsById?.price} />
+        <meta name='tags' content={appsById?.category?.map((item: any, index: any) => item)} />
+      </Helmet>
       <div className={`${styles.container}`}>
         <div className={styles.header}>
           <div className={`${styles.leftHeader} card`}>
@@ -653,7 +681,10 @@ const Details: React.FC<DetailsProps> = () => {
             </div>
           </div>
           <div style={{display: 'block', width: 619, height: 350}}>
-            <Carousel style={{height: '350px', borderRadius: '2rem'}}>
+            <Carousel
+              controls={filledImagesCount > 1}
+              style={{height: '350px', borderRadius: '2rem'}}
+            >
               {images?.map((image, index) => {
                 if (image) {
                   return (
@@ -745,7 +776,10 @@ const Details: React.FC<DetailsProps> = () => {
                               width: '40px',
                               borderRadius: '50%',
                             }}
-                            src={item?.icon ? item?.icon : defaults}
+                            src={item?.icon ? item?.icon : UserLogo}
+                            onError={(e: React.ChangeEvent<HTMLImageElement>) =>
+                              (e.target.src = UserLogo)
+                            }
                             alt=''
                           />
                         )

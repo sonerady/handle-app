@@ -3,7 +3,7 @@ import React from 'react'
 import {KTIcon, toAbsoluteUrl} from '../../../helpers'
 
 type Props = {
-  className: string
+  className?: string
 }
 
 const TablesWidget11: React.FC<Props> = ({className}) => {

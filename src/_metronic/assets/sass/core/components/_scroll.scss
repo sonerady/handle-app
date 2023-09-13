@@ -1,6 +1,97 @@
 //
 // Scroll
 //
+
+$dusty-purple: #dddef3;
+$dusty-grey: #1c1e23;
+$creamy-white: #fbfbfd;
+$pure-white: #ffffff;
+$silver-grey: #e5e7ee;
+$meteoroid-purple: #7f83ab;
+$monday-blue: #fff;
+$tomato-red: #eb5757;
+
+.approved,
+.refused,
+.rejected,
+.waiting-for-admin,
+.waiting-for-approval {
+  border: 1px solid;
+  border-radius: 4px;
+  padding: 3px 7px;
+}
+.griddle-table {
+  width: 100%;
+  overflow: auto;
+  font-size: 0.9em;
+}
+
+.approved {
+  background: rgba(35, 147, 39, 0.4);
+  color: white;
+  border-color: #29f917;
+  box-shadow: 0 0 10px rgba(41, 249, 23, 0.5);
+}
+.rejected {
+  background: rgba(221, 25, 39, 0.2);
+  color: white;
+  border-color: #dd1927;
+  box-shadow: 0 0 10px rgba(221, 25, 39, 0.5);
+}
+
+.waiting-for-approval {
+  background: rgba(255, 140, 0, 0.2);
+  color: white;
+  border-color: #ff8c00;
+  box-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
+}
+
+.refused {
+  background: rgba(221, 25, 39, 0.2);
+  color: white;
+  border-color: #dd1927;
+  box-shadow: 0 0 10px rgba(221, 25, 39, 0.5);
+}
+
+// .waiting-for-approval {
+//   background: rgba(169, 169, 169, 0.2); /* Gri tonu */
+//   color: #a9a9a9;
+//   border-color: #a9a9a9;
+//   box-shadow: 0 0 10px rgba(169, 169, 169, 0.5);
+// }
+
+.waiting-for-admin {
+  background: rgba(36, 45, 203, 0.4);
+  border: 1px solid #242dcb;
+  box-shadow: 0 0 10px rgba(36, 45, 203, 0.4);
+  color: white;
+}
+
+.griddle-table-heading {
+  color: $monday-blue;
+  line-height: 2.5rem;
+}
+
+.griddle-table-body {
+  tr:nth-child(2n + 1) {
+    background-color: $dusty-grey;
+  }
+}
+
+.griddle-table-heading-cell {
+  padding: 0 1em;
+}
+.griddle-cell {
+  line-height: 2.5rem;
+  padding: 0 1em;
+}
+
+.griddle-layout-container {
+  background: $creamy-white;
+  padding: 1rem;
+  border-radius: 5px;
+}
+
 .Toastify__toast-container {
   z-index: 200000;
 }
@@ -8,6 +99,24 @@
   z-index: 9998 !important;
   // background: #0b05050f !important;
   // backdrop-filter: blur(5px) !important;
+}
+.griddle-pagination {
+  margin-top: 15px;
+}
+.griddle-page-select {
+  width: 50px !important;
+}
+.griddle-next-button,
+.griddle-previous-button,
+.griddle-page-select {
+  width: 68px;
+  background: #1a1c21;
+  border: none;
+  height: 30px;
+  border: 1px solid rgba(128, 128, 128, 0.179);
+  color: #fff;
+  border-radius: 5px;
+  margin: 0px 5px !important;
 }
 .modal-footer {
   border-top: none !important;

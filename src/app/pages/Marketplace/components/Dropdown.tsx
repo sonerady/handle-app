@@ -72,25 +72,32 @@ const Dropdown: React.FC<DropdownProps> = ({isOpen, onClose}) => {
             ''
           )}
           {userInfo?.data?.dao_roles?.length ? (
-            <span className={styles.submenuTitle}>
-              {userInfo?.data?.dao_roles?.length && (
-                <p
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    setSubmenuOpen(!isSubmenuOpen)
-                  }}
-                >
-                  Dao
-                </p>
-              )}
+            <span
+              style={{
+                fontWeight: 'bold',
+              }}
+              onClick={() => navigate('/my-activities')}
+            >
+              My activities
+            </span>
+          ) : (
+            ''
+          )}
+          {userInfo?.data?.dao_roles?.length ? (
+            <span
+              onClick={(event) => {
+                event.stopPropagation()
+                setSubmenuOpen(!isSubmenuOpen)
+              }}
+              className={styles.submenuTitle}
+            >
+              {userInfo?.data?.dao_roles?.length && <p>Dao</p>}
 
-              {!userInfo?.data.admin_roles?.length && isDiscordUser && (
-                <img
-                  className={`${styles.arrow} ${isSubmenuOpen ? styles.arrowDown : styles.arrowUp}`}
-                  src={arrow}
-                  alt=''
-                />
-              )}
+              <img
+                className={`${styles.arrow} ${isSubmenuOpen ? styles.arrowDown : styles.arrowUp}`}
+                src={arrow}
+                alt=''
+              />
             </span>
           ) : (
             ''
@@ -124,7 +131,7 @@ const Dropdown: React.FC<DropdownProps> = ({isOpen, onClose}) => {
                 localStorage.removeItem('disLogin')
                 localStorage.removeItem('isVerifiedUser')
                 localStorage.removeItem('connect_metamask')
-                setMailAccessToken('')('')
+                setMailAccessToken('')
                 setMetamaskAccessToken('')
                 setDiscordAccessToken('')
                 setGoogleAccessToken('')

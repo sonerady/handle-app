@@ -49,13 +49,17 @@ const Review: React.FC<ReviewProps> = ({
     appid?: string
   }>({})
 
+  console.log('appss', app)
+
   const {
     approveApp,
     approveAppAdmin,
     rejectApp,
+    rejectAppAdmin,
     getWaitingApps,
     getUserCampaignConditions,
     getVariables,
+    refuseApp,
   } = useAuthService()
 
   const [hoverValue, setHoverValue] = useState(null)
@@ -74,7 +78,7 @@ const Review: React.FC<ReviewProps> = ({
 
   const [approveLoading, setApproveLoading] = useState(false)
   const [rejectLoading, setRejectLoading] = useState(false)
-
+  const [refuseLoading, setRefuseLoading] = useState(false)
   const [visibleComment, setVisibleComment] = useState(false)
   const [page, setPage] = useState(1)
   // const displayedComments = comments ? comments?.slice(0, page * 5) : []
@@ -83,12 +87,16 @@ const Review: React.FC<ReviewProps> = ({
   // VISIT CONFIG
   const [selectedApp, setSelectedApp] = useState<any>(null)
   const [show, setShow] = useState(false)
+  const [showRefuse, setShowRefuse] = useState(false)
   const [inputValue, setInputValue] = useState('')
 
   const [reasonData, setReasonData] = useState([])
 
+  const [type, setType] = useState('reject')
+
   const handleClosePopup = () => setShow(false)
   const handleShow = () => setShow(true)
+
   const handleSave = () => {
     if (inputValue.trim() === '') {
       toast.error('Please provide a reason for rejection.', {
@@ -224,13 +232,32 @@ const Review: React.FC<ReviewProps> = ({
   }
 
   const handleReject = () => {
-    setRejectLoading(true)
-    rejectApp(app.appid, inputValue)
+    // pathname kontrolü
+    const isPathAdminDao = window.location.pathname.includes('admin-dao')
+
+    const promise: any =
+      type === 'reject'
+        ? isPathAdminDao
+          ? rejectAppAdmin(app.appid, inputValue)
+          : rejectApp(app.appid, inputValue)
+        : refuseApp(app.appid, inputValue)
+
+    if (type === 'reject') {
+      setRejectLoading(true)
+    } else {
+      setRefuseLoading(true)
+    }
+    promise
       .then((res: any) => {
-        setRejectLoading(false)
+        if (type === 'reject') {
+          setRejectLoading(false)
+        } else {
+          setRefuseLoading(false)
+        }
         if (res.Status === 200) {
           console.log('res', res)
           setShow(false)
+          setInputValue('')
           toast.success(res.Description, {
             position: toast.POSITION.BOTTOM_RIGHT,
           })
@@ -254,11 +281,19 @@ const Review: React.FC<ReviewProps> = ({
       })
       .catch((err: any) => {
         console.log(err)
-        setRejectLoading(false)
+        if (type === 'reject') {
+          setRejectLoading(false)
+        } else {
+          setRefuseLoading(false)
+        }
       })
   }
 
   const isRole = userInfo?.data?.admin_roles
+
+  useEffect(() => {
+    console.log('type', type)
+  })
 
   return (
     <div
@@ -304,10 +339,6 @@ const Review: React.FC<ReviewProps> = ({
                 >
                   {app?.name}
                 </div>
-                <div
-                  className={styles.subTitle}
-                  dangerouslySetInnerHTML={{__html: app?.title || 'No Content'}}
-                />
               </div>
             </div>
           </div>
@@ -324,9 +355,8 @@ const Review: React.FC<ReviewProps> = ({
               color: '#6c757d',
               gap: '0.5rem',
               display: 'flex',
-              alignItems: 'center',
               position: 'relative',
-              top: '-4px',
+              alignItems: 'center',
             }}
             onClick={() => {
               navigator?.clipboard?.writeText(app?.appid)
@@ -343,9 +373,8 @@ const Review: React.FC<ReviewProps> = ({
               color: '#6c757d',
               gap: '0.5rem',
               display: 'flex',
-              alignItems: 'center',
               position: 'relative',
-              top: '-4px',
+              alignItems: 'center',
             }}
             onClick={() => {
               window.open(`${app?.link}`, '_blank')
@@ -353,10 +382,24 @@ const Review: React.FC<ReviewProps> = ({
           >
             <TbWorldWww size={30} color='#6c757d' />
           </span>
+          {!isDao && isRole && (
+            <button
+              onClick={() => {
+                handleShow && handleShow()
+                setType('refuse')
+              }}
+              className={`${styles.approveButton} ${styles.rejectButton}`}
+            >
+              {refuseLoading ? 'Refusing...' : 'Refuse'}
+              {/* {approveLoading || loadingSubmit ? 'Refusing...' : 'Refuse'} */}
+            </button>
+          )}
+
           <button
             onClick={() => {
               handleShow && handleShow()
               // handleReject(app.appid)
+              setType('reject')
             }}
             className={`${styles.approveButton} ${styles.rejectButton}`}
           >
@@ -402,6 +445,10 @@ const Review: React.FC<ReviewProps> = ({
                 className={styles.descWrapper}
               >
                 <div className={styles.description}>
+                  <span className={styles.descTitle}>App Title</span>
+                  <p className={styles.desc}>
+                    <div dangerouslySetInnerHTML={{__html: app?.title || 'No Content'}} />
+                  </p>
                   <span className={styles.descTitle}>Description</span>
                   <p className={styles.desc}>
                     <div dangerouslySetInnerHTML={{__html: app?.description || 'No Content'}} />
@@ -546,7 +593,9 @@ const Review: React.FC<ReviewProps> = ({
       </Modal>
       <Modal size='sm' show={show} onHide={handleClosePopup}>
         <Modal.Header closeButton>
-          <Modal.Title>Reason for rejection</Modal.Title>
+          <Modal.Title>
+            {type === 'reject' ? 'Reason for rejection' : 'Reason for refusal'}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Select
@@ -557,13 +606,11 @@ const Review: React.FC<ReviewProps> = ({
                 ...baseStyles,
                 borderColor: state.isFocused ? '#fb6fbb' : 'rgba(128, 128, 128, 0.3411764706)',
                 backgroundColor: 'transparent',
-                width: '100%',
                 color: '#FFF',
               }),
               option: (styles, {data, isDisabled, isFocused, isSelected}) => {
                 return {
                   ...styles,
-                  width: '100%',
                   color: '#FFF',
                   backgroundColor: '#1f1f21',
                   cursor: isDisabled ? 'not-allowed' : 'default',
@@ -581,7 +628,7 @@ const Review: React.FC<ReviewProps> = ({
 
         <Modal.Footer>
           <div className={styles.saveButton} onClick={handleSave}>
-            {rejectLoading ? 'Rejecting...' : 'Submit'}
+            {rejectLoading ? 'Rejecting...' : refuseLoading ? 'Refusing...' : 'Submit'}
           </div>
         </Modal.Footer>
       </Modal>

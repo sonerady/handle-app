@@ -23,6 +23,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import {Modal} from 'react-bootstrap'
 import moment from 'moment'
 import {userInfo} from 'os'
+import {TablesWidget11} from '../../../_metronic/partials/widgets'
 interface CollectionProps {}
 
 type Category = {
@@ -58,6 +59,7 @@ const Collection: React.FC<CollectionProps> = () => {
     campaignsUser,
     setCampaignsUser,
     userInfo,
+    setReopenModal,
   } = useGlobal()
   const {
     fixApp,
@@ -73,6 +75,7 @@ const Collection: React.FC<CollectionProps> = () => {
     getUserRejectedApp,
     getForApprovalReviews,
     getUserCampaignConditions,
+    getUserAction,
   } = useAuthService()
   let location = useLocation()
   const navigate = useNavigate()
@@ -104,6 +107,8 @@ const Collection: React.FC<CollectionProps> = () => {
     const bIndex = taskOrder.indexOf(b.task_name)
     return aIndex - bIndex
   })
+
+  console.log('sortedCampaigns', sortedCampaigns)
 
   const handleCloseReasonModal = () => {
     setShowReasonModal(false)
@@ -164,64 +169,91 @@ const Collection: React.FC<CollectionProps> = () => {
       title: Yup.string().required('Required'),
       icon: Yup.string().required('Required'),
       link: Yup.string().required('Required'),
+      category: Yup.array().min(1, 'Please select at least one category.'),
     }),
     onSubmit: async (values) => {},
   })
 
   const handleAddApp = async (type: any, appid: any) => {
     try {
-      if (
-        formik.values.image1 ||
-        formik.values.image2 ||
-        formik.values.image3 ||
-        formik.values.image4 ||
-        formik.values.image5
-      ) {
-        if (type === 'fix') {
-          const response = await fixApp(formik.values, appid)
-          if (response.Status === 400) {
-            toast.error(response.Description, {
-              position: toast.POSITION.BOTTOM_RIGHT,
-            })
-          } else if (response.status) {
-            // Handle the success case
-            toast.success('Operation completed successfully!', {
-              position: toast.POSITION.BOTTOM_RIGHT,
-            })
-            getUserCampaignConditions()
-
-            formik.resetForm()
-          }
-        } else {
-          const response = await addApp(formik.values)
-
-          if (response.Status === 400) {
-            toast.error(response.Description, {
-              position: toast.POSITION.BOTTOM_RIGHT,
-            })
-          } else if (response.status) {
-            toast.success('Operation completed successfully!', {
-              position: toast.POSITION.BOTTOM_RIGHT,
-            })
-            getUserCampaignConditions()
-
-            formik.resetForm()
-          }
-        }
-        setAddedApp(true)
-        setSelectedCategories([])
-        window.scrollTo(0, 0)
-
-        getRejectedApps().then((res) => {
-          setRejectedApps(res)
-        })
-
-        handleClose()
-      } else {
-        toast.error('Please fill in the required fields.', {
+      // Zorunlu alanların kontrolleri
+      if (!formik.values.name) {
+        toast.error('Name is required.', {
           position: toast.POSITION.BOTTOM_RIGHT,
         })
+        return
       }
+
+      if (!formik.values.title) {
+        toast.error('Title is required.', {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+        return
+      }
+
+      if (!formik.values.link) {
+        toast.error('Link is required.', {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+        return
+      }
+
+      if (!formik.values.description) {
+        toast.error('Description is required.', {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+        return
+      }
+
+      if (formik.values.category.length === 0) {
+        toast.error('Please select at least one category.', {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+        return
+      }
+
+      // En az bir resim yüklenmiş olmalı.
+      if (
+        !formik.values.image1 &&
+        !formik.values.image2 &&
+        !formik.values.image3 &&
+        !formik.values.image4 &&
+        !formik.values.image5
+      ) {
+        toast.error('Please upload at least one image.', {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+        return
+      }
+
+      let response
+      if (type === 'fix') {
+        response = await fixApp(formik.values, appid)
+      } else {
+        response = await addApp(formik.values)
+      }
+
+      if (response.Status === 400) {
+        toast.error(response.Description, {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+        // setReopenModal(true)
+      } else if (response.status) {
+        toast.success('Operation completed successfully!', {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+        getUserCampaignConditions()
+        formik.resetForm()
+        setAddedApp(true)
+        setSelectedCategories([])
+        getUserAction(1, 1000)
+        window.scrollTo(0, 0)
+      }
+
+      const rejectedAppsResponse = await getRejectedApps()
+      setRejectedApps(rejectedAppsResponse)
+
+      handleClose()
 
       setBackgrounds({
         image1: '',
@@ -254,7 +286,7 @@ const Collection: React.FC<CollectionProps> = () => {
   // CATEGORY SETTINS
 
   useEffect(() => {
-    if (accessToken && task === 4) {
+    if (accessToken) {
       getCategories().then((res) => {
         setCategories(res)
       })
@@ -432,31 +464,10 @@ const Collection: React.FC<CollectionProps> = () => {
         )}
         {task === 3 && parametre === 'approve-comment' && (
           <div style={{border: 'none'}} className={`${styles.approvalContainer}  card`}>
-            <div className={styles.tabContent}>
-              <ul
-                className={`${styles.header}
-         ${styles.success}
-           `}
-              >
-                <li>Created Date</li>
-                <li>Rating</li>
-                <li>Comment</li>
-                <li>Type</li>
-                <li>Validates</li>
-                <li>View App</li>
-                <li></li>
-                <li></li>
-              </ul>
-            </div>
-            {approvalReviews?.map((item: any, index: any) => {
-              return (
-                <ApproveComments
-                  approvalReviews={approvalReviews}
-                  setApprovalReviews={setApprovalReviews}
-                  item={item}
-                />
-              )
-            })}
+            <ApproveComments
+              approvalReviews={approvalReviews}
+              setApprovalReviews={setApprovalReviews}
+            />
           </div>
         )}
         {task === 1 && parametre === 'approve-app' && (
@@ -539,10 +550,11 @@ const Collection: React.FC<CollectionProps> = () => {
                             </li>
                             <li title={app.name}>{truncate(app.name, 20)}</li>
                             <li title={app.title}>{truncate(app.title, 20)}</li>
-                            <div
-                              title={app.description}
-                              dangerouslySetInnerHTML={{__html: truncate(app.description, 20)}}
-                            />
+                            <li title={app.description}>
+                              <div
+                                dangerouslySetInnerHTML={{__html: truncate(app.description, 20)}}
+                              />
+                            </li>
                           </ul>
                         </div>
                       ))
@@ -571,7 +583,7 @@ const Collection: React.FC<CollectionProps> = () => {
                               dangerouslySetInnerHTML={{__html: truncate(app.title, 20)}}
                             ></li>
 
-                            <li title={app.content}>
+                            <li title={app.description}>
                               <div
                                 dangerouslySetInnerHTML={{__html: truncate(app.description, 20)}}
                               />
@@ -615,7 +627,7 @@ const Collection: React.FC<CollectionProps> = () => {
                             </li>
                             <li title={app.description}>
                               <div
-                                dangerouslySetInnerHTML={{__html: truncate(app.description, 20)}}
+                                dangerouslySetInnerHTML={{__html: truncate(app.description, 12)}}
                               />
                             </li>
                             <span
@@ -681,7 +693,8 @@ const Collection: React.FC<CollectionProps> = () => {
               <div className={`${styles.profileWrapper} ${styles.modalProfile}`}>
                 <div style={{border: 'none'}} className={`${styles.card} ${styles.top} card`}>
                   <AddAppInputsUpdate
-                    selectedApp={selectedApp}
+                    appId={selectedApp?.appid}
+                    // selectedApp={selectedApp}
                     setSelectedCategories={setSelectedCategories}
                     contentState={contentState}
                     setContentState={setContentState}

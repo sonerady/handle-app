@@ -66,6 +66,12 @@ export const useAuthService = () => {
     campaignsUser,
     setCampaignsUser,
     setWaitingAppsAdmin,
+    rankingApp,
+    setRankingApp,
+    setDatas,
+    datas,
+    setReopenModal,
+    reopenModal,
   } = useGlobal()
 
   const checkBalance = () => {
@@ -380,6 +386,43 @@ export const useAuthService = () => {
       return response.data
     } catch (error) {}
   }
+  const getUserAction = async (page, count) => {
+    try {
+      let url = `/user/getUserActions?token=${accessToken}&page=${page}&count=${count}`
+
+      if (accessToken) {
+        url += `&token=${accessToken}`
+      }
+
+      const response = await api.get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      setDatas(response.data)
+      // setUpComingApp(response.data)
+      return response.data
+    } catch (error) {}
+  }
+
+  const getRankingApp = async (page, count) => {
+    try {
+      let url = `/user/rankingApps?page=${page}&count=${count}`
+
+      if (accessToken) {
+        url += `&token=${accessToken}`
+      }
+
+      const response = await api.get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      setRankingApp(response.data)
+      return response.data
+    } catch (error) {}
+  }
 
   const getIntegrated = async (page, count) => {
     try {
@@ -484,14 +527,21 @@ export const useAuthService = () => {
     } catch (error) {}
   }
 
-  const getAppsById = async (id) => {
+  const getAppsById = async (id, fix) => {
     try {
-      const response = await api.get(`/user/allAppsWithId?app_id=${id}`, {
+      let url = `/user/allAppsWithId?app_id=${id}&`
+
+      if (fix) {
+        url += `fix=${fix}`
+      }
+
+      const response = await api.get(url, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
       })
+
       setAppsById(response.data[0])
       return response.data
     } catch (error) {}
@@ -753,6 +803,11 @@ export const useAuthService = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       })
+
+      if (response.data.discord_unauthorized) {
+        setReopenModal(true)
+      }
+
       return response.data
     } catch (error) {
       setShowErrorImage(true)
@@ -770,6 +825,10 @@ export const useAuthService = () => {
           },
         }
       )
+      if (response.data.discord_unauthorized) {
+        setReopenModal(true)
+      }
+
       return response.data
     } catch (error) {
       setShowErrorImage(true)
@@ -812,6 +871,11 @@ export const useAuthService = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       })
+
+      if (response.data.discord_unauthorized) {
+        setReopenModal(true)
+      }
+
       return response.data
     } catch (error) {
       setShowErrorImage(true)
@@ -844,6 +908,7 @@ export const useAuthService = () => {
           },
         }
       )
+
       return response.data
     } catch (error) {
       setShowErrorImage(true)
@@ -860,6 +925,10 @@ export const useAuthService = () => {
           },
         }
       )
+      if (response.data.discord_unauthorized) {
+        setReopenModal(true)
+      }
+
       return response.data
     } catch (error) {
       setShowErrorImage(true)
@@ -875,6 +944,10 @@ export const useAuthService = () => {
           },
         }
       )
+      if (response.data.discord_unauthorized) {
+        setReopenModal(true)
+      }
+
       return response.data
     } catch (error) {
       setShowErrorImage(true)
@@ -891,6 +964,49 @@ export const useAuthService = () => {
           },
         }
       )
+      if (response.data.discord_unauthorized) {
+        setReopenModal(true)
+      }
+
+      return response.data
+    } catch (error) {
+      setShowErrorImage(true)
+    }
+  }
+  const rejectAppAdmin = async (id, reason) => {
+    try {
+      const response = await api.post(
+        `/user/rejectAppAdmin?token=${accessToken}&app_id=${id}&reject_reason=${reason}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      if (response.data.discord_unauthorized) {
+        setReopenModal(true)
+      }
+
+      return response.data
+    } catch (error) {
+      setShowErrorImage(true)
+    }
+  }
+
+  const refuseApp = async (id, reason) => {
+    try {
+      const response = await api.post(
+        `/user/refuseApp?token=${accessToken}&app_id=${id}&refuse_reason=${reason}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      if (response.data.discord_unauthorized) {
+        setReopenModal(true)
+      }
+
       return response.data
     } catch (error) {
       setShowErrorImage(true)
@@ -1213,10 +1329,16 @@ export const useAuthService = () => {
   const getUserCampaignConditions = async () => {
     try {
       const response = await api.get(`/campaign/getUserCampaignConditions?token=${accessToken}`)
+
       setCampaignsUser(response.data)
+      if (response.data.discord_unauthorized) {
+        setReopenModal(true)
+        setCampaignsUser([])
+      }
+
       return response.data
     } catch (error) {
-      console.error(error)
+      setReopenModal(true)
     }
   }
 
@@ -1691,5 +1813,9 @@ export const useAuthService = () => {
     getView,
     approveAppAdmin,
     getVariables,
+    refuseApp,
+    getRankingApp,
+    getUserAction,
+    rejectAppAdmin,
   }
 }

@@ -43,6 +43,7 @@ const Home = () => {
     position: 'center',
     bgSize: 'cover',
     isCenter: true,
+    link: data.link,
   }))
 
   const firstMarketCard = [
@@ -74,8 +75,9 @@ const Home = () => {
     trendingApps,
     verifiedApps,
     integratedApp,
+    rankingApp,
   } = useGlobal()
-  const {getAllApps, getSliderTop, getSliderCenter} = useAuthService()
+  const {getAllApps, getSliderTop, getSliderCenter, getRankingApp} = useAuthService()
 
   useEffect(() => {
     const loadData = async () => {
@@ -129,11 +131,15 @@ const Home = () => {
     default:
       cardData = allApps?.result?.filter((app: any) => app.status === 'approved')
   }
+
+  useEffect(() => {
+    getRankingApp(1, 20)
+  }, [])
+
+  const rankingFilter = rankingApp?.result?.filter((app: any) => app.status === 'approved')
+
   return (
     <div>
-      {/* {loading ? (
-        
-      ) : ( */}
       <Layout>
         <div className={styles.layout}>
           <div className={`${styles.container} `}>
@@ -173,6 +179,7 @@ const Home = () => {
               {processedSecondCard.map((item: any, index: any) => {
                 return (
                   <Card
+                    linkCentered={item.link}
                     isBottom={true}
                     isCenter={item.isCenter}
                     icon={item.icon}
@@ -201,7 +208,7 @@ const Home = () => {
                     key={index}
                     headerTitle={item.title}
                     headerIcon={item.icons}
-                    cardItems={cardData}
+                    cardItems={item.title === 'Ranking' ? rankingFilter : cardData}
                   />
                 )
               })}

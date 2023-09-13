@@ -82,7 +82,7 @@ const Home = () => {
         break
       default:
         // setCardItems([])
-        getAllApps(currentPage, 20).then(({total_page, result, total}) => {
+        getAllApps(currentPage, 30).then(({total_page, result, total}) => {
           const approvedApps = result?.filter((app: any) => app.status === 'approved')
           setCardItems((prevItems: any) => [...prevItems, ...approvedApps])
           setTotalPages(total_page)

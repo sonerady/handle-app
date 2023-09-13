@@ -284,7 +284,7 @@ const Card: React.FC<CardProps> = ({
           )
         })} */}
         {!filteredCardItems || cardItems
-          ? (search ? filteredCardItems : cardItems)?.map((item, index) => (
+          ? (search ? cardItems : cardItems)?.map((item, index) => (
               <a
                 style={{
                   textDecoration: 'none',

@@ -55,6 +55,7 @@ const Collection: React.FC<CollectionProps> = () => {
     userInfo,
     campaigns,
     setCampaigns,
+    setReopenModal,
   } = useGlobal()
   const {
     fileUpload,
@@ -151,43 +152,83 @@ const Collection: React.FC<CollectionProps> = () => {
     validationSchema: Yup.object({
       name: Yup.string().required('Required'),
       title: Yup.string().required('Required'),
-      description: Yup.string().required('Required'),
       icon: Yup.string().required('Required'),
       link: Yup.string().required('Required'),
+      category: Yup.array().min(1, 'Please select at least one category.'),
     }),
     onSubmit: async (values) => {},
   })
 
   const handleAddApp = async () => {
     try {
+      if (!formik.values.name) {
+        toast.error('Name is required.', {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+        return
+      }
+
+      // Zorunlu alanların kontrolleri
+      if (!formik.values.title) {
+        toast.error('Title is required.', {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+        return
+      }
+
+      if (!formik.values.link) {
+        toast.error('Link is required.', {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+        return
+      }
+
+      if (!formik.values.description) {
+        toast.error('Description is required.', {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+        return
+      }
+
+      // En az bir kategori seçilmemişse hata gönder.
+      if (formik.values.category.length === 0) {
+        toast.error('Please select at least one category.', {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+        return
+      }
+
+      // En az bir resim yüklenmiş olmalı.
       if (
-        formik.values.image1 ||
-        formik.values.image2 ||
-        formik.values.image3 ||
-        formik.values.image4 ||
-        formik.values.image5
+        !formik.values.image1 &&
+        !formik.values.image2 &&
+        !formik.values.image3 &&
+        !formik.values.image4 &&
+        !formik.values.image5
       ) {
-        const response = await addAppAdmin(formik.values)
-
-        if (response.Status === 400) {
-          toast.error(response.Description, {
-            position: toast.POSITION.BOTTOM_RIGHT,
-          })
-        } else if (response.status) {
-          toast.success('Operation completed successfully!', {
-            position: toast.POSITION.BOTTOM_RIGHT,
-          })
-          formik.resetForm()
-          setSelectedCategories([])
-
-          window.scrollTo(0, 0)
-          setAddedApp(true)
-        }
-      } else {
         toast.error('Please fill in the required fields.', {
           position: toast.POSITION.BOTTOM_RIGHT,
         })
+        return
       }
+
+      const response = await addAppAdmin(formik.values)
+
+      if (response.Status === 400) {
+        toast.error(response.Description, {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+        // setReopenModal(true)
+      } else if (response.status) {
+        toast.success('Operation completed successfully!', {
+          position: toast.POSITION.BOTTOM_RIGHT,
+        })
+        formik.resetForm()
+        setSelectedCategories([])
+        window.scrollTo(0, 0)
+        setAddedApp(true)
+      }
+
       setBackgrounds({
         image1: '',
         image2: '',
