@@ -4,6 +4,7 @@ import Modal from 'react-bootstrap/Modal'
 import Kanban from '../kanban/Kanban'
 import Dropdown from 'react-bootstrap/Dropdown'
 import {useAuthService} from '../../services/authService'
+import {useLocation} from 'react-router-dom'
 
 const TextToImage: FC = () => {
   const {
@@ -23,6 +24,9 @@ const TextToImage: FC = () => {
   const [showModal, setShowModal] = useState(false)
   const [modalImageSrc, setModalImageSrc] = useState('')
   const [activeCard, setActiveCard] = useState(-1)
+  const location = useLocation()
+  const searchParams = new URLSearchParams(location.search)
+  const platform = searchParams.get('platform')
 
   const handleImageClick = (src: string) => {
     setShowModal(true)
@@ -92,7 +96,7 @@ const TextToImage: FC = () => {
         <div
           className='alert alert-warning alert-dismissible fade show position-absolute top-0 w-50 mt-4 start-50 translate-middle-x'
           role='alert'
-          style={{zIndex: 1030}}
+          style={{zIndex: 1030, width: '82%'}}
         >
           {showAlert}
           <button
@@ -105,14 +109,12 @@ const TextToImage: FC = () => {
         </div>
       )}
       <div className='row justify-content-center'>
-        <div style={{marginLeft: '5rem'}}>
+        <div style={{marginLeft: platform ? 0 : '5rem'}}>
           <div className='row d-flex justify-content-center'>
             {/* <Kanban /> */}
             {imageData?.datam?.length ? (
               imageData?.datam.map((image: any, index: number) => (
-                <div 
-                
-                className='col-md-4 mb-5 mb-xl-10 d-flex justify-content-center' key={index}>
+                <div className='col-md-4 mb-5 mb-xl-10 d-flex justify-content-center' key={index}>
                   <div
                     onMouseEnter={() => setActiveCard(index)}
                     onMouseLeave={() => setActiveCard(-1)}

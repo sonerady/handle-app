@@ -119,8 +119,6 @@ const Navbar: React.FC<NavbarProps> = ({isSticky}) => {
     setIsOpen(!isOpen)
   }
 
-  const isLogin = localStorage.getItem('accessTokenMarketplace')
-
   // async function handleBalance() {
   //   const balance = await getTokenBalance()
   //   // if (balance || isLogin) {

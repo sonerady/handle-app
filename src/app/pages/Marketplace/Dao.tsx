@@ -79,7 +79,7 @@ const Collection: React.FC<CollectionProps> = () => {
   } = useAuthService()
   let location = useLocation()
   const navigate = useNavigate()
-  const [task, setTask] = useState(3)
+  const [task, setTask] = useState(1)
   const [data, setData] = useState('')
   const [show, setShow] = useState(false)
   const handleClose = () => setShow(false)
@@ -99,6 +99,10 @@ const Collection: React.FC<CollectionProps> = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [contentState, setContentState] = useState(EditorState.createEmpty())
   const [categories, setCategories] = useState<Category[]>([])
+  const [waitingLoading, setWaitingLoading] = useState(false)
+  const [rejectedLoading, setRejectedLoading] = useState(false)
+  const [approvedLoading, setApprovedLoading] = useState(false)
+  const [approvalReviewsLoading, setApprovalReviewsLoading] = useState(false)
 
   const taskOrder = ['Add App', 'Approve App', 'Add Comment', 'Approve Comment']
 
@@ -286,7 +290,7 @@ const Collection: React.FC<CollectionProps> = () => {
   // CATEGORY SETTINS
 
   useEffect(() => {
-    if (accessToken) {
+    if (accessToken && parametre === 'add-app' && task === 4) {
       getCategories().then((res) => {
         setCategories(res)
       })
@@ -296,50 +300,53 @@ const Collection: React.FC<CollectionProps> = () => {
 
   useEffect(() => {
     if (accessToken) {
-      if (activeTab === 0 || task === 1) {
-        getWaitingApps().then((res) => {
-          setWaitingApps(res)
-        })
-      } else if (activeTab === 2) {
-        getRejectedApps().then((res) => {
-          setRejectedApps(res)
-        })
+      if (task === 1) {
+        setWaitingLoading(true)
+        getWaitingApps()
+          .then((res) => {
+            setWaitingApps(res)
+          })
+          .catch((error) => {
+            console.error('Error', error)
+          })
+          .finally(() => {
+            setWaitingLoading(false)
+          })
       }
-      if (task === 2 || activeTab === 1) {
-        getApprovedApps().then((res) => {
-          setApprovedApps(res)
-        })
+
+      if (activeTab === 2) {
+        setRejectedLoading(true)
+        getRejectedApps()
+          .then((res) => {
+            setRejectedApps(res)
+          })
+          .catch((error) => {
+            console.error('Bir hata oluştu', error)
+          })
+          .finally(() => {
+            setRejectedLoading(false)
+          })
       }
     }
   }, [activeTab, task, addedApp, accessToken])
 
   useEffect(() => {
-    if (accessToken) {
-      if (activeTab === 0) {
-        getUserWaitingApp().then((res) => {
-          setUserWaitingApps(res)
-        })
-      } else if (activeTab === 1) {
-        getUserApprovedApp().then((res) => {
-          setUserApprovedApps(res)
-        })
-      } else if (activeTab === 2) {
-        getUserRejectedApp().then((res) => {
-          setUserRejectedApps(res)
-        })
-      }
-    }
-  }, [activeTab, task, addedApp, accessToken])
-
-  useEffect(() => {
-    if (accessToken) {
-      if (task === 3) {
-        getForApprovalReviews().then((res) => {
+    if (accessToken && task === 3) {
+      setApprovalReviewsLoading(true)
+      getForApprovalReviews()
+        .then((res) => {
           setApprovalReviews(res)
         })
-      }
+        .catch((error) => {
+          console.error('Error', error)
+        })
+        .finally(() => {
+          setApprovalReviewsLoading(false)
+        })
     }
-  }, [task, accessToken])
+  }, [accessToken, task])
+
+  console.log('taskkk', task)
 
   useEffect(() => {
     formik.setFieldValue('category', selectedCategories)
@@ -421,7 +428,7 @@ const Collection: React.FC<CollectionProps> = () => {
             </div>
           </div>
         </div>
-        {task === 4 && parametre === 'add-app' && (
+        {/* {task === 4 && parametre === 'add-app' && (
           <div>
             <div className={`${styles.tabs} ${styles.appsTab}`}>
               <button
@@ -440,7 +447,7 @@ const Collection: React.FC<CollectionProps> = () => {
               </button>
             </div>
           </div>
-        )}
+        )} */}
         {/* ADD YOUR APP */}
         {task === 4 && activeTabApps === 0 && (
           <AddAppInputs
@@ -465,6 +472,7 @@ const Collection: React.FC<CollectionProps> = () => {
         {task === 3 && parametre === 'approve-comment' && (
           <div style={{border: 'none'}} className={`${styles.approvalContainer}  card`}>
             <ApproveComments
+              approvalReviewsLoading={approvalReviewsLoading}
               approvalReviews={approvalReviews}
               setApprovalReviews={setApprovalReviews}
             />
@@ -473,6 +481,8 @@ const Collection: React.FC<CollectionProps> = () => {
         {task === 1 && parametre === 'approve-app' && (
           <div style={{border: 'none'}} className={`${styles.card} ${styles.left} card`}>
             <ApproveApp
+              waitingLoading={waitingLoading}
+              setWaitingLoading={setWaitingLoading}
               setWaitingApps={setWaitingApps}
               waitingApps={waitingApps}
               task={task}

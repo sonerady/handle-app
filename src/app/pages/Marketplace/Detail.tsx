@@ -45,6 +45,7 @@ const Details: React.FC<DetailsProps> = () => {
     addReview,
     removeJoin,
     getView,
+    inDetailPage,
   } = useAuthService()
   const [showModal, setShowModal] = useState(false)
   const {
@@ -188,6 +189,7 @@ const Details: React.FC<DetailsProps> = () => {
   useEffect(() => {
     if (id) {
       getAppsById(id)
+      inDetailPage(id)
     }
     setComments({result: []})
     setCommentsOther({result: []})

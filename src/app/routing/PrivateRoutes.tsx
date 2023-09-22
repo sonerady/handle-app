@@ -17,6 +17,7 @@ import TextToFeature from '../pages/TextToFeature/TextToFeature'
 import ImageToImage from '../pages/ImageToImage/ImageToImage'
 // import MarketPlace from '../pages/marketplace/MarketPlace'
 import Home from '../pages/Marketplace/MarketPlace'
+import TelegramBot from '../pages/TelegramBot/TelegramBot'
 import Profile from '../pages/Marketplace/Profile'
 
 const PrivateRoutes = () => {
@@ -34,6 +35,7 @@ const PrivateRoutes = () => {
         {/* <Route path='auth/*' element={<Navigate to='/hyberchat' />} /> */}
         {/* Pages */}
         <Route path='marketplace' element={<Home />} />
+        <Route path='telegram-bot' element={<TelegramBot />} />
         <Route path='profile' element={<Profile />} />
         <Route path='hyperchat' element={<TextToChat />} />
         <Route path='hypercodes' element={<TextToCode />} />

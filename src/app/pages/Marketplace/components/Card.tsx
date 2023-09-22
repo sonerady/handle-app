@@ -285,72 +285,78 @@ const Card: React.FC<CardProps> = ({
         })} */}
         {!filteredCardItems || cardItems
           ? (search ? cardItems : cardItems)?.map((item, index) => (
-              <a
+              <div
                 style={{
-                  textDecoration: 'none',
+                  width: 'fit-content',
+                  position: 'relative',
                 }}
-                href={
-                  isHref ? 'javascript:void(0)' : `/marketplace/detail/${item?.name}/${item?.appid}`
-                }
-                // onClick={() => navigate(`/marketplace/detail/${item?.name}/${item?.appid}`)}
-                key={index}
-                className={styles.cardItem}
               >
-                <div className={styles.rightContent}>
-                  <div className={styles.imageContainer}>
-                    <div className={styles.imageWrapper}>
-                      {item?.icon && <img src={item?.icon} alt='' />}
-                      {isListNumber && <div className={styles.listNumber}>{index + 1}</div>}
-                    </div>
-                    {/* <Rating rate={item?.average_rate ? item?.average_rate : 0} /> */}
-                    {item?.isfeatured && <div className={styles.featured}>Featured</div>}
-                    {item?.rate && <div>{item?.rate}</div>}
+                <Link
+                  to={`/marketplace/detail/${item?.name}/${item?.appid}`}
+                  style={{
+                    textDecoration: 'none',
+                  }}
+                  // href=
+                  // onClick={() => navigate(`/marketplace/detail/${item?.name}/${item?.appid}`)}
+                  key={index}
+                  className={styles.cardItem}
+                >
+                  <div className={styles.rightContent}>
+                    <div className={styles.imageContainer}>
+                      <div className={styles.imageWrapper}>
+                        {item?.icon && <img src={item?.icon} alt='' />}
+                        {isListNumber && <div className={styles.listNumber}>{index + 1}</div>}
+                      </div>
+                      {/* <Rating rate={item?.average_rate ? item?.average_rate : 0} /> */}
+                      {item?.isfeatured && <div className={styles.featured}>Featured</div>}
+                      {item?.rate && <div>{item?.rate}</div>}
 
-                    {/* {item?.isnew && <img className={styles.newBadge} src={newBadge} alt='' />}
+                      {/* {item?.isnew && <img className={styles.newBadge} src={newBadge} alt='' />}
                 {item?.isverified && (
                   <img className={styles.verifiedBadge} src={verifiedBadge} alt='' />
                 )} */}
-                  </div>
-                  <div className={styles.contentWrapper}>
-                    <label className={`${styles.name} `}>
-                      {item?.name?.length > 10 ? item?.name.slice(0, 10) + '...' : item?.name}
-                    </label>
-                    <div className={styles.content}>
-                      {item?.category && item?.category?.length > 0 && (
-                        <span title={item?.category[0]}>{item?.category[0]}</span>
-                      )}
-                      <img src={circle} alt='' />
-
-                      {item?.category && item?.category?.length > 0 && (
-                        <span title={item?.category[1]}>
-                          {item?.category[1]?.length > 7 && item?.category[1]?.slice(0, 7) + '...'}
-                        </span>
-                      )}
                     </div>
-                    <div className={styles.desc}>
-                      <span>{truncate(item?.title)}</span>
-                      {item?.isfree ? (
-                        <span
-                          style={{
-                            color: '#FB70BA',
-                          }}
-                        >
-                          FREE
-                        </span>
-                      ) : (
-                        <span
-                          style={{
-                            color: '#FB70BA',
-                            visibility: 'hidden',
-                          }}
-                        >
-                          FREE
-                        </span>
-                      )}
+                    <div className={styles.contentWrapper}>
+                      <label className={`${styles.name} `}>
+                        {item?.name?.length > 10 ? item?.name.slice(0, 10) + '...' : item?.name}
+                      </label>
+                      <div className={styles.content}>
+                        {item?.category && item?.category?.length > 0 && (
+                          <span title={item?.category[0]}>{item?.category[0]}</span>
+                        )}
+                        <img src={circle} alt='' />
+
+                        {item?.category && item?.category?.length > 0 && (
+                          <span title={item?.category[1]}>
+                            {item?.category[1]?.length > 7 &&
+                              item?.category[1]?.slice(0, 7) + '...'}
+                          </span>
+                        )}
+                      </div>
+                      <div className={styles.desc}>
+                        <span>{truncate(item?.title)}</span>
+                        {item?.isfree ? (
+                          <span
+                            style={{
+                              color: '#FB70BA',
+                            }}
+                          >
+                            FREE
+                          </span>
+                        ) : (
+                          <span
+                            style={{
+                              color: '#FB70BA',
+                              visibility: 'hidden',
+                            }}
+                          >
+                            FREE
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-
+                </Link>
                 <button
                   onMouseEnter={() => handleMouseEnter(item?.name)}
                   onMouseLeave={() => handleMouseLeave(item?.name)}
@@ -373,9 +379,9 @@ const Card: React.FC<CardProps> = ({
                         : 'var(--pink-gradient, linear-gradient(270deg, #ff9085 0%, #fb6fbb 100%))',
                   }}
                   className={styles.addButton}
-                  onClick={(event) =>
+                  onClick={(event) => {
                     handleAddButtonClick(event, item?.onAdd, item?.appid, appName)
-                  }
+                  }}
                 >
                   {loadingAppIds[item?.appid] ? (
                     <img className={styles.spinner} src={SpinnerLogo} alt='' />
@@ -385,7 +391,7 @@ const Card: React.FC<CardProps> = ({
                     'Add'
                   )}
                 </button>
-              </a>
+              </div>
             ))
           : 'Loading...'}
       </div>

@@ -35,7 +35,7 @@ const TextToContract: FC = () => {
         <div
           className='alert alert-warning alert-dismissible fade show position-absolute top-0  w-50 mt-4 start-50 translate-middle-x'
           role='alert'
-          style={{zIndex: 1030}}
+          style={{zIndex: 1030, width: '82%'}}
         >
           {showAlert}
           <button

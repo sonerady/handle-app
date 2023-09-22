@@ -679,6 +679,9 @@ main {
       display: grid;
 
       .addButton {
+        position: absolute !important;
+        right: 5px;
+        top: 9px;
         width: 62.39px;
         height: 23px;
         border: 2px solid #fb72b7;

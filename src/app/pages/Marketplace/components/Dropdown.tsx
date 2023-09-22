@@ -78,7 +78,7 @@ const Dropdown: React.FC<DropdownProps> = ({isOpen, onClose}) => {
               }}
               onClick={() => navigate('/my-activities')}
             >
-              My activities
+              My Activities
             </span>
           ) : (
             ''

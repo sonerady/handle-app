@@ -9,6 +9,7 @@ import * as Yup from 'yup'
 import {EditorState} from 'draft-js'
 import moment from 'moment'
 import AddAppInputsUpdate from './components/UpdateAppInputs'
+import UpdateCommentInputs from './components/UpdateCommentInputs'
 import 'react-tagsinput/react-tagsinput.css'
 import AddAppInputs from './components/AddAppInputsAdmin'
 import {FiEdit} from 'react-icons/fi'
@@ -63,7 +64,9 @@ const MyAcitivities: React.FC<CollectionProps> = () => {
   const handleClose = () => setShow(false)
   const [forAdminReviews, setForAdminReviews] = useState<any>([])
   const [showReasonModal, setShowReasonModal] = useState(false)
-
+  const [type, setType] = useState('' as any)
+  const [comment, setComment] = useState('' as any)
+  const [rate, setRate] = useState(0 as any)
   const [reasonData, setReasonData] = useState('')
   const [activeTab, setActiveTab] = useState(0)
   const [show, setShow] = useState(false)
@@ -76,6 +79,7 @@ const MyAcitivities: React.FC<CollectionProps> = () => {
     const data = editor.getData()
     setData(data)
   }
+  const [exampleData, setExampleData] = useState<any>([])
   const [detailModalVisible, setDetailModalVisible] = useState(false)
   const [selectedComment, setSelectedComment] = useState('')
   const [selectedRating, setSelectedRating] = useState('')
@@ -89,10 +93,15 @@ const MyAcitivities: React.FC<CollectionProps> = () => {
   const navigate = useNavigate()
   const discordID = userInfo?.data?.discord_id
   const [appId, setAppId] = useState<any>(null)
+  const [commentId, setCommentId] = useState<any>(null)
   const [counter, setCounter] = useState(5)
-
+  const numberFormatter = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
   const [descState, setDescState] = useState(EditorState.createEmpty())
   const [contentState, setContentState] = useState(EditorState.createEmpty())
+  const [loading, setLoading] = useState(false)
   const [fileNames, setFileNames] = useState({
     image1: '630x420',
     image2: '630x420',
@@ -158,9 +167,17 @@ const MyAcitivities: React.FC<CollectionProps> = () => {
   })
 
   useEffect(() => {
-    getUserAction(1, 1000).then((res) => {
-      setDatas(res.result)
-    })
+    setLoading(true)
+    getUserAction(1, 1000)
+      .then((res) => {
+        setDatas(res.result)
+      })
+      .catch((error) => {
+        console.error('Bir hata oluştu', error)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }, [])
 
   const handleAddApp = async (type: any, appid: any) => {
@@ -248,34 +265,6 @@ const MyAcitivities: React.FC<CollectionProps> = () => {
       })
     }
   }, [show])
-
-  useEffect(() => {
-    if (accessToken) {
-      if (activeTab === 0) {
-        getWaitingForAdmin().then((res) => {
-          setWaitingAppsAdmin(res)
-        })
-      } else if (activeTab === 1) {
-        getUserApprovedApp().then((res) => {
-          setUserApprovedApps(res)
-        })
-      } else if (activeTab === 2) {
-        getUserRejectedApp().then((res) => {
-          setUserRejectedApps(res)
-        })
-      }
-    }
-  }, [addedApp, accessToken])
-
-  useEffect(() => {
-    if (accessToken) {
-      if (task === 3) {
-        getWaitingReviewsForAdmin().then((res) => {
-          setForAdminReviews(res)
-        })
-      }
-    }
-  }, [activeTab, task, addedApp, accessToken])
 
   useEffect(() => {
     formik.setFieldValue('category', selectedCategories)
@@ -384,8 +373,24 @@ const MyAcitivities: React.FC<CollectionProps> = () => {
             borderRadius: '1rem',
           }}
         >
-          {datas.length > 0 ? (
+          {loading ? (
+            <span
+              style={{
+                height: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: '#fff',
+                fontSize: '20px',
+              }}
+            >
+              Loading...
+            </span>
+          ) : datas.length > 0 ? (
             <Griddle
+              pageProperties={{
+                pageSize: 50,
+              }}
               enableSettings={false}
               styleConfig={styleConfig}
               data={datas}
@@ -413,14 +418,19 @@ const MyAcitivities: React.FC<CollectionProps> = () => {
                 />
 
                 <ColumnDefinition
-                  id='date'
+                  id='created_at'
                   title='Date'
                   customComponent={(props: any) => (
-                    <span>{moment(props).format('DD-MM-YYYY')}</span>
+                    <span>{moment(props.value).format('DD-MM-YYYY')}</span>
                   )}
                 />
                 <ColumnDefinition id='app_name' title='App Name' />
                 <ColumnDefinition id='action' title='Action' />
+                <ColumnDefinition
+                  id='xp'
+                  title='Xp'
+                  customComponent={(props: any) => <span>{props.value}</span>}
+                />
                 <ColumnDefinition id='validated' title='Validated' />
                 <ColumnDefinition
                   id='status'
@@ -521,15 +531,21 @@ const MyAcitivities: React.FC<CollectionProps> = () => {
                   id='reject_reason'
                   title='Reject Reason'
                   customComponent={(props: any) => {
-                    const rowData = props.rowData
                     const isEdit = props.value._root?.entries.find(
                       (entry: any) => entry[0] === 'edit'
                     )?.[1]
-
-                    const appId = props.value._root?.entries.find(
+                    const type = props?.value?._root?.entries.find(
+                      (entry: any) => entry[0] === 'type'
+                    )?.[1]
+                    const appId = props?.value?._root?.entries.find(
                       (entry: any) => entry[0] === 'app_id'
                     )?.[1]
-                    console.log('appId', appId)
+                    const comment = props?.value?._root?.entries[4]?.[1]._root?.nodes[10]?.entry[1]
+                    const comment_id =
+                      props?.value?._root?.entries[4]?.[1]._root?.nodes[7]?.nodes?.[0]?.entry[1]
+                    const ratingCount =
+                      props?.value?._root?.entries[4]?.[1]._root?.nodes[7]?.nodes?.[1]?.entry[1]
+
                     return (
                       <div>
                         <span
@@ -539,13 +555,13 @@ const MyAcitivities: React.FC<CollectionProps> = () => {
                           className={styles.editButton}
                           onClick={() => {
                             if (
-                              props.value._root?.entries.find(
+                              props?.value?._root?.entries.find(
                                 (entry: any) => entry[0] === 'reject_reason'
                               )?.[1] === 'None'
                             )
                               return
                             setReasonData(
-                              props.value._root?.entries.find(
+                              props?.value?._root?.entries.find(
                                 (entry: any) => entry[0] === 'reject_reason'
                               )?.[1] ?? ''
                             )
@@ -553,7 +569,7 @@ const MyAcitivities: React.FC<CollectionProps> = () => {
                           }}
                         >
                           {truncateString(
-                            props.value._root?.entries.find(
+                            props?.value?._root?.entries.find(
                               (entry: any) => entry[0] === 'reject_reason'
                             )?.[1] ?? ''
                           )}
@@ -562,8 +578,11 @@ const MyAcitivities: React.FC<CollectionProps> = () => {
                           <FiEdit
                             onClick={() => {
                               setShow(true)
-                              // setSelectedApp(appId)
+                              setType(type)
+                              setComment(comment)
+                              console.log('comment_id', comment_id)
                               setAppId(appId)
+                              setCommentId(comment_id)
                             }}
                             style={{
                               cursor: 'pointer',
@@ -651,26 +670,35 @@ const MyAcitivities: React.FC<CollectionProps> = () => {
             <Modal.Body>
               <div className={`${styles.profileWrapper} ${styles.modalProfile}`}>
                 <div style={{border: 'none'}} className={`${styles.card} ${styles.top} card`}>
-                  <AddAppInputsUpdate
-                    // selectedApp={selectedApp}
-                    appId={appId}
-                    setSelectedCategories={setSelectedCategories}
-                    contentState={contentState}
-                    setContentState={setContentState}
-                    categories={categories}
-                    setCategories={setCategories}
-                    handleCategoryClick={handleCategoryClick}
-                    selectedCategories={selectedCategories}
-                    setBackgrounds={setBackgrounds}
-                    backgrounds={backgrounds}
-                    fileUpload={fileUpload}
-                    setFileNames={setFileNames}
-                    fileNames={fileNames}
-                    handleAddApp={handleAddApp}
-                    formik={formik}
-                    descState={descState}
-                    setDescState={setDescState}
-                  />
+                  {type === 'comment' || type === 'review' ? (
+                    <UpdateCommentInputs
+                      handleClose={handleClose}
+                      commentId={commentId}
+                      comment={comment}
+                      isRated={type === 'review'}
+                    />
+                  ) : (
+                    <AddAppInputsUpdate
+                      // selectedApp={selectedApp}
+                      appId={appId}
+                      setSelectedCategories={setSelectedCategories}
+                      contentState={contentState}
+                      setContentState={setContentState}
+                      categories={categories}
+                      setCategories={setCategories}
+                      handleCategoryClick={handleCategoryClick}
+                      selectedCategories={selectedCategories}
+                      setBackgrounds={setBackgrounds}
+                      backgrounds={backgrounds}
+                      fileUpload={fileUpload}
+                      setFileNames={setFileNames}
+                      fileNames={fileNames}
+                      handleAddApp={handleAddApp}
+                      formik={formik}
+                      descState={descState}
+                      setDescState={setDescState}
+                    />
+                  )}
                 </div>
               </div>
             </Modal.Body>

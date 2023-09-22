@@ -249,6 +249,9 @@ const TextToImage: FC = () => {
         <div>
           <div
             className='upload-image'
+            style={{
+              width: '100%',
+            }}
             onClick={() => {
               const inputField = document.querySelector('.input-field')
               if (inputField instanceof HTMLInputElement) {

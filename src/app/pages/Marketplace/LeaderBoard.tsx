@@ -153,7 +153,7 @@ const Collection: React.FC<CollectionProps> = () => {
                   </div>
                 </div>
               ) : (
-                'Capmaings Loading...'
+                'Capmagins Loading...'
               )}
             </div>
             {/* <button className={styles.daoContentButton}>Claim Rewards</button> */}

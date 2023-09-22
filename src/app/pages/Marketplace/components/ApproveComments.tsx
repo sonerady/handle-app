@@ -20,9 +20,15 @@ interface ApproveCommentsProps {
   item?: any
   approvalReviews: any
   setApprovalReviews: any
+  approvalReviewsLoading?: any
 }
 
-const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setApprovalReviews}) => {
+const ApproveComments: FC<ApproveCommentsProps> = ({
+  item,
+  approvalReviews,
+  setApprovalReviews,
+  approvalReviewsLoading,
+}) => {
   const [show, setShow] = useState(false)
   const [selectedApp, setSelectedApp] = useState(null)
 
@@ -257,88 +263,24 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
   return (
     <div>
       <div className={styles.tabContent}>
-        {/* <div>
-          <div className={`${styles.row}`}>
-            <ul>
-              <li title={moment(item.created_at).format('DD.MM.YYYY')}>
-                {moment(item.created_at).format('DD.MM.YYYY')}
-              </li>
-              <li title={item.name}>
-                {!item.is_comment
-                  ? Array(5)
-                      .fill(0)
-                      .map((_, i) =>
-                        i < item.rating ? (
-                          <span className={styles.activeRating}>
-                            <FaStar />
-                          </span>
-                        ) : (
-                          <FaRegStar />
-                        )
-                      )
-                  : ''}
-              </li>
-              <li className={styles.approveAppBtn}>
-                <OverlayTrigger
-                  delay={{hide: 450, show: 300}}
-                  overlay={(props) => <Tooltip {...props}>{item.comment}</Tooltip>}
-                  placement='bottom'
-                >
-                  <div>
-                    {item?.comment.length > 24
-                      ? item?.comment.substring(0, 24) + '...'
-                      : item?.comment}
-                  </div>
-                </OverlayTrigger>
-              </li>
-              <li>
-                <span>{item.is_comment ? 'Comment' : 'Review'}</span>
-              </li>
-              <li title={item.content}>
-                <span>{item.approves}</span>
-              </li>
-              <li className={styles.viewAppBtn}>
-                <button
-                  style={{
-                    borderColor: 'red',
-                    color: 'red',
-                  }}
-                  onClick={() => navigate(`/marketplace/detail/${item?.name}/${item?.appid}`)}
-                >
-                  View
-                </button>
-              </li>
-              <li className={styles.approveAppBtn}>
-                <button
-                  style={{
-                    borderColor: 'red',
-                    color: 'red',
-                  }}
-                  onClick={() => {
-                    handleShowRejectModal(item)
-                  }}
-                >
-                  Reject
-                </button>
-              </li>
-              <li className={styles.approveAppBtn}>
-                <button
-                  style={{
-                    borderColor: '#1aaa55',
-                    color: '#1aaa55',
-                  }}
-                  onClick={() => {
-                    handleApprove(item.id)
-                  }}
-                >
-                  {approvingLoading ? 'Approving...' : 'Approve'}
-                </button>
-              </li>
-            </ul>
-          </div>
-        </div> */}
-        {approvalReviews.length > 0 ? (
+        {approvalReviewsLoading ? (
+          <span
+            style={{
+              height: '100vh',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              color: '#fff',
+              fontSize: '20px',
+            }}
+          >
+            Loading...
+          </span>
+        ) : approvalReviews.length > 0 ? (
           <Griddle
+            pageProperties={{
+              pageSize: 50,
+            }}
             enableSettings={false}
             styleConfig={styleConfig}
             data={approvalReviews}
@@ -348,7 +290,9 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
               <ColumnDefinition
                 id='createdAt'
                 title='Date'
-                customComponent={(props: any) => <span>{moment(props).format('DD-MM-YYYY')}</span>}
+                customComponent={(props: any) => (
+                  <span>{moment(props.value).format('DD-MM-YYYY')}</span>
+                )}
               />
               <ColumnDefinition
                 id='rating'
@@ -375,7 +319,7 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
                 customComponent={(props: any) => (
                   <OverlayTrigger
                     delay={{hide: 450, show: 300}}
-                    overlay={(props) => <Tooltip {...props}>{props.value}</Tooltip>}
+                    overlay={<Tooltip>{props.value}</Tooltip>}
                     placement='bottom'
                   >
                     <div>
@@ -387,7 +331,7 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
                 )}
               />
               <ColumnDefinition
-                id='type'
+                id='is_comment'
                 title='Type'
                 customComponent={(props: any) => <span>{props.value ? 'Comment' : 'Review'}</span>}
               />
@@ -408,7 +352,7 @@ const ApproveComments: FC<ApproveCommentsProps> = ({item, approvalReviews, setAp
                       }}
                       onClick={() => navigate(`/marketplace/detail/${props?.name}/${props?.value}`)}
                     >
-                      View
+                      App Detail
                     </button>
                   </li>
                 )}

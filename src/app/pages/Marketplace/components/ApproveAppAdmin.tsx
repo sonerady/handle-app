@@ -15,6 +15,7 @@ interface ApproveAppProps {
   setWaitingApps?: any
   getWaitingForAdmin?: any
   setWaitingAppsAdmin?: any
+  waitingLoading?: any
 }
 
 const ApproveApp: FC<ApproveAppProps> = ({
@@ -25,6 +26,7 @@ const ApproveApp: FC<ApproveAppProps> = ({
   setWaitingApps,
   getWaitingForAdmin,
   setWaitingAppsAdmin,
+  waitingLoading,
 }) => {
   const [show, setShow] = useState(false)
   const [selectedApp, setSelectedApp] = useState<any>(null)
@@ -105,116 +107,105 @@ const ApproveApp: FC<ApproveAppProps> = ({
     <div>
       {task > 0 && (
         <div className={styles.tabContent}>
-          {/* <div>
-            {waitingApps?.length > 0 ? (
-              waitingApps.map((app: any, index: any) => (
-                <div key={index} className={`${styles.row}`}>
-                  <ul>
-                    <li className={styles.icons}>
-                      <span className={styles.icon}>
-                        <img src={app.icon ? app.icon : RobotIcon} alt='' />
-                      </span>
-                    </li>
-                    <li title={moment(app.created_at).format('DD.MM.YYYY')}>
-                      {moment(app.created_at).format('DD.MM.YYYY')}
-                    </li>
-                    <li title={app.name}>{truncate(app.name, 20)}</li>
-                    <li title={app.title}>
-                      <div dangerouslySetInnerHTML={{__html: truncate(app.title, 20)}} />
-                    </li>
-                    <li title={app.content}>
-                      <span>{app.approves}</span>
-                    </li>
-                    <li className={styles.approveAppBtn}>
-                      <button onClick={() => handleShow(app)}>View App</button>
-                    </li>
-                  </ul>
-                </div>
-              ))
-            ) : (
-              <div className={styles.noData}>No Data</div>
-            )}
-          </div> */}
-          {waitingApps.length > 0 ? (
-            <Griddle
-              enableSettings={false}
-              styleConfig={styleConfig}
-              data={waitingApps}
-              plugins={[plugins.LocalPlugin]}
-            >
-              <RowDefinition>
-                <ColumnDefinition
-                  id='icon'
-                  title='App Icon'
-                  customComponent={(props: any) => {
-                    return (
-                      <div>
-                        <img
-                          style={{width: '35px', height: '35px', borderRadius: '50%'}}
-                          src={props.value ?? RobotIcon}
-                          alt=''
-                          onError={(e: any) => {
-                            e.target.onerror = null
-                            e.target.src = RobotIcon
-                          }}
-                        />
-                      </div>
-                    )
-                  }}
-                />
+          {activeTab === 0 ? (
+            waitingLoading ? (
+              <span
+                style={{
+                  height: '100vh',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  color: '#fff',
+                  fontSize: '20px',
+                }}
+              >
+                Loading...
+              </span>
+            ) : waitingApps.length > 0 ? (
+              <Griddle
+                pageProperties={{
+                  pageSize: 50,
+                }}
+                enableSettings={false}
+                styleConfig={styleConfig}
+                data={waitingApps}
+                plugins={[plugins.LocalPlugin]}
+              >
+                <RowDefinition>
+                  <ColumnDefinition
+                    id='icon'
+                    title='App Icon'
+                    customComponent={(props: any) => {
+                      return (
+                        <div>
+                          <img
+                            style={{width: '35px', height: '35px', borderRadius: '50%'}}
+                            src={props.value ?? RobotIcon}
+                            alt=''
+                            onError={(e: any) => {
+                              e.target.onerror = null
+                              e.target.src = RobotIcon
+                            }}
+                          />
+                        </div>
+                      )
+                    }}
+                  />
 
-                <ColumnDefinition
-                  id='date'
-                  title='Date'
-                  customComponent={(props: any) => (
-                    <span>{moment(props).format('DD-MM-YYYY')}</span>
-                  )}
-                />
-                <ColumnDefinition
-                  id='name'
-                  title='App Name'
-                  customComponent={(props: any) => <span>{truncate(props.value, 15)}</span>}
-                />
-                <ColumnDefinition
-                  id='title'
-                  title='Title'
-                  customComponent={(props: any) => <span>{truncate(props.value, 15)}</span>}
-                />
-                <ColumnDefinition id='approves' title='Approves' />
-                <ColumnDefinition
-                  id='appid'
-                  title='View App'
-                  customComponent={(props: any) => (
-                    <li className={styles.approveAppBtn}>
-                      <button
-                        onClick={() => {
-                          handleShow(props.value)
-                          setAppId(props.value)
-                        }}
-                      >
-                        View App
-                      </button>
-                    </li>
-                  )}
-                />
-              </RowDefinition>
-            </Griddle>
-          ) : (
-            <span
-              style={{
-                height: '100vh',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                color: '#fff',
-                fontSize: '20px',
-              }}
-            >
-              No Data
-            </span>
-          )}
+                  <ColumnDefinition
+                    id='created_at'
+                    title='Date'
+                    customComponent={(props: any) => (
+                      <span>{moment(props.value).format('DD-MM-YYYY')}</span>
+                    )}
+                  />
+                  <ColumnDefinition
+                    id='name'
+                    title='App Name'
+                    customComponent={(props: any) => <span>{truncate(props.value, 15)}</span>}
+                  />
+                  <ColumnDefinition
+                    id='title'
+                    title='Title'
+                    customComponent={(props: any) => <span>{truncate(props.value, 15)}</span>}
+                  />
+                  <ColumnDefinition id='approves' title='Approves' />
+                  <ColumnDefinition
+                    id='appid'
+                    title='View App'
+                    customComponent={(props: any) => (
+                      <li className={styles.approveAppBtn}>
+                        <button
+                          onClick={() => {
+                            handleShow(props.value)
+                            setAppId(props.value)
+                          }}
+                        >
+                          View App
+                        </button>
+                      </li>
+                    )}
+                  />
+                </RowDefinition>
+              </Griddle>
+            ) : (
+              <span
+                style={{
+                  height: '100vh',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  color: '#fff',
+                  fontSize: '20px',
+                }}
+              >
+                No Data
+              </span>
+            )
+          ) : null}
         </div>
       )}
+
       <Modal
         style={{
           padding: '2rem',

@@ -44,8 +44,10 @@ const Content = ({children}: WithChildren) => {
     setOpenHistory(false)
   }
 
+  const isTelegram = location.pathname === '/telegram-bot'
+
   useEffect(() => {
-    if (!accessToken) return
+    if (!accessToken || location.pathname === '/marketplace' || location.pathname === '/') return
     getHistory(accessToken)
       .then((res) => {
         let filteredHistory
@@ -70,6 +72,9 @@ const Content = ({children}: WithChildren) => {
   }, [accessToken, account, location, code, messages, imageData])
 
   const pathname = location.pathname
+
+  const searchParams = new URLSearchParams(location.search)
+  const platform = searchParams.get('platform')
 
   return (
     <div
@@ -178,14 +183,18 @@ const Content = ({children}: WithChildren) => {
       ) : (
         <div
           style={{
-            marginTop: '5rem',
+            marginTop: isTelegram ? '0rem' : '5rem',
             height: ' 100%',
           }}
         >
           {children}
         </div>
       )}
-      {window.location.pathname !== '/marketplace' && (
+      {!(
+        window.location.pathname === '/marketplace' ||
+        window.location.pathname === '/telegram-bot' ||
+        platform
+      ) && (
         <div
           style={{
             position: 'fixed',

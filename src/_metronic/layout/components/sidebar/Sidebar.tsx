@@ -16,6 +16,24 @@ const Sidebar = () => {
     updateDOM(config)
   }, [config])
 
+  const renderSidebar = () => {
+    return (
+      <div
+        ref={sidebarRef}
+        id='kt_app_sidebar'
+        className={clsx('app-sidebar', config.app?.sidebar?.default?.class)}
+      >
+        <SidebarLogo sidebarRef={sidebarRef} />
+        <SidebarMenu />
+        {/* <SidebarFooter /> */}
+      </div>
+    )
+  }
+
+  useEffect(() => {
+    renderSidebar()
+  }, [location, location.search])
+
   if (!config.app?.sidebar?.display) {
     return null
   }
@@ -25,19 +43,9 @@ const Sidebar = () => {
       {(config.layoutType === 'dark-sidebar' || config.layoutType === 'light-sidebar') &&
         !location.pathname.includes('hyperchat') &&
         !location.pathname.includes('marketplace') &&
-        !location.pathname.includes('hypercodes') && (
-          <div>
-            <div
-              ref={sidebarRef}
-              id='kt_app_sidebar'
-              className={clsx('app-sidebar', config.app?.sidebar?.default?.class)}
-            >
-              <SidebarLogo sidebarRef={sidebarRef} />
-              <SidebarMenu />
-              {/* <SidebarFooter /> */}
-            </div>
-          </div>
-        )}
+        !location.pathname.includes('hypercodes') &&
+        !location.pathname.includes('telegram-bot') &&
+        renderSidebar()}
     </div>
   )
 }

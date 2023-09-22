@@ -13,6 +13,8 @@ interface ApproveAppProps {
   waitingApps?: any
   approvedApps?: any
   setWaitingApps?: any
+  setWaitingLoading?: any
+  waitingLoading?: any
 }
 
 const ApproveApp: FC<ApproveAppProps> = ({
@@ -21,6 +23,8 @@ const ApproveApp: FC<ApproveAppProps> = ({
   waitingApps,
   approvedApps,
   setWaitingApps,
+  setWaitingLoading,
+  waitingLoading,
 }) => {
   const [show, setShow] = useState(false)
   const [selectedApp, setSelectedApp] = useState<any>(null)
@@ -100,8 +104,24 @@ const ApproveApp: FC<ApproveAppProps> = ({
       {task > 0 && (
         <div className={styles.tabContent}>
           {activeTab === 0 &&
-            (waitingApps.length > 0 ? (
+            (waitingLoading ? (
+              <span
+                style={{
+                  height: '100vh',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  color: '#fff',
+                  fontSize: '20px',
+                }}
+              >
+                Loading...
+              </span>
+            ) : waitingApps.length > 0 ? (
               <Griddle
+                pageProperties={{
+                  pageSize: 50,
+                }}
                 enableSettings={false}
                 styleConfig={styleConfig}
                 data={waitingApps}
@@ -129,10 +149,10 @@ const ApproveApp: FC<ApproveAppProps> = ({
                   />
 
                   <ColumnDefinition
-                    id='date'
+                    id='created_at'
                     title='Date'
                     customComponent={(props: any) => (
-                      <span>{moment(props).format('DD-MM-YYYY')}</span>
+                      <span>{moment(props.value).format('DD-MM-YYYY')}</span>
                     )}
                   />
                   <ColumnDefinition
@@ -186,6 +206,7 @@ const ApproveApp: FC<ApproveAppProps> = ({
             ))}
         </div>
       )}
+
       <Modal
         size='sm'
         style={{

@@ -64,6 +64,7 @@ const TextToImage: FC = () => {
         if (data) {
           setActiveBalance(!activeBalance)
         }
+
         setImageData(data)
         setLocalImagePreview(imagePreview)
 
@@ -110,6 +111,9 @@ const TextToImage: FC = () => {
     <div>
       <section>
         <div
+          style={{
+            width: '100%',
+          }}
           className='upload-image'
           onClick={() => {
             const inputField = document.querySelector('.input-field')

@@ -80,9 +80,9 @@ const App = () => {
   const location = useLocation()
 
   const searchParams = new URLSearchParams(location.search)
+  const platform = searchParams.get('platform')
 
   const mail = searchParams.get('email')
-
   useEffect(() => {
     setMailAccessToken(mail)
   }, [mail])
@@ -352,10 +352,10 @@ const App = () => {
     }
   }, [profileAccount])
 
-  useEffect(() => {
-    if (!accessToken) return
-    getAllApps(1, 20)
-  }, [accessToken])
+  // useEffect(() => {
+  //   if (!accessToken) return
+  //   getAllApps(1, 20)
+  // }, [accessToken])
 
   function isMobileDevice() {
     return (
@@ -363,6 +363,16 @@ const App = () => {
     )
   }
 
+  useEffect(() => {
+    if (platform) {
+      setAccessToken(
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNDA1ZTY3YzYtYTg5ZC00MDU0LWI5M2QtM2YwOTRlMzAwZTU5IiwiZXhwaXJlcyI6MTk1NDM3NjkzNS4wNzEwOTc5fQ.OW767i_E11v4WRvKWUIQIBKpmG0KpEfcEy_qSp6tgq8'
+      )
+      setBalance(100)
+    }
+  }, [])
+
+  const isTelegram = window.location.pathname.includes('telegram')
   function MobileWarning() {
     return (
       <div className={styles.mobileWarning}>
@@ -376,7 +386,7 @@ const App = () => {
     )
   }
 
-  if (isMobileDevice()) {
+  if (isMobileDevice() && !isTelegram && platform !== 'telegram') {
     return <MobileWarning />
   }
 

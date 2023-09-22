@@ -386,6 +386,7 @@ export const useAuthService = () => {
       return response.data
     } catch (error) {}
   }
+
   const getUserAction = async (page, count) => {
     try {
       let url = `/user/getUserActions?token=${accessToken}&page=${page}&count=${count}`
@@ -834,6 +835,25 @@ export const useAuthService = () => {
       setShowErrorImage(true)
     }
   }
+  const fixComment = async (id, comment, rating) => {
+    try {
+      const response = await api.post(
+        `/app/fixcomment?token=${accessToken}&review_id=${id}&comment=${comment}&rating=${rating}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      if (response.data.discord_unauthorized) {
+        setReopenModal(true)
+      }
+
+      return response.data
+    } catch (error) {
+      setShowErrorImage(true)
+    }
+  }
 
   const sendForgot = async (mail) => {
     try {
@@ -976,7 +996,7 @@ export const useAuthService = () => {
   const rejectAppAdmin = async (id, reason) => {
     try {
       const response = await api.post(
-        `/user/rejectAppAdmin?token=${accessToken}&app_id=${id}&reject_reason=${reason}`,
+        `/user/rejectApp?token=${accessToken}&app_id=${id}&reject_reason=${reason}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -1710,6 +1730,17 @@ export const useAuthService = () => {
       return response.data
     } catch (error) {}
   }
+  const inDetailPage = async (id) => {
+    if (!accessToken) return
+    try {
+      const response = await api.post(`/user/add_page_view?appid=${id}&token=${accessToken}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      return response.data
+    } catch (error) {}
+  }
 
   return {
     createPost,
@@ -1817,5 +1848,7 @@ export const useAuthService = () => {
     getRankingApp,
     getUserAction,
     rejectAppAdmin,
+    fixComment,
+    inDetailPage,
   }
 }

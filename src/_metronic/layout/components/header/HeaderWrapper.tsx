@@ -9,6 +9,9 @@ import Logo from '../../../assets/Logo.svg'
 import {useGlobal} from '../../../../app/context/AuthContext'
 import MetaMaskConnect from '../Metamask/metamaskHeader'
 import {ThemeModeSwitcher} from '../../../partials'
+import {IoChevronBackCircleOutline} from 'react-icons/io5'
+import {AiOutlineMenuFold} from 'react-icons/ai'
+import {useState} from 'react'
 
 export function HeaderWrapper() {
   const {config, classes} = useLayout()
@@ -18,6 +21,16 @@ export function HeaderWrapper() {
 
   const isHyperChat = !window.location.pathname.includes('hyperchat')
   const isHyperCodes = !window.location.pathname.includes('hypercodes')
+
+  let isDriver = false
+
+  const toggleDrawer = () => {
+    const sidebarDiv = document.getElementById('kt_app_sidebar')
+    if (sidebarDiv) {
+      sidebarDiv.classList.toggle('drawer-on')
+      isDriver = !isDriver
+    }
+  }
 
   const style: any = {}
 
@@ -37,6 +50,9 @@ export function HeaderWrapper() {
       {!isHyperChat || !isHyperCodes ? (
         <div style={style} id='kt_app_header' className='app-header'>
           <div
+            style={{
+              width: '100%',
+            }}
             id='kt_app_header_container'
             className={clsx(
               'app-container flex-lg-grow-1 gap-3',
@@ -47,7 +63,8 @@ export function HeaderWrapper() {
             <a
               className='d-flex align-items-center justify-content-center'
               href='https://hypergpt.ai/'
-              target='_blank' rel="noreferrer"
+              target='_blank'
+              rel='noreferrer'
             >
               {config.layoutType === 'dark-sidebar' ? (
                 <img alt='Logo' src={Logo} className='h-25px app-sidebar-logo-default' />
@@ -72,10 +89,19 @@ export function HeaderWrapper() {
                 className='h-20px app-sidebar-logo-minimize'
               />
             </a>
-            <MetaMaskConnect />
+            <a
+              href={'https://hypermarket.azurewebsites.net/telegram-bot'}
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <IoChevronBackCircleOutline color='white' size='2rem' />
+            </a>
+            {/* <MetaMaskConnect /> */}
             {/* <button>Login Metamask</button> */}
             {/* {login && <span>{'account'}</span>} */}
-
             {!(config.layoutType === 'dark-sidebar' || config.layoutType === 'light-sidebar') && (
               <div className='d-flex align-items-center flex-grow-1 flex-lg-grow-0 me-lg-15'>
                 <Link to='/hyperchat'>
@@ -132,9 +158,9 @@ export function HeaderWrapper() {
         <div
           style={{
             padding: '0.4rem',
-            width: 'fit-content',
+            width: '100%',
             display: 'flex',
-            justifyContent: 'end',
+            justifyContent: 'space-between',
             position: 'absolute',
             right: '0',
           }}
@@ -151,13 +177,57 @@ export function HeaderWrapper() {
                 <div
                   className='btn btn-icon btn-active-color-primary w-35px h-35px'
                   id='kt_app_sidebar_mobile_toggle'
+                  onClick={toggleDrawer}
                 >
-                  <KTIcon iconName='abstract-14' className=' fs-1' />
+                  <AiOutlineMenuFold color='white' size='2rem' />
                 </div>
               </div>
             </>
           )}
-          <MetaMaskConnect />
+          <a
+            style={{
+              position: 'relative',
+              bottom: '-5px',
+            }}
+            className='d-flex align-items-center justify-content-center'
+            href='https://hypergpt.ai/'
+            target='_blank'
+            rel='noreferrer'
+          >
+            {config.layoutType === 'dark-sidebar' ? (
+              <img alt='Logo' src={Logo} className='h-25px app-sidebar-logo-default' />
+            ) : (
+              <>
+                <img
+                  alt='Logo'
+                  src={Logo}
+                  className='h-25px app-sidebar-logo-default theme-light-show'
+                />
+                <img
+                  alt='Logo'
+                  src={Logo}
+                  className='h-25px app-sidebar-logo-default theme-dark-show'
+                />
+              </>
+            )}
+
+            <img
+              alt='Logo'
+              src={toAbsoluteUrl('/media/logos/default-small.svg')}
+              className='h-20px app-sidebar-logo-minimize'
+            />
+          </a>
+          {/* <MetaMaskConnect /> */}
+          <a
+            href={'https://hypermarket.azurewebsites.net/telegram-bot'}
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <IoChevronBackCircleOutline color='white' size='2rem' />
+          </a>
         </div>
       )}
     </>

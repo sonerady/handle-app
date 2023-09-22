@@ -96,7 +96,7 @@ const Home = () => {
   useEffect(() => {
     const loadData = async () => {
       await Promise.all([
-        getAllApps(1, 20),
+        // getAllApps(1, 20),
         getSliderCenter().then((res: any) => setSliderCenterDatas(res?.data)),
       ])
       // if (accessToken) {

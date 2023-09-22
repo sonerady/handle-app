@@ -87,6 +87,9 @@ const Collection: React.FC<CollectionProps> = () => {
     const data = editor.getData()
     setData(data)
   }
+  const [waitingLoading, setWaitingLoading] = useState(false)
+  const [rejectedLoading, setRejectedLoading] = useState(false)
+  const [approvedLoading, setApprovedLoading] = useState(false)
   const [isverified, setIsverified] = useState(false)
   const [isfeautured, setIsfeautured] = useState(false)
   const [isnew, setIsnew] = useState(false)
@@ -301,9 +304,17 @@ const Collection: React.FC<CollectionProps> = () => {
   useEffect(() => {
     if (accessToken) {
       if (activeTab === 0) {
-        getWaitingForAdmin().then((res) => {
-          setWaitingAppsAdmin(res)
-        })
+        setWaitingLoading(true)
+        getWaitingForAdmin()
+          .then((res) => {
+            setWaitingAppsAdmin(res)
+          })
+          .catch((error) => {
+            console.error('Error', error)
+          })
+          .finally(() => {
+            setWaitingLoading(false)
+          })
       } else if (activeTab === 1) {
         getUserApprovedApp().then((res) => {
           setUserApprovedApps(res)
@@ -452,6 +463,7 @@ const Collection: React.FC<CollectionProps> = () => {
         {task === 1 && (
           <div style={{border: 'none'}} className={`${styles.card} ${styles.left} card`}>
             <ApproveApp
+              waitingLoading={waitingLoading}
               getWaitingForAdmin={getWaitingForAdmin}
               setWaitingAppsAdmin={setWaitingAppsAdmin}
               waitingApps={waitingAppsAdmin}
@@ -463,6 +475,7 @@ const Collection: React.FC<CollectionProps> = () => {
         {task === 2 && (
           <div style={{border: 'none'}} className={`${styles.card} ${styles.left} card`}>
             <ApproveApp
+              waitingLoading={waitingLoading}
               getWaitingForAdmin={getWaitingForAdmin}
               setWaitingApps={setWaitingAppsAdmin}
               waitingApps={waitingAppsAdmin}

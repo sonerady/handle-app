@@ -30,11 +30,12 @@ const MasterLayout = () => {
   const isHyperChat = window.location.pathname.includes('hyperchat')
   const isHyperCodes = window.location.pathname.includes('hypercodes')
   const isMarketplace = window.location.pathname.includes('marketplace')
+  const isTelegram = window.location.pathname.includes('telegram-bot')
 
   const style: any = {}
   const styleOther: any = {}
 
-  if (isHyperChat || isHyperCodes || isMarketplace) {
+  if (isHyperChat || isHyperCodes || isMarketplace || isTelegram) {
     style.marginLeft = 0
   }
   if (isMarketplace) {
@@ -65,14 +66,17 @@ const MasterLayout = () => {
 
   const itemClass = 'ms-1 ms-lg-3'
 
+  const searchParams = new URLSearchParams(location.search)
+  const platform = searchParams.get('platform')
+
   return (
     <PageDataProvider>
       <ThemeModeProvider>
         <div className='d-flex flex-column flex-root app-root' id='kt_app_root'>
           <div className='app-page flex-column flex-column-fluid' id='kt_app_page'>
             {/* <Navbar/> */}
-            {/* {!isMarketplace && <HeaderWrapper />} */}
-            <Navbar />
+            {platform && <HeaderWrapper />}
+            {!(window.location.pathname == '/telegram-bot' || platform) && <Navbar />}
             <div
               style={style}
               className='app-wrapper flex-column flex-row-fluid'

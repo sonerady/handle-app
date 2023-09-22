@@ -7,6 +7,7 @@ import Collection from '../../../_metronic/layout/components/collection/Collecti
 import CollectionMenu from '../../pages/Marketplace/components/CollectionMenu'
 import Dropdown from 'react-bootstrap/Dropdown'
 import {useAuthService} from '../../services/authService'
+import {useLocation} from 'react-router-dom'
 
 const TextToImage: FC = () => {
   const {
@@ -26,6 +27,9 @@ const TextToImage: FC = () => {
   const [modalImageSrc, setModalImageSrc] = useState('')
   const [activeCard, setActiveCard] = useState(-1)
   const [collectionName, setCollectionName] = useState('')
+  const location = useLocation()
+  const searchParams = new URLSearchParams(location.search)
+  const platform = searchParams.get('platform')
 
   const handleImageClick = (src: string) => {
     setShowModal(true)
@@ -85,7 +89,7 @@ const TextToImage: FC = () => {
       )}
 
       <div className='row justify-content-center'>
-        <div style={{marginLeft: '5rem'}}>
+        <div style={{marginLeft: platform ? 0 : '5rem'}}>
           <div className='row d-flex justify-content-center'>
             {/* <CollectionMenu setCollectionName={setCollectionName} /> */}
             {imageData?.datam?.length
