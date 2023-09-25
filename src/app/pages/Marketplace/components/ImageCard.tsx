@@ -1,6 +1,7 @@
 // Card.tsx
 import React from 'react'
 import styles from '../Home.module.scss'
+import {useAuthService} from '../../../services/authService'
 
 interface CardProps {
   backgroundImage: string
@@ -16,6 +17,7 @@ interface CardProps {
   link?: string
   order?: any
   linkCentered?: string
+  id?: string
 }
 
 const Card: React.FC<CardProps> = ({
@@ -32,6 +34,7 @@ const Card: React.FC<CardProps> = ({
   link,
   order,
   linkCentered,
+  id,
 }) => {
   const cardStyle = {
     backgroundImage: `url(${backgroundImage})`,
@@ -43,10 +46,12 @@ const Card: React.FC<CardProps> = ({
     height,
   }
 
+  const {topSliderLog, centerSliderLog} = useAuthService()
   return (
     <div
       onClick={() => {
         window.open(linkCentered ?? link, '_blank')
+        // isCenter ? centerSliderLog(id) : topSliderLog(id)
       }}
       className={`${styles.imageCard} ${isCenter && styles.darkBg}`}
       style={cardStyle}

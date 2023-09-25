@@ -996,7 +996,7 @@ export const useAuthService = () => {
   const rejectAppAdmin = async (id, reason) => {
     try {
       const response = await api.post(
-        `/user/rejectApp?token=${accessToken}&app_id=${id}&reject_reason=${reason}`,
+        `/user/rejectAppAdmin?token=${accessToken}&app_id=${id}&reject_reason=${reason}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -1741,6 +1741,35 @@ export const useAuthService = () => {
       return response.data
     } catch (error) {}
   }
+  const topSliderLog = async (id) => {
+    if (!accessToken) return
+    try {
+      const response = await api.post(
+        `/user/add_top_slider_view?slider_id=${id}&token=${accessToken}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      return response.data
+    } catch (error) {}
+  }
+
+  const centerSliderLog = async (id) => {
+    if (!accessToken) return
+    try {
+      const response = await api.post(
+        `/user/add_center_slider_view?slider_id=${id}&token=${accessToken}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      )
+      return response.data
+    } catch (error) {}
+  }
 
   return {
     createPost,
@@ -1850,5 +1879,7 @@ export const useAuthService = () => {
     rejectAppAdmin,
     fixComment,
     inDetailPage,
+    topSliderLog,
+    centerSliderLog,
   }
 }

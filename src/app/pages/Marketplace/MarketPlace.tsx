@@ -31,6 +31,7 @@ const Home = () => {
       position: 'center',
       bgSize: 'cover',
       link: sortedData[nextIndex]?.link,
+      id: data?.id,
     }
   })
 
@@ -44,6 +45,7 @@ const Home = () => {
     bgSize: 'cover',
     isCenter: true,
     link: data.link,
+    id: data?.id,
   }))
 
   const firstMarketCard = [
@@ -147,6 +149,7 @@ const Home = () => {
               {firstCard.map((item: any, index: any) => {
                 return (
                   <Card
+                    id={item.id}
                     order={item.order}
                     link={item.link}
                     color={item.color}
@@ -179,6 +182,7 @@ const Home = () => {
               {processedSecondCard.map((item: any, index: any) => {
                 return (
                   <Card
+                    id={item.id}
                     linkCentered={item.link}
                     isBottom={true}
                     isCenter={item.isCenter}

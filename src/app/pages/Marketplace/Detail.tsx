@@ -46,6 +46,7 @@ const Details: React.FC<DetailsProps> = () => {
     removeJoin,
     getView,
     inDetailPage,
+    addVisit,
   } = useAuthService()
   const [showModal, setShowModal] = useState(false)
   const {
@@ -189,7 +190,7 @@ const Details: React.FC<DetailsProps> = () => {
   useEffect(() => {
     if (id) {
       getAppsById(id)
-      inDetailPage(id)
+      // inDetailPage(id)
     }
     setComments({result: []})
     setCommentsOther({result: []})
@@ -530,7 +531,15 @@ const Details: React.FC<DetailsProps> = () => {
                     </div>
                   </div>
                   {!appsById?.is_upcoming && (
-                    <a target='_blank' href={appsById?.link}>
+                    <a
+                      // onClick={() => {
+                      //   if (accessToken) {
+                      //     addVisit(id)
+                      //   }
+                      // }}
+                      target='_blank'
+                      href={appsById?.link}
+                    >
                       <img
                         // onClick={() => {
                         //   window.open(appsById?.link, '_blank')
